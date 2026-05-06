@@ -3,8 +3,13 @@
 PMO_NA_STRINGS <- c('N/A','NA','Not Applicable','')
 PMO_ID_OFFSET <- 1
 PMO_ARRAY_FIELD_NAMES <- c("additional_argument", "alt_annotations", "alternate_identifiers", "associated_protein_variants", "associated_seq_variants", "associations", "bioinformatics_methods_info", "bioinformatics_run_info", "chromosomes", "detected_microhaplotypes", "drug_usage", "library_sample_info", "library_samples", "markers_of_interest", "masking", "methods", "mhaps", "microhaplotypes", "panel_info", "panel_targets", "parasite_density_info", "project_contributors", "project_info", "qpcr_parasite_density_info", "reactions", "read_counts_by_library_sample_by_stage", "read_counts_by_stage", "read_counts_for_targets", "sequencing_info", "specimen_comments", "specimen_info", "specimen_taxon_id", "stages", "target_attributes", "target_info", "target_results", "targeted_genomes", "targets", "taxon_id", "travel_out_six_month", "treatment_status")
+PMO_ID_EXTRA_FIELDS <- c("panel_targets")
 
 `%||%` <- function(a, b) if (is.null(a)) b else a
+
+pmo_should_apply_id_offset <- function(field_name) {
+  (grepl('_id$', field_name) && !grepl('taxon', field_name, ignore.case = TRUE)) || field_name %in% PMO_ID_EXTRA_FIELDS
+}
 
 #' Open a text connection, optionally compressed
 #'
@@ -27,7 +32,7 @@ open_text_connection <- function(path, mode = c('rt', 'wt')) {
 
 #' @keywords internal
 pmo_apply_id_offset_read <- function(x, field_name, offset = PMO_ID_OFFSET) {
-  if (offset == 0 || is.null(x) || !grepl('_id$', field_name)) return(x)
+  if (offset == 0 || is.null(x) || !pmo_should_apply_id_offset(field_name)) return(x)
   if (length(x) == 0) return(x)
   if (is.list(x)) return(x)
   ifelse(is.na(x), x, x + offset)
@@ -35,7 +40,7 @@ pmo_apply_id_offset_read <- function(x, field_name, offset = PMO_ID_OFFSET) {
 
 #' @keywords internal
 pmo_apply_id_offset_write <- function(x, field_name, offset = PMO_ID_OFFSET) {
-  if (offset == 0 || is.null(x) || !grepl('_id$', field_name)) return(x)
+  if (offset == 0 || is.null(x) || !pmo_should_apply_id_offset(field_name)) return(x)
   if (length(x) == 0) return(x)
   if (is.list(x)) return(x)
   ifelse(is.na(x), x, x - offset)
@@ -51,7 +56,7 @@ pmo_raw_postprocess <- function(x) {
       v <- out[[nm]]
       if (is.list(v) && is.null(names(v))) {
         if (length(v) == 0) {
-          if (grepl('_id$', nm) && !grepl('taxon', nm, ignore.case = TRUE)) out[[nm]] <- numeric() else out[[nm]] <- list()
+          if (pmo_should_apply_id_offset(nm)) out[[nm]] <- numeric() else out[[nm]] <- list()
         } else if (all(vapply(v, function(.x) is.null(.x) || is.character(.x) || (length(.x) == 1 && is.na(.x)), logical(1)))) {
           out[[nm]] <- as.character(unlist(v, use.names = FALSE))
         } else if (all(vapply(v, function(.x) is.null(.x) || is.logical(.x) || (length(.x) == 1 && is.na(.x)), logical(1)))) {
@@ -64,7 +69,7 @@ pmo_raw_postprocess <- function(x) {
       } else {
         out[[nm]] <- pmo_raw_postprocess(v)
       }
-      if (grepl('_id$', nm) && !grepl('taxon', nm, ignore.case = TRUE)) {
+      if (pmo_should_apply_id_offset(nm)) {
         out[[nm]] <- pmo_apply_id_offset_read(out[[nm]], nm)
       }
     }
@@ -88,7 +93,7 @@ pmo_raw_prepare_for_json <- function(x, field_name = NULL) {
     out <- x
     for (nm in names(out)) {
       v <- out[[nm]]
-      if (grepl('_id$', nm) && !grepl('taxon', nm, ignore.case = TRUE)) {
+      if (pmo_should_apply_id_offset(nm)) {
         v <- pmo_apply_id_offset_write(v, nm)
       }
       out[[nm]] <- pmo_raw_prepare_for_json(v, nm)
@@ -1021,104 +1026,6 @@ GenomicLocation$from_json <- function(x, validate = TRUE) {
   inst
 }
 
-#' PlateInfo
-#'
-#' Information about a plate location, e.g. a standard 96 well plate with row having a letter and column having a number.
-#'
-#' Auto-generated R6 class from JSON Schema.
-#'
-#' @field plate_col The column position.
-#' @field plate_name A name for the plate.
-#' @field plate_row The row position.
-#' @field extras Additional properties not explicitly defined in the schema.
-#'
-#' @section Constructor:
-#' `new(...)` supports the following arguments.
-#' * `plate_col`: The column position.
-#' * `plate_name`: A name for the plate.
-#' * `plate_row`: The row position.
-#' * `extras`: Additional properties not explicitly defined in the schema.
-#'
-#' @section Methods:
-#' See inline method documentation for `initialize()`, `validate()`, `to_list()`, `to_json_list()`, and `to_json()`.
-#'
-#' @format An [R6::R6Class()] generator object.
-#' @export
-PlateInfo <- R6::R6Class(
-  "PlateInfo",
-  public = list(
-    plate_col = NA_real_,
-    plate_name = NA_character_,
-    plate_row = NA_character_,
-    extras = list(),
-
-    #' @description Create a new instance.
-    #' @param plate_col The column position.
-    #' @param plate_name A name for the plate.
-    #' @param plate_row The row position.
-    #' @param extras Additional properties not explicitly defined in the schema.
-    initialize = function(plate_col = NA_real_, plate_name = NA_character_, plate_row = NA_character_, extras = list()) {
-      self$plate_col <- plate_col
-      self$plate_name <- plate_name
-      self$plate_row <- plate_row
-      self$extras <- extras
-    },
-
-    #' @description Validate the current instance against schema-derived constraints.
-    validate = function() {
-      if (!is.null(self$plate_col) && !is.na(self$plate_col) && (!is.numeric(self$plate_col) || length(self$plate_col) != 1)) stop("PlateInfo.plate_col must be a single numeric value")
-      if (!is.null(self$plate_col) && !is.na(self$plate_col) && self$plate_col < 0) stop("PlateInfo.plate_col < minimum 0")
-      if (!is.null(self$plate_col) && !is.na(self$plate_col) && !(is.numeric(self$plate_col) && isTRUE(all.equal(self$plate_col, as.integer(self$plate_col))))) stop("PlateInfo.plate_col must be integer-like")
-      if (!is.null(self$plate_name) && !is.na(self$plate_name) && (!is.character(self$plate_name) || length(self$plate_name) != 1)) stop("PlateInfo.plate_name must be a single string")
-      if (!is.null(self$plate_name) && !is.na(self$plate_name) && !grepl("^[A-z-._0-9 ]+$", self$plate_name, perl = TRUE)) stop("PlateInfo.plate_name does not match pattern: ^[A-z-._0-9 ]+$")
-      if (!is.null(self$plate_row) && !is.na(self$plate_row) && (!is.character(self$plate_row) || length(self$plate_row) != 1)) stop("PlateInfo.plate_row must be a single string")
-      if (!is.null(self$plate_row) && !is.na(self$plate_row) && !grepl("^[A-z]$", self$plate_row, perl = TRUE)) stop("PlateInfo.plate_row does not match pattern: ^[A-z]$")
-      invisible(TRUE)
-    },
-
-    #' @description Convert the object to a plain R list using in-memory values.
-    to_list = function() {
-      out <- list()
-      if (!is.null(self$plate_col)) out$plate_col <- self$plate_col
-      if (!is.null(self$plate_name)) out$plate_name <- if (is.na(self$plate_name)) "NA" else self$plate_name
-      if (!is.null(self$plate_row)) out$plate_row <- if (is.na(self$plate_row)) "NA" else self$plate_row
-      for (nm in names(self$extras)) out[[nm]] <- self$extras[[nm]]
-      out
-    },
-
-    #' @description Convert the object to a JSON-ready R list.
-    to_json_list = function() {
-      out <- list()
-      if (!is.null(self$plate_col)) out$plate_col <- self$plate_col
-      if (!is.null(self$plate_name)) out$plate_name <- if (is.na(self$plate_name)) "NA" else self$plate_name
-      if (!is.null(self$plate_row)) out$plate_row <- if (is.na(self$plate_row)) "NA" else self$plate_row
-      for (nm in names(self$extras)) out[[nm]] <- self$extras[[nm]]
-      out
-    },
-
-    #' @description Convert the object to a JSON string.
-    #' @param pretty Logical; pretty-print the JSON.
-    #' @param auto_unbox Logical; passed to [jsonlite::toJSON()].
-    #' @param ... Additional arguments passed to [jsonlite::toJSON()].
-    to_json = function(pretty = FALSE, auto_unbox = TRUE, ...) {
-      jsonlite::toJSON(self$to_json_list(), pretty = pretty, auto_unbox = auto_unbox, na = "string", ...)
-    }
-  )
-)
-
-PlateInfo$from_json <- function(x, validate = TRUE) {
-  obj <- if (is.character(x)) jsonlite::fromJSON(x, simplifyVector = FALSE) else x
-  if (!is.list(obj)) stop("from_json expects a JSON object or list")
-  required_fields <- c("plate_col","plate_name","plate_row")
-  missing_required <- setdiff(required_fields, names(obj))
-  if (length(missing_required) > 0) stop("PlateInfo missing required field(s): ", paste(missing_required, collapse = ", "))
-  known <- c("plate_col","plate_name","plate_row")
-  extras <- obj[setdiff(names(obj), known)]
-  inst <- PlateInfo$new(plate_col = if (!is.null(obj[["plate_col"]])) obj[["plate_col"]] else NA_real_, plate_name = { v <- obj[["plate_name"]]; if (is.null(v)) NA_character_ else if (is.character(v) && length(v)==1 && v %in% PMO_NA_STRINGS) NA_character_ else v }, plate_row = { v <- obj[["plate_row"]]; if (is.null(v)) NA_character_ else if (is.character(v) && length(v)==1 && v %in% PMO_NA_STRINGS) NA_character_ else v }, extras = extras)
-  if (validate) inst$validate()
-  inst
-}
-
 #' ParasiteDensity
 #'
 #' Method and value of determined parasite density.
@@ -1221,6 +1128,104 @@ ParasiteDensity$from_json <- function(x, validate = TRUE) {
   known <- c("date_measured","density_method_comments","parasite_density","parasite_density_method")
   extras <- obj[setdiff(names(obj), known)]
   inst <- ParasiteDensity$new(date_measured = { v <- obj[["date_measured"]]; if (is.null(v)) NULL else if (is.character(v) && length(v)==1 && v %in% PMO_NA_STRINGS) NA_character_ else v }, density_method_comments = { v <- obj[["density_method_comments"]]; if (is.null(v)) NULL else if (is.character(v) && length(v)==1 && v %in% PMO_NA_STRINGS) NA_character_ else v }, parasite_density = if (!is.null(obj[["parasite_density"]])) obj[["parasite_density"]] else NA_real_, parasite_density_method = { v <- obj[["parasite_density_method"]]; if (is.null(v)) NA_character_ else if (is.character(v) && length(v)==1 && v %in% PMO_NA_STRINGS) NA_character_ else v }, extras = extras)
+  if (validate) inst$validate()
+  inst
+}
+
+#' PlateInfo
+#'
+#' Information about a plate location, e.g. a standard 96 well plate with row having a letter and column having a number.
+#'
+#' Auto-generated R6 class from JSON Schema.
+#'
+#' @field plate_col The column position.
+#' @field plate_name A name for the plate.
+#' @field plate_row The row position.
+#' @field extras Additional properties not explicitly defined in the schema.
+#'
+#' @section Constructor:
+#' `new(...)` supports the following arguments.
+#' * `plate_col`: The column position.
+#' * `plate_name`: A name for the plate.
+#' * `plate_row`: The row position.
+#' * `extras`: Additional properties not explicitly defined in the schema.
+#'
+#' @section Methods:
+#' See inline method documentation for `initialize()`, `validate()`, `to_list()`, `to_json_list()`, and `to_json()`.
+#'
+#' @format An [R6::R6Class()] generator object.
+#' @export
+PlateInfo <- R6::R6Class(
+  "PlateInfo",
+  public = list(
+    plate_col = NA_real_,
+    plate_name = NA_character_,
+    plate_row = NA_character_,
+    extras = list(),
+
+    #' @description Create a new instance.
+    #' @param plate_col The column position.
+    #' @param plate_name A name for the plate.
+    #' @param plate_row The row position.
+    #' @param extras Additional properties not explicitly defined in the schema.
+    initialize = function(plate_col = NA_real_, plate_name = NA_character_, plate_row = NA_character_, extras = list()) {
+      self$plate_col <- plate_col
+      self$plate_name <- plate_name
+      self$plate_row <- plate_row
+      self$extras <- extras
+    },
+
+    #' @description Validate the current instance against schema-derived constraints.
+    validate = function() {
+      if (!is.null(self$plate_col) && !is.na(self$plate_col) && (!is.numeric(self$plate_col) || length(self$plate_col) != 1)) stop("PlateInfo.plate_col must be a single numeric value")
+      if (!is.null(self$plate_col) && !is.na(self$plate_col) && self$plate_col < 0) stop("PlateInfo.plate_col < minimum 0")
+      if (!is.null(self$plate_col) && !is.na(self$plate_col) && !(is.numeric(self$plate_col) && isTRUE(all.equal(self$plate_col, as.integer(self$plate_col))))) stop("PlateInfo.plate_col must be integer-like")
+      if (!is.null(self$plate_name) && !is.na(self$plate_name) && (!is.character(self$plate_name) || length(self$plate_name) != 1)) stop("PlateInfo.plate_name must be a single string")
+      if (!is.null(self$plate_name) && !is.na(self$plate_name) && !grepl("^[A-z-._0-9 ]+$", self$plate_name, perl = TRUE)) stop("PlateInfo.plate_name does not match pattern: ^[A-z-._0-9 ]+$")
+      if (!is.null(self$plate_row) && !is.na(self$plate_row) && (!is.character(self$plate_row) || length(self$plate_row) != 1)) stop("PlateInfo.plate_row must be a single string")
+      if (!is.null(self$plate_row) && !is.na(self$plate_row) && !grepl("^[A-z]$", self$plate_row, perl = TRUE)) stop("PlateInfo.plate_row does not match pattern: ^[A-z]$")
+      invisible(TRUE)
+    },
+
+    #' @description Convert the object to a plain R list using in-memory values.
+    to_list = function() {
+      out <- list()
+      if (!is.null(self$plate_col)) out$plate_col <- self$plate_col
+      if (!is.null(self$plate_name)) out$plate_name <- if (is.na(self$plate_name)) "NA" else self$plate_name
+      if (!is.null(self$plate_row)) out$plate_row <- if (is.na(self$plate_row)) "NA" else self$plate_row
+      for (nm in names(self$extras)) out[[nm]] <- self$extras[[nm]]
+      out
+    },
+
+    #' @description Convert the object to a JSON-ready R list.
+    to_json_list = function() {
+      out <- list()
+      if (!is.null(self$plate_col)) out$plate_col <- self$plate_col
+      if (!is.null(self$plate_name)) out$plate_name <- if (is.na(self$plate_name)) "NA" else self$plate_name
+      if (!is.null(self$plate_row)) out$plate_row <- if (is.na(self$plate_row)) "NA" else self$plate_row
+      for (nm in names(self$extras)) out[[nm]] <- self$extras[[nm]]
+      out
+    },
+
+    #' @description Convert the object to a JSON string.
+    #' @param pretty Logical; pretty-print the JSON.
+    #' @param auto_unbox Logical; passed to [jsonlite::toJSON()].
+    #' @param ... Additional arguments passed to [jsonlite::toJSON()].
+    to_json = function(pretty = FALSE, auto_unbox = TRUE, ...) {
+      jsonlite::toJSON(self$to_json_list(), pretty = pretty, auto_unbox = auto_unbox, na = "string", ...)
+    }
+  )
+)
+
+PlateInfo$from_json <- function(x, validate = TRUE) {
+  obj <- if (is.character(x)) jsonlite::fromJSON(x, simplifyVector = FALSE) else x
+  if (!is.list(obj)) stop("from_json expects a JSON object or list")
+  required_fields <- c("plate_col","plate_name","plate_row")
+  missing_required <- setdiff(required_fields, names(obj))
+  if (length(missing_required) > 0) stop("PlateInfo missing required field(s): ", paste(missing_required, collapse = ", "))
+  known <- c("plate_col","plate_name","plate_row")
+  extras <- obj[setdiff(names(obj), known)]
+  inst <- PlateInfo$new(plate_col = if (!is.null(obj[["plate_col"]])) obj[["plate_col"]] else NA_real_, plate_name = { v <- obj[["plate_name"]]; if (is.null(v)) NA_character_ else if (is.character(v) && length(v)==1 && v %in% PMO_NA_STRINGS) NA_character_ else v }, plate_row = { v <- obj[["plate_row"]]; if (is.null(v)) NA_character_ else if (is.character(v) && length(v)==1 && v %in% PMO_NA_STRINGS) NA_character_ else v }, extras = extras)
   if (validate) inst$validate()
   inst
 }
@@ -1642,7 +1647,7 @@ ReactionInfo <- R6::R6Class(
     #' @description Convert the object to a JSON-ready R list.
     to_json_list = function() {
       out <- list()
-      if (!is.null(self$panel_targets)) out$panel_targets <- I(self$panel_targets)
+      if (!is.null(self$panel_targets)) out$panel_targets <- I(pmo_apply_id_offset_write(self$panel_targets, "panel_targets"))
       if (!is.null(self$reaction_name)) out$reaction_name <- if (is.na(self$reaction_name)) "NA" else self$reaction_name
       for (nm in names(self$extras)) out[[nm]] <- self$extras[[nm]]
       out
@@ -1938,6 +1943,495 @@ PmoHeader$from_json <- function(x, validate = TRUE) {
   known <- c("creation_date","generation_method","pmo_version")
   extras <- obj[setdiff(names(obj), known)]
   inst <- PmoHeader$new(creation_date = { v <- obj[["creation_date"]]; if (is.null(v)) NULL else if (is.character(v) && length(v)==1 && v %in% PMO_NA_STRINGS) NA_character_ else v }, generation_method = if (!is.null(obj[["generation_method"]])) obj[["generation_method"]] else NULL, pmo_version = { v <- obj[["pmo_version"]]; if (is.null(v)) NA_character_ else if (is.character(v) && length(v)==1 && v %in% PMO_NA_STRINGS) NA_character_ else v }, extras = extras)
+  if (validate) inst$validate()
+  inst
+}
+
+#' ProjectInfo
+#'
+#' Information on a project underwhich a collection of specimens belong to.
+#'
+#' Auto-generated R6 class from JSON Schema.
+#'
+#' @field BioProject_accession An SRA bioproject accession e.g. PRJNA33823.
+#' @field project_collector_chief_scientist Can be collection of names separated by a semicolon if multiple people involved or can just be the name of the primary person managing the specimen.
+#' @field project_contributors A list of collaborators who contributed to this project.
+#' @field project_description A short description of the project.
+#' @field project_name A name for the project, should be unique if multiple projects listed.
+#' @field project_type The type of project conducted, e.g. TES vs surveillance vs transmission.
+#' @field extras Additional properties not explicitly defined in the schema.
+#'
+#' @section Constructor:
+#' `new(...)` supports the following arguments.
+#' * `BioProject_accession`: An SRA bioproject accession e.g. PRJNA33823.
+#' * `project_collector_chief_scientist`: Can be collection of names separated by a semicolon if multiple people involved or can just be the name of the primary person managing the specimen.
+#' * `project_contributors`: A list of collaborators who contributed to this project.
+#' * `project_description`: A short description of the project.
+#' * `project_name`: A name for the project, should be unique if multiple projects listed.
+#' * `project_type`: The type of project conducted, e.g. TES vs surveillance vs transmission.
+#' * `extras`: Additional properties not explicitly defined in the schema.
+#'
+#' @section Methods:
+#' See inline method documentation for `initialize()`, `validate()`, `to_list()`, `to_json_list()`, and `to_json()`.
+#'
+#' @format An [R6::R6Class()] generator object.
+#' @export
+ProjectInfo <- R6::R6Class(
+  "ProjectInfo",
+  public = list(
+    BioProject_accession = NA_character_,
+    project_collector_chief_scientist = NA_character_,
+    project_contributors = character(),
+    project_description = NA_character_,
+    project_name = NA_character_,
+    project_type = NA_character_,
+    extras = list(),
+
+    #' @description Create a new instance.
+    #' @param BioProject_accession An SRA bioproject accession e.g. PRJNA33823.
+    #' @param project_collector_chief_scientist Can be collection of names separated by a semicolon if multiple people involved or can just be the name of the primary person managing the specimen.
+    #' @param project_contributors A list of collaborators who contributed to this project.
+    #' @param project_description A short description of the project.
+    #' @param project_name A name for the project, should be unique if multiple projects listed.
+    #' @param project_type The type of project conducted, e.g. TES vs surveillance vs transmission.
+    #' @param extras Additional properties not explicitly defined in the schema.
+    initialize = function(BioProject_accession = NULL, project_collector_chief_scientist = NULL, project_contributors = NULL, project_description = NA_character_, project_name = NA_character_, project_type = NULL, extras = list()) {
+      self$BioProject_accession <- BioProject_accession
+      self$project_collector_chief_scientist <- project_collector_chief_scientist
+      self$project_contributors <- project_contributors
+      self$project_description <- project_description
+      self$project_name <- project_name
+      self$project_type <- project_type
+      self$extras <- extras
+    },
+
+    #' @description Validate the current instance against schema-derived constraints.
+    validate = function() {
+      if (!is.null(self$BioProject_accession) && !is.na(self$BioProject_accession) && (!is.character(self$BioProject_accession) || length(self$BioProject_accession) != 1)) stop("ProjectInfo.BioProject_accession must be a single string")
+      if (!is.null(self$BioProject_accession) && !is.na(self$BioProject_accession) && !grepl("^[A-z-._0-9 ]+$", self$BioProject_accession, perl = TRUE)) stop("ProjectInfo.BioProject_accession does not match pattern: ^[A-z-._0-9 ]+$")
+      if (!is.null(self$project_collector_chief_scientist) && !is.na(self$project_collector_chief_scientist) && (!is.character(self$project_collector_chief_scientist) || length(self$project_collector_chief_scientist) != 1)) stop("ProjectInfo.project_collector_chief_scientist must be a single string")
+      if (!is.null(self$project_collector_chief_scientist) && !is.na(self$project_collector_chief_scientist) && !grepl("^[A-z-._0-9;|\\(\\),\\/\\ ]+$", self$project_collector_chief_scientist, perl = TRUE)) stop("ProjectInfo.project_collector_chief_scientist does not match pattern: ^[A-z-._0-9;|\\(\\),\\/\\ ]+$")
+      if (!is.null(self$project_contributors) && !is.character(self$project_contributors)) stop("ProjectInfo.project_contributors must be a character vector")
+      if (!is.null(self$project_contributors) && length(self$project_contributors) > 0 && any(!grepl("^[A-z-._0-9 ]+$", self$project_contributors, perl = TRUE))) stop("ProjectInfo.project_contributors contains values that do not match pattern: ^[A-z-._0-9 ]+$")
+      if (!is.null(self$project_description) && !is.na(self$project_description) && (!is.character(self$project_description) || length(self$project_description) != 1)) stop("ProjectInfo.project_description must be a single string")
+      if (!is.null(self$project_name) && !is.na(self$project_name) && (!is.character(self$project_name) || length(self$project_name) != 1)) stop("ProjectInfo.project_name must be a single string")
+      if (!is.null(self$project_name) && !is.na(self$project_name) && !grepl("^[A-z-._0-9 ]+$", self$project_name, perl = TRUE)) stop("ProjectInfo.project_name does not match pattern: ^[A-z-._0-9 ]+$")
+      if (!is.null(self$project_type) && !is.na(self$project_type) && (!is.character(self$project_type) || length(self$project_type) != 1)) stop("ProjectInfo.project_type must be a single string")
+      if (!is.null(self$project_type) && !is.na(self$project_type) && !grepl("^[A-z-._0-9 ]+$", self$project_type, perl = TRUE)) stop("ProjectInfo.project_type does not match pattern: ^[A-z-._0-9 ]+$")
+      invisible(TRUE)
+    },
+
+    #' @description Convert the object to a plain R list using in-memory values.
+    to_list = function() {
+      out <- list()
+      if (!is.null(self$BioProject_accession)) out$BioProject_accession <- if (is.na(self$BioProject_accession)) "NA" else self$BioProject_accession
+      if (!is.null(self$project_collector_chief_scientist)) out$project_collector_chief_scientist <- if (is.na(self$project_collector_chief_scientist)) "NA" else self$project_collector_chief_scientist
+      if (!is.null(self$project_contributors)) out$project_contributors <- self$project_contributors
+      if (!is.null(self$project_description)) out$project_description <- if (is.na(self$project_description)) "NA" else self$project_description
+      if (!is.null(self$project_name)) out$project_name <- if (is.na(self$project_name)) "NA" else self$project_name
+      if (!is.null(self$project_type)) out$project_type <- if (is.na(self$project_type)) "NA" else self$project_type
+      for (nm in names(self$extras)) out[[nm]] <- self$extras[[nm]]
+      out
+    },
+
+    #' @description Convert the object to a JSON-ready R list.
+    to_json_list = function() {
+      out <- list()
+      if (!is.null(self$BioProject_accession)) out$BioProject_accession <- if (is.na(self$BioProject_accession)) "NA" else self$BioProject_accession
+      if (!is.null(self$project_collector_chief_scientist)) out$project_collector_chief_scientist <- if (is.na(self$project_collector_chief_scientist)) "NA" else self$project_collector_chief_scientist
+      if (!is.null(self$project_contributors)) out$project_contributors <- I(self$project_contributors)
+      if (!is.null(self$project_description)) out$project_description <- if (is.na(self$project_description)) "NA" else self$project_description
+      if (!is.null(self$project_name)) out$project_name <- if (is.na(self$project_name)) "NA" else self$project_name
+      if (!is.null(self$project_type)) out$project_type <- if (is.na(self$project_type)) "NA" else self$project_type
+      for (nm in names(self$extras)) out[[nm]] <- self$extras[[nm]]
+      out
+    },
+
+    #' @description Convert the object to a JSON string.
+    #' @param pretty Logical; pretty-print the JSON.
+    #' @param auto_unbox Logical; passed to [jsonlite::toJSON()].
+    #' @param ... Additional arguments passed to [jsonlite::toJSON()].
+    to_json = function(pretty = FALSE, auto_unbox = TRUE, ...) {
+      jsonlite::toJSON(self$to_json_list(), pretty = pretty, auto_unbox = auto_unbox, na = "string", ...)
+    }
+  )
+)
+
+ProjectInfo$from_json <- function(x, validate = TRUE) {
+  obj <- if (is.character(x)) jsonlite::fromJSON(x, simplifyVector = FALSE) else x
+  if (!is.list(obj)) stop("from_json expects a JSON object or list")
+  required_fields <- c("project_description","project_name")
+  missing_required <- setdiff(required_fields, names(obj))
+  if (length(missing_required) > 0) stop("ProjectInfo missing required field(s): ", paste(missing_required, collapse = ", "))
+  known <- c("BioProject_accession","project_collector_chief_scientist","project_contributors","project_description","project_name","project_type")
+  extras <- obj[setdiff(names(obj), known)]
+  inst <- ProjectInfo$new(BioProject_accession = { v <- obj[["BioProject_accession"]]; if (is.null(v)) NULL else if (is.character(v) && length(v)==1 && v %in% PMO_NA_STRINGS) NA_character_ else v }, project_collector_chief_scientist = { v <- obj[["project_collector_chief_scientist"]]; if (is.null(v)) NULL else if (is.character(v) && length(v)==1 && v %in% PMO_NA_STRINGS) NA_character_ else v }, project_contributors = { v <- obj[["project_contributors"]]; if (is.null(v)) NULL else if (length(v) == 0) character() else as.character(unlist(v, use.names = FALSE)) }, project_description = { v <- obj[["project_description"]]; if (is.null(v)) NA_character_ else if (is.character(v) && length(v)==1 && v %in% PMO_NA_STRINGS) NA_character_ else v }, project_name = { v <- obj[["project_name"]]; if (is.null(v)) NA_character_ else if (is.character(v) && length(v)==1 && v %in% PMO_NA_STRINGS) NA_character_ else v }, project_type = { v <- obj[["project_type"]]; if (is.null(v)) NULL else if (is.character(v) && length(v)==1 && v %in% PMO_NA_STRINGS) NA_character_ else v }, extras = extras)
+  if (validate) inst$validate()
+  inst
+}
+
+#' StageReadCounts
+#'
+#' Information on the reads counts at several stages.
+#'
+#' Auto-generated R6 class from JSON Schema.
+#'
+#' @field reads The read counts for this stage.
+#' @field stage The stage of the pipeline, e.g. demultiplexed, denoised, etc.
+#' @field extras Additional properties not explicitly defined in the schema.
+#'
+#' @section Constructor:
+#' `new(...)` supports the following arguments.
+#' * `reads`: The read counts for this stage.
+#' * `stage`: The stage of the pipeline, e.g. demultiplexed, denoised, etc.
+#' * `extras`: Additional properties not explicitly defined in the schema.
+#'
+#' @section Methods:
+#' See inline method documentation for `initialize()`, `validate()`, `to_list()`, `to_json_list()`, and `to_json()`.
+#'
+#' @format An [R6::R6Class()] generator object.
+#' @export
+StageReadCounts <- R6::R6Class(
+  "StageReadCounts",
+  public = list(
+    reads = NA_real_,
+    stage = NA_character_,
+    extras = list(),
+
+    #' @description Create a new instance.
+    #' @param reads The read counts for this stage.
+    #' @param stage The stage of the pipeline, e.g. demultiplexed, denoised, etc.
+    #' @param extras Additional properties not explicitly defined in the schema.
+    initialize = function(reads = NA_real_, stage = NA_character_, extras = list()) {
+      self$reads <- reads
+      self$stage <- stage
+      self$extras <- extras
+    },
+
+    #' @description Validate the current instance against schema-derived constraints.
+    validate = function() {
+      if (!is.null(self$reads) && !is.na(self$reads) && (!is.numeric(self$reads) || length(self$reads) != 1)) stop("StageReadCounts.reads must be a single numeric value")
+      if (!is.null(self$reads) && !is.na(self$reads) && self$reads < 0) stop("StageReadCounts.reads < minimum 0")
+      if (!is.null(self$reads) && !is.na(self$reads) && !(is.numeric(self$reads) && isTRUE(all.equal(self$reads, as.integer(self$reads))))) stop("StageReadCounts.reads must be integer-like")
+      if (!is.null(self$stage) && !is.na(self$stage) && (!is.character(self$stage) || length(self$stage) != 1)) stop("StageReadCounts.stage must be a single string")
+      if (!is.null(self$stage) && !is.na(self$stage) && !grepl("^[A-z-._0-9 ]+$", self$stage, perl = TRUE)) stop("StageReadCounts.stage does not match pattern: ^[A-z-._0-9 ]+$")
+      invisible(TRUE)
+    },
+
+    #' @description Convert the object to a plain R list using in-memory values.
+    to_list = function() {
+      out <- list()
+      if (!is.null(self$reads)) out$reads <- self$reads
+      if (!is.null(self$stage)) out$stage <- if (is.na(self$stage)) "NA" else self$stage
+      for (nm in names(self$extras)) out[[nm]] <- self$extras[[nm]]
+      out
+    },
+
+    #' @description Convert the object to a JSON-ready R list.
+    to_json_list = function() {
+      out <- list()
+      if (!is.null(self$reads)) out$reads <- self$reads
+      if (!is.null(self$stage)) out$stage <- if (is.na(self$stage)) "NA" else self$stage
+      for (nm in names(self$extras)) out[[nm]] <- self$extras[[nm]]
+      out
+    },
+
+    #' @description Convert the object to a JSON string.
+    #' @param pretty Logical; pretty-print the JSON.
+    #' @param auto_unbox Logical; passed to [jsonlite::toJSON()].
+    #' @param ... Additional arguments passed to [jsonlite::toJSON()].
+    to_json = function(pretty = FALSE, auto_unbox = TRUE, ...) {
+      jsonlite::toJSON(self$to_json_list(), pretty = pretty, auto_unbox = auto_unbox, na = "string", ...)
+    }
+  )
+)
+
+StageReadCounts$from_json <- function(x, validate = TRUE) {
+  obj <- if (is.character(x)) jsonlite::fromJSON(x, simplifyVector = FALSE) else x
+  if (!is.list(obj)) stop("from_json expects a JSON object or list")
+  required_fields <- c("reads","stage")
+  missing_required <- setdiff(required_fields, names(obj))
+  if (length(missing_required) > 0) stop("StageReadCounts missing required field(s): ", paste(missing_required, collapse = ", "))
+  known <- c("reads","stage")
+  extras <- obj[setdiff(names(obj), known)]
+  inst <- StageReadCounts$new(reads = if (!is.null(obj[["reads"]])) obj[["reads"]] else NA_real_, stage = { v <- obj[["stage"]]; if (is.null(v)) NA_character_ else if (is.character(v) && length(v)==1 && v %in% PMO_NA_STRINGS) NA_character_ else v }, extras = extras)
+  if (validate) inst$validate()
+  inst
+}
+
+#' ReadCountsByStageForTarget
+#'
+#' Information on the reads counts at several stages of a pipeline for a target.
+#'
+#' Auto-generated R6 class from JSON Schema.
+#'
+#' @field stages The read counts by each stage.
+#' @field target_id The index into the target_info list.
+#' @field extras Additional properties not explicitly defined in the schema.
+#'
+#' @section Constructor:
+#' `new(...)` supports the following arguments.
+#' * `stages`: The read counts by each stage.
+#' * `target_id`: The index into the target_info list.
+#' * `extras`: Additional properties not explicitly defined in the schema.
+#'
+#' @section Methods:
+#' See inline method documentation for `initialize()`, `validate()`, `to_list()`, `to_json_list()`, and `to_json()`.
+#'
+#' @format An [R6::R6Class()] generator object.
+#' @export
+ReadCountsByStageForTarget <- R6::R6Class(
+  "ReadCountsByStageForTarget",
+  public = list(
+    stages = list(),
+    target_id = NA_real_,
+    extras = list(),
+
+    #' @description Create a new instance.
+    #' @param stages The read counts by each stage.
+    #' @param target_id The index into the target_info list.
+    #' @param extras Additional properties not explicitly defined in the schema.
+    initialize = function(stages = list(), target_id = NA_real_, extras = list()) {
+      self$stages <- stages
+      self$target_id <- target_id
+      self$extras <- extras
+    },
+
+    #' @description Validate the current instance against schema-derived constraints.
+    validate = function() {
+      if (!is.null(self$stages) && !is.list(self$stages)) stop("ReadCountsByStageForTarget.stages must be a list")
+      if (!is.null(self$target_id) && !is.na(self$target_id) && (!is.numeric(self$target_id) || length(self$target_id) != 1)) stop("ReadCountsByStageForTarget.target_id must be a single numeric value")
+      if (!is.null(self$target_id) && !is.na(self$target_id) && self$target_id < 0) stop("ReadCountsByStageForTarget.target_id < minimum 0")
+      if (!is.null(self$target_id) && !is.na(self$target_id) && !(is.numeric(self$target_id) && isTRUE(all.equal(self$target_id, as.integer(self$target_id))))) stop("ReadCountsByStageForTarget.target_id must be integer-like")
+      if (!is.null(self$stages)) for (.x in self$stages) .x$validate()
+      invisible(TRUE)
+    },
+
+    #' @description Convert the object to a plain R list using in-memory values.
+    to_list = function() {
+      out <- list()
+      if (!is.null(self$stages)) out$stages <- lapply(self$stages, function(x) x$to_list())
+      if (!is.null(self$target_id)) out$target_id <- self$target_id
+      for (nm in names(self$extras)) out[[nm]] <- self$extras[[nm]]
+      out
+    },
+
+    #' @description Convert the object to a JSON-ready R list.
+    to_json_list = function() {
+      out <- list()
+      if (!is.null(self$stages)) out$stages <- I(lapply(self$stages, function(x) x$to_json_list()))
+      if (!is.null(self$target_id)) out$target_id <- pmo_apply_id_offset_write(self$target_id, "target_id")
+      for (nm in names(self$extras)) out[[nm]] <- self$extras[[nm]]
+      out
+    },
+
+    #' @description Convert the object to a JSON string.
+    #' @param pretty Logical; pretty-print the JSON.
+    #' @param auto_unbox Logical; passed to [jsonlite::toJSON()].
+    #' @param ... Additional arguments passed to [jsonlite::toJSON()].
+    to_json = function(pretty = FALSE, auto_unbox = TRUE, ...) {
+      jsonlite::toJSON(self$to_json_list(), pretty = pretty, auto_unbox = auto_unbox, na = "string", ...)
+    }
+  )
+)
+
+ReadCountsByStageForTarget$from_json <- function(x, validate = TRUE) {
+  obj <- if (is.character(x)) jsonlite::fromJSON(x, simplifyVector = FALSE) else x
+  if (!is.list(obj)) stop("from_json expects a JSON object or list")
+  required_fields <- c("stages","target_id")
+  missing_required <- setdiff(required_fields, names(obj))
+  if (length(missing_required) > 0) stop("ReadCountsByStageForTarget missing required field(s): ", paste(missing_required, collapse = ", "))
+  known <- c("stages","target_id")
+  extras <- obj[setdiff(names(obj), known)]
+  inst <- ReadCountsByStageForTarget$new(stages = if (!is.null(obj[["stages"]])) lapply(obj[["stages"]], function(.x) StageReadCounts$from_json(.x, validate = FALSE)) else NULL, target_id = pmo_apply_id_offset_read(if (!is.null(obj[["target_id"]])) obj[["target_id"]] else NA_real_, "target_id"), extras = extras)
+  if (validate) inst$validate()
+  inst
+}
+
+#' ReadCountsByStageForLibrarySample
+#'
+#' Information on the reads counts at several stages of a pipeline for a library_sample.
+#'
+#' Auto-generated R6 class from JSON Schema.
+#'
+#' @field library_sample_id The index into the library_sample_info list.
+#' @field read_counts_for_targets A list of counts by stage for a target.
+#' @field total_raw_count The raw counts off the sequencing machine that a sample began with.
+#' @field extras Additional properties not explicitly defined in the schema.
+#'
+#' @section Constructor:
+#' `new(...)` supports the following arguments.
+#' * `library_sample_id`: The index into the library_sample_info list.
+#' * `read_counts_for_targets`: A list of counts by stage for a target.
+#' * `total_raw_count`: The raw counts off the sequencing machine that a sample began with.
+#' * `extras`: Additional properties not explicitly defined in the schema.
+#'
+#' @section Methods:
+#' See inline method documentation for `initialize()`, `validate()`, `to_list()`, `to_json_list()`, and `to_json()`.
+#'
+#' @format An [R6::R6Class()] generator object.
+#' @export
+ReadCountsByStageForLibrarySample <- R6::R6Class(
+  "ReadCountsByStageForLibrarySample",
+  public = list(
+    library_sample_id = NA_real_,
+    read_counts_for_targets = list(),
+    total_raw_count = NA_real_,
+    extras = list(),
+
+    #' @description Create a new instance.
+    #' @param library_sample_id The index into the library_sample_info list.
+    #' @param read_counts_for_targets A list of counts by stage for a target.
+    #' @param total_raw_count The raw counts off the sequencing machine that a sample began with.
+    #' @param extras Additional properties not explicitly defined in the schema.
+    initialize = function(library_sample_id = NA_real_, read_counts_for_targets = NULL, total_raw_count = NA_real_, extras = list()) {
+      self$library_sample_id <- library_sample_id
+      self$read_counts_for_targets <- read_counts_for_targets
+      self$total_raw_count <- total_raw_count
+      self$extras <- extras
+    },
+
+    #' @description Validate the current instance against schema-derived constraints.
+    validate = function() {
+      if (!is.null(self$library_sample_id) && !is.na(self$library_sample_id) && (!is.numeric(self$library_sample_id) || length(self$library_sample_id) != 1)) stop("ReadCountsByStageForLibrarySample.library_sample_id must be a single numeric value")
+      if (!is.null(self$library_sample_id) && !is.na(self$library_sample_id) && self$library_sample_id < 0) stop("ReadCountsByStageForLibrarySample.library_sample_id < minimum 0")
+      if (!is.null(self$library_sample_id) && !is.na(self$library_sample_id) && !(is.numeric(self$library_sample_id) && isTRUE(all.equal(self$library_sample_id, as.integer(self$library_sample_id))))) stop("ReadCountsByStageForLibrarySample.library_sample_id must be integer-like")
+      if (!is.null(self$read_counts_for_targets) && !is.list(self$read_counts_for_targets)) stop("ReadCountsByStageForLibrarySample.read_counts_for_targets must be a list")
+      if (!is.null(self$total_raw_count) && !is.na(self$total_raw_count) && (!is.numeric(self$total_raw_count) || length(self$total_raw_count) != 1)) stop("ReadCountsByStageForLibrarySample.total_raw_count must be a single numeric value")
+      if (!is.null(self$total_raw_count) && !is.na(self$total_raw_count) && self$total_raw_count < 0) stop("ReadCountsByStageForLibrarySample.total_raw_count < minimum 0")
+      if (!is.null(self$total_raw_count) && !is.na(self$total_raw_count) && !(is.numeric(self$total_raw_count) && isTRUE(all.equal(self$total_raw_count, as.integer(self$total_raw_count))))) stop("ReadCountsByStageForLibrarySample.total_raw_count must be integer-like")
+      if (!is.null(self$read_counts_for_targets)) for (.x in self$read_counts_for_targets) .x$validate()
+      invisible(TRUE)
+    },
+
+    #' @description Convert the object to a plain R list using in-memory values.
+    to_list = function() {
+      out <- list()
+      if (!is.null(self$library_sample_id)) out$library_sample_id <- self$library_sample_id
+      if (!is.null(self$read_counts_for_targets)) out$read_counts_for_targets <- lapply(self$read_counts_for_targets, function(x) x$to_list())
+      if (!is.null(self$total_raw_count)) out$total_raw_count <- self$total_raw_count
+      for (nm in names(self$extras)) out[[nm]] <- self$extras[[nm]]
+      out
+    },
+
+    #' @description Convert the object to a JSON-ready R list.
+    to_json_list = function() {
+      out <- list()
+      if (!is.null(self$library_sample_id)) out$library_sample_id <- pmo_apply_id_offset_write(self$library_sample_id, "library_sample_id")
+      if (!is.null(self$read_counts_for_targets)) out$read_counts_for_targets <- I(lapply(self$read_counts_for_targets, function(x) x$to_json_list()))
+      if (!is.null(self$total_raw_count)) out$total_raw_count <- self$total_raw_count
+      for (nm in names(self$extras)) out[[nm]] <- self$extras[[nm]]
+      out
+    },
+
+    #' @description Convert the object to a JSON string.
+    #' @param pretty Logical; pretty-print the JSON.
+    #' @param auto_unbox Logical; passed to [jsonlite::toJSON()].
+    #' @param ... Additional arguments passed to [jsonlite::toJSON()].
+    to_json = function(pretty = FALSE, auto_unbox = TRUE, ...) {
+      jsonlite::toJSON(self$to_json_list(), pretty = pretty, auto_unbox = auto_unbox, na = "string", ...)
+    }
+  )
+)
+
+ReadCountsByStageForLibrarySample$from_json <- function(x, validate = TRUE) {
+  obj <- if (is.character(x)) jsonlite::fromJSON(x, simplifyVector = FALSE) else x
+  if (!is.list(obj)) stop("from_json expects a JSON object or list")
+  required_fields <- c("library_sample_id","total_raw_count")
+  missing_required <- setdiff(required_fields, names(obj))
+  if (length(missing_required) > 0) stop("ReadCountsByStageForLibrarySample missing required field(s): ", paste(missing_required, collapse = ", "))
+  known <- c("library_sample_id","read_counts_for_targets","total_raw_count")
+  extras <- obj[setdiff(names(obj), known)]
+  inst <- ReadCountsByStageForLibrarySample$new(library_sample_id = pmo_apply_id_offset_read(if (!is.null(obj[["library_sample_id"]])) obj[["library_sample_id"]] else NA_real_, "library_sample_id"), read_counts_for_targets = if (!is.null(obj[["read_counts_for_targets"]])) lapply(obj[["read_counts_for_targets"]], function(.x) ReadCountsByStageForTarget$from_json(.x, validate = FALSE)) else NULL, total_raw_count = if (!is.null(obj[["total_raw_count"]])) obj[["total_raw_count"]] else NA_real_, extras = extras)
+  if (validate) inst$validate()
+  inst
+}
+
+#' ReadCountsByStage
+#'
+#' Information on the reads counts at several stages of a pipeline.
+#'
+#' Auto-generated R6 class from JSON Schema.
+#'
+#' @field bioinformatics_run_id The index into bioinformatics_run_info list.
+#' @field read_counts_by_library_sample_by_stage A list by library_sample for the counts at each stage.
+#' @field extras Additional properties not explicitly defined in the schema.
+#'
+#' @section Constructor:
+#' `new(...)` supports the following arguments.
+#' * `bioinformatics_run_id`: The index into bioinformatics_run_info list.
+#' * `read_counts_by_library_sample_by_stage`: A list by library_sample for the counts at each stage.
+#' * `extras`: Additional properties not explicitly defined in the schema.
+#'
+#' @section Methods:
+#' See inline method documentation for `initialize()`, `validate()`, `to_list()`, `to_json_list()`, and `to_json()`.
+#'
+#' @format An [R6::R6Class()] generator object.
+#' @export
+ReadCountsByStage <- R6::R6Class(
+  "ReadCountsByStage",
+  public = list(
+    bioinformatics_run_id = NA_real_,
+    read_counts_by_library_sample_by_stage = list(),
+    extras = list(),
+
+    #' @description Create a new instance.
+    #' @param bioinformatics_run_id The index into bioinformatics_run_info list.
+    #' @param read_counts_by_library_sample_by_stage A list by library_sample for the counts at each stage.
+    #' @param extras Additional properties not explicitly defined in the schema.
+    initialize = function(bioinformatics_run_id = NULL, read_counts_by_library_sample_by_stage = list(), extras = list()) {
+      self$bioinformatics_run_id <- bioinformatics_run_id
+      self$read_counts_by_library_sample_by_stage <- read_counts_by_library_sample_by_stage
+      self$extras <- extras
+    },
+
+    #' @description Validate the current instance against schema-derived constraints.
+    validate = function() {
+      if (!is.null(self$bioinformatics_run_id) && !is.na(self$bioinformatics_run_id) && (!is.numeric(self$bioinformatics_run_id) || length(self$bioinformatics_run_id) != 1)) stop("ReadCountsByStage.bioinformatics_run_id must be a single numeric value")
+      if (!is.null(self$bioinformatics_run_id) && !is.na(self$bioinformatics_run_id) && self$bioinformatics_run_id < 0) stop("ReadCountsByStage.bioinformatics_run_id < minimum 0")
+      if (!is.null(self$bioinformatics_run_id) && !is.na(self$bioinformatics_run_id) && !(is.numeric(self$bioinformatics_run_id) && isTRUE(all.equal(self$bioinformatics_run_id, as.integer(self$bioinformatics_run_id))))) stop("ReadCountsByStage.bioinformatics_run_id must be integer-like")
+      if (!is.null(self$read_counts_by_library_sample_by_stage) && !is.list(self$read_counts_by_library_sample_by_stage)) stop("ReadCountsByStage.read_counts_by_library_sample_by_stage must be a list")
+      if (!is.null(self$read_counts_by_library_sample_by_stage)) for (.x in self$read_counts_by_library_sample_by_stage) .x$validate()
+      invisible(TRUE)
+    },
+
+    #' @description Convert the object to a plain R list using in-memory values.
+    to_list = function() {
+      out <- list()
+      if (!is.null(self$bioinformatics_run_id)) out$bioinformatics_run_id <- self$bioinformatics_run_id
+      if (!is.null(self$read_counts_by_library_sample_by_stage)) out$read_counts_by_library_sample_by_stage <- lapply(self$read_counts_by_library_sample_by_stage, function(x) x$to_list())
+      for (nm in names(self$extras)) out[[nm]] <- self$extras[[nm]]
+      out
+    },
+
+    #' @description Convert the object to a JSON-ready R list.
+    to_json_list = function() {
+      out <- list()
+      if (!is.null(self$bioinformatics_run_id)) out$bioinformatics_run_id <- pmo_apply_id_offset_write(self$bioinformatics_run_id, "bioinformatics_run_id")
+      if (!is.null(self$read_counts_by_library_sample_by_stage)) out$read_counts_by_library_sample_by_stage <- I(lapply(self$read_counts_by_library_sample_by_stage, function(x) x$to_json_list()))
+      for (nm in names(self$extras)) out[[nm]] <- self$extras[[nm]]
+      out
+    },
+
+    #' @description Convert the object to a JSON string.
+    #' @param pretty Logical; pretty-print the JSON.
+    #' @param auto_unbox Logical; passed to [jsonlite::toJSON()].
+    #' @param ... Additional arguments passed to [jsonlite::toJSON()].
+    to_json = function(pretty = FALSE, auto_unbox = TRUE, ...) {
+      jsonlite::toJSON(self$to_json_list(), pretty = pretty, auto_unbox = auto_unbox, na = "string", ...)
+    }
+  )
+)
+
+ReadCountsByStage$from_json <- function(x, validate = TRUE) {
+  obj <- if (is.character(x)) jsonlite::fromJSON(x, simplifyVector = FALSE) else x
+  if (!is.list(obj)) stop("from_json expects a JSON object or list")
+  required_fields <- c("read_counts_by_library_sample_by_stage")
+  missing_required <- setdiff(required_fields, names(obj))
+  if (length(missing_required) > 0) stop("ReadCountsByStage missing required field(s): ", paste(missing_required, collapse = ", "))
+  known <- c("bioinformatics_run_id","read_counts_by_library_sample_by_stage")
+  extras <- obj[setdiff(names(obj), known)]
+  inst <- ReadCountsByStage$new(bioinformatics_run_id = pmo_apply_id_offset_read(if (!is.null(obj[["bioinformatics_run_id"]])) obj[["bioinformatics_run_id"]] else NULL, "bioinformatics_run_id"), read_counts_by_library_sample_by_stage = if (!is.null(obj[["read_counts_by_library_sample_by_stage"]])) lapply(obj[["read_counts_by_library_sample_by_stage"]], function(.x) ReadCountsByStageForLibrarySample$from_json(.x, validate = FALSE)) else NULL, extras = extras)
   if (validate) inst$validate()
   inst
 }
@@ -2669,129 +3163,6 @@ SequencingInfo$from_json <- function(x, validate = TRUE) {
   inst
 }
 
-#' ProjectInfo
-#'
-#' Information on a project underwhich a collection of specimens belong to.
-#'
-#' Auto-generated R6 class from JSON Schema.
-#'
-#' @field BioProject_accession An SRA bioproject accession e.g. PRJNA33823.
-#' @field project_collector_chief_scientist Can be collection of names separated by a semicolon if multiple people involved or can just be the name of the primary person managing the specimen.
-#' @field project_contributors A list of collaborators who contributed to this project.
-#' @field project_description A short description of the project.
-#' @field project_name A name for the project, should be unique if multiple projects listed.
-#' @field project_type The type of project conducted, e.g. TES vs surveillance vs transmission.
-#' @field extras Additional properties not explicitly defined in the schema.
-#'
-#' @section Constructor:
-#' `new(...)` supports the following arguments.
-#' * `BioProject_accession`: An SRA bioproject accession e.g. PRJNA33823.
-#' * `project_collector_chief_scientist`: Can be collection of names separated by a semicolon if multiple people involved or can just be the name of the primary person managing the specimen.
-#' * `project_contributors`: A list of collaborators who contributed to this project.
-#' * `project_description`: A short description of the project.
-#' * `project_name`: A name for the project, should be unique if multiple projects listed.
-#' * `project_type`: The type of project conducted, e.g. TES vs surveillance vs transmission.
-#' * `extras`: Additional properties not explicitly defined in the schema.
-#'
-#' @section Methods:
-#' See inline method documentation for `initialize()`, `validate()`, `to_list()`, `to_json_list()`, and `to_json()`.
-#'
-#' @format An [R6::R6Class()] generator object.
-#' @export
-ProjectInfo <- R6::R6Class(
-  "ProjectInfo",
-  public = list(
-    BioProject_accession = NA_character_,
-    project_collector_chief_scientist = NA_character_,
-    project_contributors = character(),
-    project_description = NA_character_,
-    project_name = NA_character_,
-    project_type = NA_character_,
-    extras = list(),
-
-    #' @description Create a new instance.
-    #' @param BioProject_accession An SRA bioproject accession e.g. PRJNA33823.
-    #' @param project_collector_chief_scientist Can be collection of names separated by a semicolon if multiple people involved or can just be the name of the primary person managing the specimen.
-    #' @param project_contributors A list of collaborators who contributed to this project.
-    #' @param project_description A short description of the project.
-    #' @param project_name A name for the project, should be unique if multiple projects listed.
-    #' @param project_type The type of project conducted, e.g. TES vs surveillance vs transmission.
-    #' @param extras Additional properties not explicitly defined in the schema.
-    initialize = function(BioProject_accession = NULL, project_collector_chief_scientist = NULL, project_contributors = NULL, project_description = NA_character_, project_name = NA_character_, project_type = NULL, extras = list()) {
-      self$BioProject_accession <- BioProject_accession
-      self$project_collector_chief_scientist <- project_collector_chief_scientist
-      self$project_contributors <- project_contributors
-      self$project_description <- project_description
-      self$project_name <- project_name
-      self$project_type <- project_type
-      self$extras <- extras
-    },
-
-    #' @description Validate the current instance against schema-derived constraints.
-    validate = function() {
-      if (!is.null(self$BioProject_accession) && !is.na(self$BioProject_accession) && (!is.character(self$BioProject_accession) || length(self$BioProject_accession) != 1)) stop("ProjectInfo.BioProject_accession must be a single string")
-      if (!is.null(self$BioProject_accession) && !is.na(self$BioProject_accession) && !grepl("^[A-z-._0-9 ]+$", self$BioProject_accession, perl = TRUE)) stop("ProjectInfo.BioProject_accession does not match pattern: ^[A-z-._0-9 ]+$")
-      if (!is.null(self$project_collector_chief_scientist) && !is.na(self$project_collector_chief_scientist) && (!is.character(self$project_collector_chief_scientist) || length(self$project_collector_chief_scientist) != 1)) stop("ProjectInfo.project_collector_chief_scientist must be a single string")
-      if (!is.null(self$project_collector_chief_scientist) && !is.na(self$project_collector_chief_scientist) && !grepl("^[A-z-._0-9;|\\(\\),\\/\\ ]+$", self$project_collector_chief_scientist, perl = TRUE)) stop("ProjectInfo.project_collector_chief_scientist does not match pattern: ^[A-z-._0-9;|\\(\\),\\/\\ ]+$")
-      if (!is.null(self$project_contributors) && !is.character(self$project_contributors)) stop("ProjectInfo.project_contributors must be a character vector")
-      if (!is.null(self$project_contributors) && length(self$project_contributors) > 0 && any(!grepl("^[A-z-._0-9 ]+$", self$project_contributors, perl = TRUE))) stop("ProjectInfo.project_contributors contains values that do not match pattern: ^[A-z-._0-9 ]+$")
-      if (!is.null(self$project_description) && !is.na(self$project_description) && (!is.character(self$project_description) || length(self$project_description) != 1)) stop("ProjectInfo.project_description must be a single string")
-      if (!is.null(self$project_name) && !is.na(self$project_name) && (!is.character(self$project_name) || length(self$project_name) != 1)) stop("ProjectInfo.project_name must be a single string")
-      if (!is.null(self$project_name) && !is.na(self$project_name) && !grepl("^[A-z-._0-9 ]+$", self$project_name, perl = TRUE)) stop("ProjectInfo.project_name does not match pattern: ^[A-z-._0-9 ]+$")
-      if (!is.null(self$project_type) && !is.na(self$project_type) && (!is.character(self$project_type) || length(self$project_type) != 1)) stop("ProjectInfo.project_type must be a single string")
-      if (!is.null(self$project_type) && !is.na(self$project_type) && !grepl("^[A-z-._0-9 ]+$", self$project_type, perl = TRUE)) stop("ProjectInfo.project_type does not match pattern: ^[A-z-._0-9 ]+$")
-      invisible(TRUE)
-    },
-
-    #' @description Convert the object to a plain R list using in-memory values.
-    to_list = function() {
-      out <- list()
-      if (!is.null(self$BioProject_accession)) out$BioProject_accession <- if (is.na(self$BioProject_accession)) "NA" else self$BioProject_accession
-      if (!is.null(self$project_collector_chief_scientist)) out$project_collector_chief_scientist <- if (is.na(self$project_collector_chief_scientist)) "NA" else self$project_collector_chief_scientist
-      if (!is.null(self$project_contributors)) out$project_contributors <- self$project_contributors
-      if (!is.null(self$project_description)) out$project_description <- if (is.na(self$project_description)) "NA" else self$project_description
-      if (!is.null(self$project_name)) out$project_name <- if (is.na(self$project_name)) "NA" else self$project_name
-      if (!is.null(self$project_type)) out$project_type <- if (is.na(self$project_type)) "NA" else self$project_type
-      for (nm in names(self$extras)) out[[nm]] <- self$extras[[nm]]
-      out
-    },
-
-    #' @description Convert the object to a JSON-ready R list.
-    to_json_list = function() {
-      out <- list()
-      if (!is.null(self$BioProject_accession)) out$BioProject_accession <- if (is.na(self$BioProject_accession)) "NA" else self$BioProject_accession
-      if (!is.null(self$project_collector_chief_scientist)) out$project_collector_chief_scientist <- if (is.na(self$project_collector_chief_scientist)) "NA" else self$project_collector_chief_scientist
-      if (!is.null(self$project_contributors)) out$project_contributors <- I(self$project_contributors)
-      if (!is.null(self$project_description)) out$project_description <- if (is.na(self$project_description)) "NA" else self$project_description
-      if (!is.null(self$project_name)) out$project_name <- if (is.na(self$project_name)) "NA" else self$project_name
-      if (!is.null(self$project_type)) out$project_type <- if (is.na(self$project_type)) "NA" else self$project_type
-      for (nm in names(self$extras)) out[[nm]] <- self$extras[[nm]]
-      out
-    },
-
-    #' @description Convert the object to a JSON string.
-    #' @param pretty Logical; pretty-print the JSON.
-    #' @param auto_unbox Logical; passed to [jsonlite::toJSON()].
-    #' @param ... Additional arguments passed to [jsonlite::toJSON()].
-    to_json = function(pretty = FALSE, auto_unbox = TRUE, ...) {
-      jsonlite::toJSON(self$to_json_list(), pretty = pretty, auto_unbox = auto_unbox, na = "string", ...)
-    }
-  )
-)
-
-ProjectInfo$from_json <- function(x, validate = TRUE) {
-  obj <- if (is.character(x)) jsonlite::fromJSON(x, simplifyVector = FALSE) else x
-  if (!is.list(obj)) stop("from_json expects a JSON object or list")
-  required_fields <- c("project_description","project_name")
-  missing_required <- setdiff(required_fields, names(obj))
-  if (length(missing_required) > 0) stop("ProjectInfo missing required field(s): ", paste(missing_required, collapse = ", "))
-  known <- c("BioProject_accession","project_collector_chief_scientist","project_contributors","project_description","project_name","project_type")
-  extras <- obj[setdiff(names(obj), known)]
-  inst <- ProjectInfo$new(BioProject_accession = { v <- obj[["BioProject_accession"]]; if (is.null(v)) NULL else if (is.character(v) && length(v)==1 && v %in% PMO_NA_STRINGS) NA_character_ else v }, project_collector_chief_scientist = { v <- obj[["project_collector_chief_scientist"]]; if (is.null(v)) NULL else if (is.character(v) && length(v)==1 && v %in% PMO_NA_STRINGS) NA_character_ else v }, project_contributors = { v <- obj[["project_contributors"]]; if (is.null(v)) NULL else if (length(v) == 0) character() else as.character(unlist(v, use.names = FALSE)) }, project_description = { v <- obj[["project_description"]]; if (is.null(v)) NA_character_ else if (is.character(v) && length(v)==1 && v %in% PMO_NA_STRINGS) NA_character_ else v }, project_name = { v <- obj[["project_name"]]; if (is.null(v)) NA_character_ else if (is.character(v) && length(v)==1 && v %in% PMO_NA_STRINGS) NA_character_ else v }, project_type = { v <- obj[["project_type"]]; if (is.null(v)) NULL else if (is.character(v) && length(v)==1 && v %in% PMO_NA_STRINGS) NA_character_ else v }, extras = extras)
-  if (validate) inst$validate()
-  inst
-}
-
 #' TravelInfo
 #'
 #' Information on travel info.
@@ -3271,372 +3642,6 @@ SpecimenInfo$from_json <- function(x, validate = TRUE) {
   known <- c("alternate_identifiers","blood_meal","collection_country","collection_date","drug_usage","env_broad_scale","env_local_scale","env_medium","geo_admin1","geo_admin2","geo_admin3","gravid","gravidity","has_travel_out_six_month","host_age","host_sex","host_subject_name","host_taxon_id","lat_lon","parasite_density_info","project_id","specimen_accession","specimen_collect_device","specimen_comments","specimen_name","specimen_store_loc","specimen_taxon_id","specimen_type","storage_plate_info","travel_out_six_month","treatment_status")
   extras <- obj[setdiff(names(obj), known)]
   inst <- SpecimenInfo$new(alternate_identifiers = { v <- obj[["alternate_identifiers"]]; if (is.null(v)) NULL else if (length(v) == 0) character() else as.character(unlist(v, use.names = FALSE)) }, blood_meal = if (!is.null(obj[["blood_meal"]])) obj[["blood_meal"]] else NULL, collection_country = { v <- obj[["collection_country"]]; if (is.null(v)) NULL else if (is.character(v) && length(v)==1 && v %in% PMO_NA_STRINGS) NA_character_ else v }, collection_date = { v <- obj[["collection_date"]]; if (is.null(v)) NULL else if (is.character(v) && length(v)==1 && v %in% PMO_NA_STRINGS) NA_character_ else v }, drug_usage = { v <- obj[["drug_usage"]]; if (is.null(v)) NULL else if (length(v) == 0) character() else as.character(unlist(v, use.names = FALSE)) }, env_broad_scale = { v <- obj[["env_broad_scale"]]; if (is.null(v)) NULL else if (is.character(v) && length(v)==1 && v %in% PMO_NA_STRINGS) NA_character_ else v }, env_local_scale = { v <- obj[["env_local_scale"]]; if (is.null(v)) NULL else if (is.character(v) && length(v)==1 && v %in% PMO_NA_STRINGS) NA_character_ else v }, env_medium = { v <- obj[["env_medium"]]; if (is.null(v)) NULL else if (is.character(v) && length(v)==1 && v %in% PMO_NA_STRINGS) NA_character_ else v }, geo_admin1 = { v <- obj[["geo_admin1"]]; if (is.null(v)) NULL else if (is.character(v) && length(v)==1 && v %in% PMO_NA_STRINGS) NA_character_ else v }, geo_admin2 = { v <- obj[["geo_admin2"]]; if (is.null(v)) NULL else if (is.character(v) && length(v)==1 && v %in% PMO_NA_STRINGS) NA_character_ else v }, geo_admin3 = { v <- obj[["geo_admin3"]]; if (is.null(v)) NULL else if (is.character(v) && length(v)==1 && v %in% PMO_NA_STRINGS) NA_character_ else v }, gravid = if (!is.null(obj[["gravid"]])) obj[["gravid"]] else NULL, gravidity = if (!is.null(obj[["gravidity"]])) obj[["gravidity"]] else NULL, has_travel_out_six_month = if (!is.null(obj[["has_travel_out_six_month"]])) obj[["has_travel_out_six_month"]] else NULL, host_age = if (!is.null(obj[["host_age"]])) obj[["host_age"]] else NULL, host_sex = { v <- obj[["host_sex"]]; if (is.null(v)) NULL else if (is.character(v) && length(v)==1 && v %in% PMO_NA_STRINGS) NA_character_ else v }, host_subject_name = { v <- obj[["host_subject_name"]]; if (is.null(v)) NULL else if (is.character(v) && length(v)==1 && v %in% PMO_NA_STRINGS) NA_character_ else v }, host_taxon_id = if (!is.null(obj[["host_taxon_id"]])) obj[["host_taxon_id"]] else NULL, lat_lon = { v <- obj[["lat_lon"]]; if (is.null(v)) NULL else if (is.character(v) && length(v)==1 && v %in% PMO_NA_STRINGS) NA_character_ else v }, parasite_density_info = if (!is.null(obj[["parasite_density_info"]])) lapply(obj[["parasite_density_info"]], function(.x) ParasiteDensity$from_json(.x, validate = FALSE)) else NULL, project_id = pmo_apply_id_offset_read(if (!is.null(obj[["project_id"]])) obj[["project_id"]] else NULL, "project_id"), specimen_accession = { v <- obj[["specimen_accession"]]; if (is.null(v)) NULL else if (is.character(v) && length(v)==1 && v %in% PMO_NA_STRINGS) NA_character_ else v }, specimen_collect_device = { v <- obj[["specimen_collect_device"]]; if (is.null(v)) NULL else if (is.character(v) && length(v)==1 && v %in% PMO_NA_STRINGS) NA_character_ else v }, specimen_comments = { v <- obj[["specimen_comments"]]; if (is.null(v)) NULL else if (length(v) == 0) character() else as.character(unlist(v, use.names = FALSE)) }, specimen_name = { v <- obj[["specimen_name"]]; if (is.null(v)) NA_character_ else if (is.character(v) && length(v)==1 && v %in% PMO_NA_STRINGS) NA_character_ else v }, specimen_store_loc = { v <- obj[["specimen_store_loc"]]; if (is.null(v)) NULL else if (is.character(v) && length(v)==1 && v %in% PMO_NA_STRINGS) NA_character_ else v }, specimen_taxon_id = { v <- obj[["specimen_taxon_id"]]; if (is.null(v)) NULL else if (length(v) == 0) numeric() else as.numeric(unlist(v, use.names = FALSE)) }, specimen_type = { v <- obj[["specimen_type"]]; if (is.null(v)) NULL else if (is.character(v) && length(v)==1 && v %in% PMO_NA_STRINGS) NA_character_ else v }, storage_plate_info = if (!is.null(obj[["storage_plate_info"]])) obj[["storage_plate_info"]] else NULL, travel_out_six_month = if (!is.null(obj[["travel_out_six_month"]])) lapply(obj[["travel_out_six_month"]], function(.x) TravelInfo$from_json(.x, validate = FALSE)) else NULL, treatment_status = { v <- obj[["treatment_status"]]; if (is.null(v)) NULL else if (length(v) == 0) character() else as.character(unlist(v, use.names = FALSE)) }, extras = extras)
-  if (validate) inst$validate()
-  inst
-}
-
-#' StageReadCounts
-#'
-#' Information on the reads counts at several stages.
-#'
-#' Auto-generated R6 class from JSON Schema.
-#'
-#' @field reads The read counts for this stage.
-#' @field stage The stage of the pipeline, e.g. demultiplexed, denoised, etc.
-#' @field extras Additional properties not explicitly defined in the schema.
-#'
-#' @section Constructor:
-#' `new(...)` supports the following arguments.
-#' * `reads`: The read counts for this stage.
-#' * `stage`: The stage of the pipeline, e.g. demultiplexed, denoised, etc.
-#' * `extras`: Additional properties not explicitly defined in the schema.
-#'
-#' @section Methods:
-#' See inline method documentation for `initialize()`, `validate()`, `to_list()`, `to_json_list()`, and `to_json()`.
-#'
-#' @format An [R6::R6Class()] generator object.
-#' @export
-StageReadCounts <- R6::R6Class(
-  "StageReadCounts",
-  public = list(
-    reads = NA_real_,
-    stage = NA_character_,
-    extras = list(),
-
-    #' @description Create a new instance.
-    #' @param reads The read counts for this stage.
-    #' @param stage The stage of the pipeline, e.g. demultiplexed, denoised, etc.
-    #' @param extras Additional properties not explicitly defined in the schema.
-    initialize = function(reads = NA_real_, stage = NA_character_, extras = list()) {
-      self$reads <- reads
-      self$stage <- stage
-      self$extras <- extras
-    },
-
-    #' @description Validate the current instance against schema-derived constraints.
-    validate = function() {
-      if (!is.null(self$reads) && !is.na(self$reads) && (!is.numeric(self$reads) || length(self$reads) != 1)) stop("StageReadCounts.reads must be a single numeric value")
-      if (!is.null(self$reads) && !is.na(self$reads) && self$reads < 0) stop("StageReadCounts.reads < minimum 0")
-      if (!is.null(self$reads) && !is.na(self$reads) && !(is.numeric(self$reads) && isTRUE(all.equal(self$reads, as.integer(self$reads))))) stop("StageReadCounts.reads must be integer-like")
-      if (!is.null(self$stage) && !is.na(self$stage) && (!is.character(self$stage) || length(self$stage) != 1)) stop("StageReadCounts.stage must be a single string")
-      if (!is.null(self$stage) && !is.na(self$stage) && !grepl("^[A-z-._0-9 ]+$", self$stage, perl = TRUE)) stop("StageReadCounts.stage does not match pattern: ^[A-z-._0-9 ]+$")
-      invisible(TRUE)
-    },
-
-    #' @description Convert the object to a plain R list using in-memory values.
-    to_list = function() {
-      out <- list()
-      if (!is.null(self$reads)) out$reads <- self$reads
-      if (!is.null(self$stage)) out$stage <- if (is.na(self$stage)) "NA" else self$stage
-      for (nm in names(self$extras)) out[[nm]] <- self$extras[[nm]]
-      out
-    },
-
-    #' @description Convert the object to a JSON-ready R list.
-    to_json_list = function() {
-      out <- list()
-      if (!is.null(self$reads)) out$reads <- self$reads
-      if (!is.null(self$stage)) out$stage <- if (is.na(self$stage)) "NA" else self$stage
-      for (nm in names(self$extras)) out[[nm]] <- self$extras[[nm]]
-      out
-    },
-
-    #' @description Convert the object to a JSON string.
-    #' @param pretty Logical; pretty-print the JSON.
-    #' @param auto_unbox Logical; passed to [jsonlite::toJSON()].
-    #' @param ... Additional arguments passed to [jsonlite::toJSON()].
-    to_json = function(pretty = FALSE, auto_unbox = TRUE, ...) {
-      jsonlite::toJSON(self$to_json_list(), pretty = pretty, auto_unbox = auto_unbox, na = "string", ...)
-    }
-  )
-)
-
-StageReadCounts$from_json <- function(x, validate = TRUE) {
-  obj <- if (is.character(x)) jsonlite::fromJSON(x, simplifyVector = FALSE) else x
-  if (!is.list(obj)) stop("from_json expects a JSON object or list")
-  required_fields <- c("reads","stage")
-  missing_required <- setdiff(required_fields, names(obj))
-  if (length(missing_required) > 0) stop("StageReadCounts missing required field(s): ", paste(missing_required, collapse = ", "))
-  known <- c("reads","stage")
-  extras <- obj[setdiff(names(obj), known)]
-  inst <- StageReadCounts$new(reads = if (!is.null(obj[["reads"]])) obj[["reads"]] else NA_real_, stage = { v <- obj[["stage"]]; if (is.null(v)) NA_character_ else if (is.character(v) && length(v)==1 && v %in% PMO_NA_STRINGS) NA_character_ else v }, extras = extras)
-  if (validate) inst$validate()
-  inst
-}
-
-#' ReadCountsByStageForTarget
-#'
-#' Information on the reads counts at several stages of a pipeline for a target.
-#'
-#' Auto-generated R6 class from JSON Schema.
-#'
-#' @field stages The read counts by each stage.
-#' @field target_id The index into the target_info list.
-#' @field extras Additional properties not explicitly defined in the schema.
-#'
-#' @section Constructor:
-#' `new(...)` supports the following arguments.
-#' * `stages`: The read counts by each stage.
-#' * `target_id`: The index into the target_info list.
-#' * `extras`: Additional properties not explicitly defined in the schema.
-#'
-#' @section Methods:
-#' See inline method documentation for `initialize()`, `validate()`, `to_list()`, `to_json_list()`, and `to_json()`.
-#'
-#' @format An [R6::R6Class()] generator object.
-#' @export
-ReadCountsByStageForTarget <- R6::R6Class(
-  "ReadCountsByStageForTarget",
-  public = list(
-    stages = list(),
-    target_id = NA_real_,
-    extras = list(),
-
-    #' @description Create a new instance.
-    #' @param stages The read counts by each stage.
-    #' @param target_id The index into the target_info list.
-    #' @param extras Additional properties not explicitly defined in the schema.
-    initialize = function(stages = list(), target_id = NA_real_, extras = list()) {
-      self$stages <- stages
-      self$target_id <- target_id
-      self$extras <- extras
-    },
-
-    #' @description Validate the current instance against schema-derived constraints.
-    validate = function() {
-      if (!is.null(self$stages) && !is.list(self$stages)) stop("ReadCountsByStageForTarget.stages must be a list")
-      if (!is.null(self$target_id) && !is.na(self$target_id) && (!is.numeric(self$target_id) || length(self$target_id) != 1)) stop("ReadCountsByStageForTarget.target_id must be a single numeric value")
-      if (!is.null(self$target_id) && !is.na(self$target_id) && self$target_id < 0) stop("ReadCountsByStageForTarget.target_id < minimum 0")
-      if (!is.null(self$target_id) && !is.na(self$target_id) && !(is.numeric(self$target_id) && isTRUE(all.equal(self$target_id, as.integer(self$target_id))))) stop("ReadCountsByStageForTarget.target_id must be integer-like")
-      if (!is.null(self$stages)) for (.x in self$stages) .x$validate()
-      invisible(TRUE)
-    },
-
-    #' @description Convert the object to a plain R list using in-memory values.
-    to_list = function() {
-      out <- list()
-      if (!is.null(self$stages)) out$stages <- lapply(self$stages, function(x) x$to_list())
-      if (!is.null(self$target_id)) out$target_id <- self$target_id
-      for (nm in names(self$extras)) out[[nm]] <- self$extras[[nm]]
-      out
-    },
-
-    #' @description Convert the object to a JSON-ready R list.
-    to_json_list = function() {
-      out <- list()
-      if (!is.null(self$stages)) out$stages <- I(lapply(self$stages, function(x) x$to_json_list()))
-      if (!is.null(self$target_id)) out$target_id <- pmo_apply_id_offset_write(self$target_id, "target_id")
-      for (nm in names(self$extras)) out[[nm]] <- self$extras[[nm]]
-      out
-    },
-
-    #' @description Convert the object to a JSON string.
-    #' @param pretty Logical; pretty-print the JSON.
-    #' @param auto_unbox Logical; passed to [jsonlite::toJSON()].
-    #' @param ... Additional arguments passed to [jsonlite::toJSON()].
-    to_json = function(pretty = FALSE, auto_unbox = TRUE, ...) {
-      jsonlite::toJSON(self$to_json_list(), pretty = pretty, auto_unbox = auto_unbox, na = "string", ...)
-    }
-  )
-)
-
-ReadCountsByStageForTarget$from_json <- function(x, validate = TRUE) {
-  obj <- if (is.character(x)) jsonlite::fromJSON(x, simplifyVector = FALSE) else x
-  if (!is.list(obj)) stop("from_json expects a JSON object or list")
-  required_fields <- c("stages","target_id")
-  missing_required <- setdiff(required_fields, names(obj))
-  if (length(missing_required) > 0) stop("ReadCountsByStageForTarget missing required field(s): ", paste(missing_required, collapse = ", "))
-  known <- c("stages","target_id")
-  extras <- obj[setdiff(names(obj), known)]
-  inst <- ReadCountsByStageForTarget$new(stages = if (!is.null(obj[["stages"]])) lapply(obj[["stages"]], function(.x) StageReadCounts$from_json(.x, validate = FALSE)) else NULL, target_id = pmo_apply_id_offset_read(if (!is.null(obj[["target_id"]])) obj[["target_id"]] else NA_real_, "target_id"), extras = extras)
-  if (validate) inst$validate()
-  inst
-}
-
-#' ReadCountsByStageForLibrarySample
-#'
-#' Information on the reads counts at several stages of a pipeline for a library_sample.
-#'
-#' Auto-generated R6 class from JSON Schema.
-#'
-#' @field library_sample_id The index into the library_sample_info list.
-#' @field read_counts_for_targets A list of counts by stage for a target.
-#' @field total_raw_count The raw counts off the sequencing machine that a sample began with.
-#' @field extras Additional properties not explicitly defined in the schema.
-#'
-#' @section Constructor:
-#' `new(...)` supports the following arguments.
-#' * `library_sample_id`: The index into the library_sample_info list.
-#' * `read_counts_for_targets`: A list of counts by stage for a target.
-#' * `total_raw_count`: The raw counts off the sequencing machine that a sample began with.
-#' * `extras`: Additional properties not explicitly defined in the schema.
-#'
-#' @section Methods:
-#' See inline method documentation for `initialize()`, `validate()`, `to_list()`, `to_json_list()`, and `to_json()`.
-#'
-#' @format An [R6::R6Class()] generator object.
-#' @export
-ReadCountsByStageForLibrarySample <- R6::R6Class(
-  "ReadCountsByStageForLibrarySample",
-  public = list(
-    library_sample_id = NA_real_,
-    read_counts_for_targets = list(),
-    total_raw_count = NA_real_,
-    extras = list(),
-
-    #' @description Create a new instance.
-    #' @param library_sample_id The index into the library_sample_info list.
-    #' @param read_counts_for_targets A list of counts by stage for a target.
-    #' @param total_raw_count The raw counts off the sequencing machine that a sample began with.
-    #' @param extras Additional properties not explicitly defined in the schema.
-    initialize = function(library_sample_id = NA_real_, read_counts_for_targets = NULL, total_raw_count = NA_real_, extras = list()) {
-      self$library_sample_id <- library_sample_id
-      self$read_counts_for_targets <- read_counts_for_targets
-      self$total_raw_count <- total_raw_count
-      self$extras <- extras
-    },
-
-    #' @description Validate the current instance against schema-derived constraints.
-    validate = function() {
-      if (!is.null(self$library_sample_id) && !is.na(self$library_sample_id) && (!is.numeric(self$library_sample_id) || length(self$library_sample_id) != 1)) stop("ReadCountsByStageForLibrarySample.library_sample_id must be a single numeric value")
-      if (!is.null(self$library_sample_id) && !is.na(self$library_sample_id) && self$library_sample_id < 0) stop("ReadCountsByStageForLibrarySample.library_sample_id < minimum 0")
-      if (!is.null(self$library_sample_id) && !is.na(self$library_sample_id) && !(is.numeric(self$library_sample_id) && isTRUE(all.equal(self$library_sample_id, as.integer(self$library_sample_id))))) stop("ReadCountsByStageForLibrarySample.library_sample_id must be integer-like")
-      if (!is.null(self$read_counts_for_targets) && !is.list(self$read_counts_for_targets)) stop("ReadCountsByStageForLibrarySample.read_counts_for_targets must be a list")
-      if (!is.null(self$total_raw_count) && !is.na(self$total_raw_count) && (!is.numeric(self$total_raw_count) || length(self$total_raw_count) != 1)) stop("ReadCountsByStageForLibrarySample.total_raw_count must be a single numeric value")
-      if (!is.null(self$total_raw_count) && !is.na(self$total_raw_count) && self$total_raw_count < 0) stop("ReadCountsByStageForLibrarySample.total_raw_count < minimum 0")
-      if (!is.null(self$total_raw_count) && !is.na(self$total_raw_count) && !(is.numeric(self$total_raw_count) && isTRUE(all.equal(self$total_raw_count, as.integer(self$total_raw_count))))) stop("ReadCountsByStageForLibrarySample.total_raw_count must be integer-like")
-      if (!is.null(self$read_counts_for_targets)) for (.x in self$read_counts_for_targets) .x$validate()
-      invisible(TRUE)
-    },
-
-    #' @description Convert the object to a plain R list using in-memory values.
-    to_list = function() {
-      out <- list()
-      if (!is.null(self$library_sample_id)) out$library_sample_id <- self$library_sample_id
-      if (!is.null(self$read_counts_for_targets)) out$read_counts_for_targets <- lapply(self$read_counts_for_targets, function(x) x$to_list())
-      if (!is.null(self$total_raw_count)) out$total_raw_count <- self$total_raw_count
-      for (nm in names(self$extras)) out[[nm]] <- self$extras[[nm]]
-      out
-    },
-
-    #' @description Convert the object to a JSON-ready R list.
-    to_json_list = function() {
-      out <- list()
-      if (!is.null(self$library_sample_id)) out$library_sample_id <- pmo_apply_id_offset_write(self$library_sample_id, "library_sample_id")
-      if (!is.null(self$read_counts_for_targets)) out$read_counts_for_targets <- I(lapply(self$read_counts_for_targets, function(x) x$to_json_list()))
-      if (!is.null(self$total_raw_count)) out$total_raw_count <- self$total_raw_count
-      for (nm in names(self$extras)) out[[nm]] <- self$extras[[nm]]
-      out
-    },
-
-    #' @description Convert the object to a JSON string.
-    #' @param pretty Logical; pretty-print the JSON.
-    #' @param auto_unbox Logical; passed to [jsonlite::toJSON()].
-    #' @param ... Additional arguments passed to [jsonlite::toJSON()].
-    to_json = function(pretty = FALSE, auto_unbox = TRUE, ...) {
-      jsonlite::toJSON(self$to_json_list(), pretty = pretty, auto_unbox = auto_unbox, na = "string", ...)
-    }
-  )
-)
-
-ReadCountsByStageForLibrarySample$from_json <- function(x, validate = TRUE) {
-  obj <- if (is.character(x)) jsonlite::fromJSON(x, simplifyVector = FALSE) else x
-  if (!is.list(obj)) stop("from_json expects a JSON object or list")
-  required_fields <- c("library_sample_id","total_raw_count")
-  missing_required <- setdiff(required_fields, names(obj))
-  if (length(missing_required) > 0) stop("ReadCountsByStageForLibrarySample missing required field(s): ", paste(missing_required, collapse = ", "))
-  known <- c("library_sample_id","read_counts_for_targets","total_raw_count")
-  extras <- obj[setdiff(names(obj), known)]
-  inst <- ReadCountsByStageForLibrarySample$new(library_sample_id = pmo_apply_id_offset_read(if (!is.null(obj[["library_sample_id"]])) obj[["library_sample_id"]] else NA_real_, "library_sample_id"), read_counts_for_targets = if (!is.null(obj[["read_counts_for_targets"]])) lapply(obj[["read_counts_for_targets"]], function(.x) ReadCountsByStageForTarget$from_json(.x, validate = FALSE)) else NULL, total_raw_count = if (!is.null(obj[["total_raw_count"]])) obj[["total_raw_count"]] else NA_real_, extras = extras)
-  if (validate) inst$validate()
-  inst
-}
-
-#' ReadCountsByStage
-#'
-#' Information on the reads counts at several stages of a pipeline.
-#'
-#' Auto-generated R6 class from JSON Schema.
-#'
-#' @field bioinformatics_run_id The index into bioinformatics_run_info list.
-#' @field read_counts_by_library_sample_by_stage A list by library_sample for the counts at each stage.
-#' @field extras Additional properties not explicitly defined in the schema.
-#'
-#' @section Constructor:
-#' `new(...)` supports the following arguments.
-#' * `bioinformatics_run_id`: The index into bioinformatics_run_info list.
-#' * `read_counts_by_library_sample_by_stage`: A list by library_sample for the counts at each stage.
-#' * `extras`: Additional properties not explicitly defined in the schema.
-#'
-#' @section Methods:
-#' See inline method documentation for `initialize()`, `validate()`, `to_list()`, `to_json_list()`, and `to_json()`.
-#'
-#' @format An [R6::R6Class()] generator object.
-#' @export
-ReadCountsByStage <- R6::R6Class(
-  "ReadCountsByStage",
-  public = list(
-    bioinformatics_run_id = NA_real_,
-    read_counts_by_library_sample_by_stage = list(),
-    extras = list(),
-
-    #' @description Create a new instance.
-    #' @param bioinformatics_run_id The index into bioinformatics_run_info list.
-    #' @param read_counts_by_library_sample_by_stage A list by library_sample for the counts at each stage.
-    #' @param extras Additional properties not explicitly defined in the schema.
-    initialize = function(bioinformatics_run_id = NULL, read_counts_by_library_sample_by_stage = list(), extras = list()) {
-      self$bioinformatics_run_id <- bioinformatics_run_id
-      self$read_counts_by_library_sample_by_stage <- read_counts_by_library_sample_by_stage
-      self$extras <- extras
-    },
-
-    #' @description Validate the current instance against schema-derived constraints.
-    validate = function() {
-      if (!is.null(self$bioinformatics_run_id) && !is.na(self$bioinformatics_run_id) && (!is.numeric(self$bioinformatics_run_id) || length(self$bioinformatics_run_id) != 1)) stop("ReadCountsByStage.bioinformatics_run_id must be a single numeric value")
-      if (!is.null(self$bioinformatics_run_id) && !is.na(self$bioinformatics_run_id) && self$bioinformatics_run_id < 0) stop("ReadCountsByStage.bioinformatics_run_id < minimum 0")
-      if (!is.null(self$bioinformatics_run_id) && !is.na(self$bioinformatics_run_id) && !(is.numeric(self$bioinformatics_run_id) && isTRUE(all.equal(self$bioinformatics_run_id, as.integer(self$bioinformatics_run_id))))) stop("ReadCountsByStage.bioinformatics_run_id must be integer-like")
-      if (!is.null(self$read_counts_by_library_sample_by_stage) && !is.list(self$read_counts_by_library_sample_by_stage)) stop("ReadCountsByStage.read_counts_by_library_sample_by_stage must be a list")
-      if (!is.null(self$read_counts_by_library_sample_by_stage)) for (.x in self$read_counts_by_library_sample_by_stage) .x$validate()
-      invisible(TRUE)
-    },
-
-    #' @description Convert the object to a plain R list using in-memory values.
-    to_list = function() {
-      out <- list()
-      if (!is.null(self$bioinformatics_run_id)) out$bioinformatics_run_id <- self$bioinformatics_run_id
-      if (!is.null(self$read_counts_by_library_sample_by_stage)) out$read_counts_by_library_sample_by_stage <- lapply(self$read_counts_by_library_sample_by_stage, function(x) x$to_list())
-      for (nm in names(self$extras)) out[[nm]] <- self$extras[[nm]]
-      out
-    },
-
-    #' @description Convert the object to a JSON-ready R list.
-    to_json_list = function() {
-      out <- list()
-      if (!is.null(self$bioinformatics_run_id)) out$bioinformatics_run_id <- pmo_apply_id_offset_write(self$bioinformatics_run_id, "bioinformatics_run_id")
-      if (!is.null(self$read_counts_by_library_sample_by_stage)) out$read_counts_by_library_sample_by_stage <- I(lapply(self$read_counts_by_library_sample_by_stage, function(x) x$to_json_list()))
-      for (nm in names(self$extras)) out[[nm]] <- self$extras[[nm]]
-      out
-    },
-
-    #' @description Convert the object to a JSON string.
-    #' @param pretty Logical; pretty-print the JSON.
-    #' @param auto_unbox Logical; passed to [jsonlite::toJSON()].
-    #' @param ... Additional arguments passed to [jsonlite::toJSON()].
-    to_json = function(pretty = FALSE, auto_unbox = TRUE, ...) {
-      jsonlite::toJSON(self$to_json_list(), pretty = pretty, auto_unbox = auto_unbox, na = "string", ...)
-    }
-  )
-)
-
-ReadCountsByStage$from_json <- function(x, validate = TRUE) {
-  obj <- if (is.character(x)) jsonlite::fromJSON(x, simplifyVector = FALSE) else x
-  if (!is.list(obj)) stop("from_json expects a JSON object or list")
-  required_fields <- c("read_counts_by_library_sample_by_stage")
-  missing_required <- setdiff(required_fields, names(obj))
-  if (length(missing_required) > 0) stop("ReadCountsByStage missing required field(s): ", paste(missing_required, collapse = ", "))
-  known <- c("bioinformatics_run_id","read_counts_by_library_sample_by_stage")
-  extras <- obj[setdiff(names(obj), known)]
-  inst <- ReadCountsByStage$new(bioinformatics_run_id = pmo_apply_id_offset_read(if (!is.null(obj[["bioinformatics_run_id"]])) obj[["bioinformatics_run_id"]] else NULL, "bioinformatics_run_id"), read_counts_by_library_sample_by_stage = if (!is.null(obj[["read_counts_by_library_sample_by_stage"]])) lapply(obj[["read_counts_by_library_sample_by_stage"]], function(.x) ReadCountsByStageForLibrarySample$from_json(.x, validate = FALSE)) else NULL, extras = extras)
   if (validate) inst$validate()
   inst
 }
