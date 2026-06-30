@@ -1,5 +1,9 @@
 # pmotoolsr
 
+<!-- badges: start -->
+[![R-CMD-check](https://github.com/PlasmoGenEpi/pmotoolsr/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/PlasmoGenEpi/pmotoolsr/actions/workflows/R-CMD-check.yaml)
+<!-- badges: end -->
+
 > 📖 **To see full documentation of PMO and its associated tools, please see
 > <https://plasmogenepi.github.io/PMO_Docs/>** — the de facto site for all things
 > PMO.
