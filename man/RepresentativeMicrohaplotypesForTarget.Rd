@@ -7,11 +7,6 @@
 An \code{\link[R6:R6Class]{R6::R6Class()}} generator object.
 }
 \description{
-RepresentativeMicrohaplotypesForTarget
-
-RepresentativeMicrohaplotypesForTarget
-}
-\details{
 A list of the representative sequence for the microhaplotypes for a target.
 
 Auto-generated R6 class from JSON Schema.
@@ -33,127 +28,134 @@ See inline method documentation for \code{initialize()}, \code{validate()}, \cod
 }
 
 \section{Public fields}{
-\if{html}{\out{<div class="r6-fields">}}
-\describe{
-\item{\code{mhap_location}}{A genomic location that was analyzed for this target info, this allows listing location that may be different from the full target location (e.g 1 trimmed off the full length).}
+  \if{html}{\out{<div class="r6-fields">}}
+  \describe{
+    \item{\code{mhap_location}}{A genomic location that was analyzed for this target info, this allows listing location that may be different from the full target location (e.g 1 trimmed off the full length).}
 
-\item{\code{microhaplotypes}}{A list of all the microhaplotypes for a target.}
+    \item{\code{microhaplotypes}}{A list of all the microhaplotypes for a target.}
 
-\item{\code{target_id}}{The index into the target_info list.}
+    \item{\code{target_id}}{The index into the target_info list.}
 
-\item{\code{extras}}{Additional properties not explicitly defined in the schema.}
-}
-\if{html}{\out{</div>}}
+    \item{\code{extras}}{Additional properties not explicitly defined in the schema.}
+  }
+  \if{html}{\out{</div>}}
 }
 \section{Methods}{
 \subsection{Public methods}{
-\itemize{
-\item \href{#method-RepresentativeMicrohaplotypesForTarget-new}{\code{RepresentativeMicrohaplotypesForTarget$new()}}
-\item \href{#method-RepresentativeMicrohaplotypesForTarget-validate}{\code{RepresentativeMicrohaplotypesForTarget$validate()}}
-\item \href{#method-RepresentativeMicrohaplotypesForTarget-to_list}{\code{RepresentativeMicrohaplotypesForTarget$to_list()}}
-\item \href{#method-RepresentativeMicrohaplotypesForTarget-to_json_list}{\code{RepresentativeMicrohaplotypesForTarget$to_json_list()}}
-\item \href{#method-RepresentativeMicrohaplotypesForTarget-to_json}{\code{RepresentativeMicrohaplotypesForTarget$to_json()}}
-\item \href{#method-RepresentativeMicrohaplotypesForTarget-clone}{\code{RepresentativeMicrohaplotypesForTarget$clone()}}
-}
+  \itemize{
+    \item \href{#method-RepresentativeMicrohaplotypesForTarget-initialize}{\code{RepresentativeMicrohaplotypesForTarget$new()}}
+    \item \href{#method-RepresentativeMicrohaplotypesForTarget-validate}{\code{RepresentativeMicrohaplotypesForTarget$validate()}}
+    \item \href{#method-RepresentativeMicrohaplotypesForTarget-to_list}{\code{RepresentativeMicrohaplotypesForTarget$to_list()}}
+    \item \href{#method-RepresentativeMicrohaplotypesForTarget-to_json_list}{\code{RepresentativeMicrohaplotypesForTarget$to_json_list()}}
+    \item \href{#method-RepresentativeMicrohaplotypesForTarget-to_json}{\code{RepresentativeMicrohaplotypesForTarget$to_json()}}
+    \item \href{#method-RepresentativeMicrohaplotypesForTarget-clone}{\code{RepresentativeMicrohaplotypesForTarget$clone()}}
+  }
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-RepresentativeMicrohaplotypesForTarget-new"></a>}}
-\if{latex}{\out{\hypertarget{method-RepresentativeMicrohaplotypesForTarget-new}{}}}
-\subsection{Method \code{new()}}{
-Create a new instance.
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{RepresentativeMicrohaplotypesForTarget$new(
+\if{html}{\out{<a id="method-RepresentativeMicrohaplotypesForTarget-initialize"></a>}}
+\if{latex}{\out{\hypertarget{method-RepresentativeMicrohaplotypesForTarget-initialize}{}}}
+\subsection{\code{RepresentativeMicrohaplotypesForTarget$new()}}{
+  Create a new instance.
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{RepresentativeMicrohaplotypesForTarget$new(
   mhap_location = NULL,
   microhaplotypes = list(),
   target_id = NA_real_,
   extras = list()
-)}\if{html}{\out{</div>}}
+)}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Arguments}{
+    \if{html}{\out{<div class="arguments">}}
+    \describe{
+      \item{\code{mhap_location}}{A genomic location that was analyzed for this target info, this allows listing location that may be different from the full target location (e.g 1 trimmed off the full length).}
+      \item{\code{microhaplotypes}}{A list of all the microhaplotypes for a target.}
+      \item{\code{target_id}}{The index into the target_info list.}
+      \item{\code{extras}}{Additional properties not explicitly defined in the schema.}
+    }
+    \if{html}{\out{</div>}}
+  }
 }
 
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{mhap_location}}{A genomic location that was analyzed for this target info, this allows listing location that may be different from the full target location (e.g 1 trimmed off the full length).}
-
-\item{\code{microhaplotypes}}{A list of all the microhaplotypes for a target.}
-
-\item{\code{target_id}}{The index into the target_info list.}
-
-\item{\code{extras}}{Additional properties not explicitly defined in the schema.}
-}
-\if{html}{\out{</div>}}
-}
-}
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-RepresentativeMicrohaplotypesForTarget-validate"></a>}}
 \if{latex}{\out{\hypertarget{method-RepresentativeMicrohaplotypesForTarget-validate}{}}}
-\subsection{Method \code{validate()}}{
-Validate the current instance against schema-derived constraints.
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{RepresentativeMicrohaplotypesForTarget$validate()}\if{html}{\out{</div>}}
+\subsection{\code{RepresentativeMicrohaplotypesForTarget$validate()}}{
+  Validate the current instance against schema-derived constraints.
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{RepresentativeMicrohaplotypesForTarget$validate()}
+    \if{html}{\out{</div>}}
+  }
 }
 
-}
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-RepresentativeMicrohaplotypesForTarget-to_list"></a>}}
 \if{latex}{\out{\hypertarget{method-RepresentativeMicrohaplotypesForTarget-to_list}{}}}
-\subsection{Method \code{to_list()}}{
-Convert the object to a plain R list using in-memory values.
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{RepresentativeMicrohaplotypesForTarget$to_list()}\if{html}{\out{</div>}}
+\subsection{\code{RepresentativeMicrohaplotypesForTarget$to_list()}}{
+  Convert the object to a plain R list using in-memory values.
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{RepresentativeMicrohaplotypesForTarget$to_list()}
+    \if{html}{\out{</div>}}
+  }
 }
 
-}
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-RepresentativeMicrohaplotypesForTarget-to_json_list"></a>}}
 \if{latex}{\out{\hypertarget{method-RepresentativeMicrohaplotypesForTarget-to_json_list}{}}}
-\subsection{Method \code{to_json_list()}}{
-Convert the object to a JSON-ready R list.
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{RepresentativeMicrohaplotypesForTarget$to_json_list()}\if{html}{\out{</div>}}
+\subsection{\code{RepresentativeMicrohaplotypesForTarget$to_json_list()}}{
+  Convert the object to a JSON-ready R list.
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{RepresentativeMicrohaplotypesForTarget$to_json_list()}
+    \if{html}{\out{</div>}}
+  }
 }
 
-}
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-RepresentativeMicrohaplotypesForTarget-to_json"></a>}}
 \if{latex}{\out{\hypertarget{method-RepresentativeMicrohaplotypesForTarget-to_json}{}}}
-\subsection{Method \code{to_json()}}{
-Convert the object to a JSON string.
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{RepresentativeMicrohaplotypesForTarget$to_json(
+\subsection{\code{RepresentativeMicrohaplotypesForTarget$to_json()}}{
+  Convert the object to a JSON string.
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{RepresentativeMicrohaplotypesForTarget$to_json(
   pretty = FALSE,
   auto_unbox = TRUE,
   ...
-)}\if{html}{\out{</div>}}
+)}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Arguments}{
+    \if{html}{\out{<div class="arguments">}}
+    \describe{
+      \item{\code{pretty}}{Logical; pretty-print the JSON.}
+      \item{\code{auto_unbox}}{Logical; passed to \code{\link[jsonlite:toJSON]{jsonlite::toJSON()}}.}
+      \item{\code{...}}{Additional arguments passed to \code{\link[jsonlite:toJSON]{jsonlite::toJSON()}}.}
+    }
+    \if{html}{\out{</div>}}
+  }
 }
 
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{pretty}}{Logical; pretty-print the JSON.}
-
-\item{\code{auto_unbox}}{Logical; passed to \code{\link[jsonlite:fromJSON]{jsonlite::toJSON()}}.}
-
-\item{\code{...}}{Additional arguments passed to \code{\link[jsonlite:fromJSON]{jsonlite::toJSON()}}.}
-}
-\if{html}{\out{</div>}}
-}
-}
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-RepresentativeMicrohaplotypesForTarget-clone"></a>}}
 \if{latex}{\out{\hypertarget{method-RepresentativeMicrohaplotypesForTarget-clone}{}}}
-\subsection{Method \code{clone()}}{
-The objects of this class are cloneable with this method.
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{RepresentativeMicrohaplotypesForTarget$clone(deep = FALSE)}\if{html}{\out{</div>}}
+\subsection{\code{RepresentativeMicrohaplotypesForTarget$clone()}}{
+  The objects of this class are cloneable with this method.
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{RepresentativeMicrohaplotypesForTarget$clone(deep = FALSE)}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Arguments}{
+    \if{html}{\out{<div class="arguments">}}
+    \describe{
+      \item{\code{deep}}{Whether to make a deep clone.}
+    }
+    \if{html}{\out{</div>}}
+  }
 }
 
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{deep}}{Whether to make a deep clone.}
-}
-\if{html}{\out{</div>}}
-}
-}
 }

@@ -7,11 +7,6 @@
 An \code{\link[R6:R6Class]{R6::R6Class()}} generator object.
 }
 \description{
-TargetInfo
-
-TargetInfo
-}
-\details{
 Information about a specific targeted microhaplotype.
 
 Auto-generated R6 class from JSON Schema.
@@ -37,44 +32,45 @@ See inline method documentation for \code{initialize()}, \code{validate()}, \cod
 }
 
 \section{Public fields}{
-\if{html}{\out{<div class="r6-fields">}}
-\describe{
-\item{\code{forward_primer}}{The forward primer for this target.}
+  \if{html}{\out{<div class="r6-fields">}}
+  \describe{
+    \item{\code{forward_primer}}{The forward primer for this target.}
 
-\item{\code{gene_name}}{An identifier of the gene, if any, is being covered with this targeted.}
+    \item{\code{gene_name}}{An identifier of the gene, if any, is being covered with this targeted.}
 
-\item{\code{insert_location}}{The intended genomic location of the insert of the amplicon (the location between the end of the forward primer and the beginning of the reverse primer).}
+    \item{\code{insert_location}}{The intended genomic location of the insert of the amplicon (the location between the end of the forward primer and the beginning of the reverse primer).}
 
-\item{\code{markers_of_interest}}{A list of markers of interest that are covered by this target.}
+    \item{\code{markers_of_interest}}{A list of markers of interest that are covered by this target.}
 
-\item{\code{reverse_primer}}{The reverse primer for this target.}
+    \item{\code{reverse_primer}}{The reverse primer for this target.}
 
-\item{\code{target_attributes}}{A list of classification types for this target.}
+    \item{\code{target_attributes}}{A list of classification types for this target.}
 
-\item{\code{target_name}}{A name for this target.}
+    \item{\code{target_name}}{A name for this target.}
 
-\item{\code{extras}}{Additional properties not explicitly defined in the schema.}
-}
-\if{html}{\out{</div>}}
+    \item{\code{extras}}{Additional properties not explicitly defined in the schema.}
+  }
+  \if{html}{\out{</div>}}
 }
 \section{Methods}{
 \subsection{Public methods}{
-\itemize{
-\item \href{#method-TargetInfo-new}{\code{TargetInfo$new()}}
-\item \href{#method-TargetInfo-validate}{\code{TargetInfo$validate()}}
-\item \href{#method-TargetInfo-to_list}{\code{TargetInfo$to_list()}}
-\item \href{#method-TargetInfo-to_json_list}{\code{TargetInfo$to_json_list()}}
-\item \href{#method-TargetInfo-to_json}{\code{TargetInfo$to_json()}}
-\item \href{#method-TargetInfo-clone}{\code{TargetInfo$clone()}}
-}
+  \itemize{
+    \item \href{#method-TargetInfo-initialize}{\code{TargetInfo$new()}}
+    \item \href{#method-TargetInfo-validate}{\code{TargetInfo$validate()}}
+    \item \href{#method-TargetInfo-to_list}{\code{TargetInfo$to_list()}}
+    \item \href{#method-TargetInfo-to_json_list}{\code{TargetInfo$to_json_list()}}
+    \item \href{#method-TargetInfo-to_json}{\code{TargetInfo$to_json()}}
+    \item \href{#method-TargetInfo-clone}{\code{TargetInfo$clone()}}
+  }
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-TargetInfo-new"></a>}}
-\if{latex}{\out{\hypertarget{method-TargetInfo-new}{}}}
-\subsection{Method \code{new()}}{
-Create a new instance.
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{TargetInfo$new(
+\if{html}{\out{<a id="method-TargetInfo-initialize"></a>}}
+\if{latex}{\out{\hypertarget{method-TargetInfo-initialize}{}}}
+\subsection{\code{TargetInfo$new()}}{
+  Create a new instance.
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{TargetInfo$new(
   forward_primer = NULL,
   gene_name = NULL,
   insert_location = NULL,
@@ -83,97 +79,99 @@ Create a new instance.
   target_attributes = NULL,
   target_name = NA_character_,
   extras = list()
-)}\if{html}{\out{</div>}}
+)}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Arguments}{
+    \if{html}{\out{<div class="arguments">}}
+    \describe{
+      \item{\code{forward_primer}}{The forward primer for this target.}
+      \item{\code{gene_name}}{An identifier of the gene, if any, is being covered with this targeted.}
+      \item{\code{insert_location}}{The intended genomic location of the insert of the amplicon (the location between the end of the forward primer and the beginning of the reverse primer).}
+      \item{\code{markers_of_interest}}{A list of markers of interest that are covered by this target.}
+      \item{\code{reverse_primer}}{The reverse primer for this target.}
+      \item{\code{target_attributes}}{A list of classification types for this target.}
+      \item{\code{target_name}}{A name for this target.}
+      \item{\code{extras}}{Additional properties not explicitly defined in the schema.}
+    }
+    \if{html}{\out{</div>}}
+  }
 }
 
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{forward_primer}}{The forward primer for this target.}
-
-\item{\code{gene_name}}{An identifier of the gene, if any, is being covered with this targeted.}
-
-\item{\code{insert_location}}{The intended genomic location of the insert of the amplicon (the location between the end of the forward primer and the beginning of the reverse primer).}
-
-\item{\code{markers_of_interest}}{A list of markers of interest that are covered by this target.}
-
-\item{\code{reverse_primer}}{The reverse primer for this target.}
-
-\item{\code{target_attributes}}{A list of classification types for this target.}
-
-\item{\code{target_name}}{A name for this target.}
-
-\item{\code{extras}}{Additional properties not explicitly defined in the schema.}
-}
-\if{html}{\out{</div>}}
-}
-}
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-TargetInfo-validate"></a>}}
 \if{latex}{\out{\hypertarget{method-TargetInfo-validate}{}}}
-\subsection{Method \code{validate()}}{
-Validate the current instance against schema-derived constraints.
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{TargetInfo$validate()}\if{html}{\out{</div>}}
+\subsection{\code{TargetInfo$validate()}}{
+  Validate the current instance against schema-derived constraints.
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{TargetInfo$validate()}
+    \if{html}{\out{</div>}}
+  }
 }
 
-}
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-TargetInfo-to_list"></a>}}
 \if{latex}{\out{\hypertarget{method-TargetInfo-to_list}{}}}
-\subsection{Method \code{to_list()}}{
-Convert the object to a plain R list using in-memory values.
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{TargetInfo$to_list()}\if{html}{\out{</div>}}
+\subsection{\code{TargetInfo$to_list()}}{
+  Convert the object to a plain R list using in-memory values.
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{TargetInfo$to_list()}
+    \if{html}{\out{</div>}}
+  }
 }
 
-}
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-TargetInfo-to_json_list"></a>}}
 \if{latex}{\out{\hypertarget{method-TargetInfo-to_json_list}{}}}
-\subsection{Method \code{to_json_list()}}{
-Convert the object to a JSON-ready R list.
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{TargetInfo$to_json_list()}\if{html}{\out{</div>}}
+\subsection{\code{TargetInfo$to_json_list()}}{
+  Convert the object to a JSON-ready R list.
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{TargetInfo$to_json_list()}
+    \if{html}{\out{</div>}}
+  }
 }
 
-}
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-TargetInfo-to_json"></a>}}
 \if{latex}{\out{\hypertarget{method-TargetInfo-to_json}{}}}
-\subsection{Method \code{to_json()}}{
-Convert the object to a JSON string.
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{TargetInfo$to_json(pretty = FALSE, auto_unbox = TRUE, ...)}\if{html}{\out{</div>}}
+\subsection{\code{TargetInfo$to_json()}}{
+  Convert the object to a JSON string.
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{TargetInfo$to_json(pretty = FALSE, auto_unbox = TRUE, ...)}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Arguments}{
+    \if{html}{\out{<div class="arguments">}}
+    \describe{
+      \item{\code{pretty}}{Logical; pretty-print the JSON.}
+      \item{\code{auto_unbox}}{Logical; passed to \code{\link[jsonlite:toJSON]{jsonlite::toJSON()}}.}
+      \item{\code{...}}{Additional arguments passed to \code{\link[jsonlite:toJSON]{jsonlite::toJSON()}}.}
+    }
+    \if{html}{\out{</div>}}
+  }
 }
 
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{pretty}}{Logical; pretty-print the JSON.}
-
-\item{\code{auto_unbox}}{Logical; passed to \code{\link[jsonlite:fromJSON]{jsonlite::toJSON()}}.}
-
-\item{\code{...}}{Additional arguments passed to \code{\link[jsonlite:fromJSON]{jsonlite::toJSON()}}.}
-}
-\if{html}{\out{</div>}}
-}
-}
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-TargetInfo-clone"></a>}}
 \if{latex}{\out{\hypertarget{method-TargetInfo-clone}{}}}
-\subsection{Method \code{clone()}}{
-The objects of this class are cloneable with this method.
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{TargetInfo$clone(deep = FALSE)}\if{html}{\out{</div>}}
+\subsection{\code{TargetInfo$clone()}}{
+  The objects of this class are cloneable with this method.
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{TargetInfo$clone(deep = FALSE)}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Arguments}{
+    \if{html}{\out{<div class="arguments">}}
+    \describe{
+      \item{\code{deep}}{Whether to make a deep clone.}
+    }
+    \if{html}{\out{</div>}}
+  }
 }
 
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{deep}}{Whether to make a deep clone.}
-}
-\if{html}{\out{</div>}}
-}
-}
 }

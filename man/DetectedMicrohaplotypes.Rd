@@ -7,11 +7,6 @@
 An \code{\link[R6:R6Class]{R6::R6Class()}} generator object.
 }
 \description{
-DetectedMicrohaplotypes
-
-DetectedMicrohaplotypes
-}
-\details{
 The microhaplotypes detected in a targeted amplicon analysis.
 
 Auto-generated R6 class from JSON Schema.
@@ -32,118 +27,126 @@ See inline method documentation for \code{initialize()}, \code{validate()}, \cod
 }
 
 \section{Public fields}{
-\if{html}{\out{<div class="r6-fields">}}
-\describe{
-\item{\code{bioinformatics_run_id}}{The index into bioinformatics_run_info list.}
+  \if{html}{\out{<div class="r6-fields">}}
+  \describe{
+    \item{\code{bioinformatics_run_id}}{The index into bioinformatics_run_info list.}
 
-\item{\code{library_samples}}{A list of the microhaplotypes detected for all samples with a list for each target.}
+    \item{\code{library_samples}}{A list of the microhaplotypes detected for all samples with a list for each target.}
 
-\item{\code{extras}}{Additional properties not explicitly defined in the schema.}
-}
-\if{html}{\out{</div>}}
+    \item{\code{extras}}{Additional properties not explicitly defined in the schema.}
+  }
+  \if{html}{\out{</div>}}
 }
 \section{Methods}{
 \subsection{Public methods}{
-\itemize{
-\item \href{#method-DetectedMicrohaplotypes-new}{\code{DetectedMicrohaplotypes$new()}}
-\item \href{#method-DetectedMicrohaplotypes-validate}{\code{DetectedMicrohaplotypes$validate()}}
-\item \href{#method-DetectedMicrohaplotypes-to_list}{\code{DetectedMicrohaplotypes$to_list()}}
-\item \href{#method-DetectedMicrohaplotypes-to_json_list}{\code{DetectedMicrohaplotypes$to_json_list()}}
-\item \href{#method-DetectedMicrohaplotypes-to_json}{\code{DetectedMicrohaplotypes$to_json()}}
-\item \href{#method-DetectedMicrohaplotypes-clone}{\code{DetectedMicrohaplotypes$clone()}}
-}
+  \itemize{
+    \item \href{#method-DetectedMicrohaplotypes-initialize}{\code{DetectedMicrohaplotypes$new()}}
+    \item \href{#method-DetectedMicrohaplotypes-validate}{\code{DetectedMicrohaplotypes$validate()}}
+    \item \href{#method-DetectedMicrohaplotypes-to_list}{\code{DetectedMicrohaplotypes$to_list()}}
+    \item \href{#method-DetectedMicrohaplotypes-to_json_list}{\code{DetectedMicrohaplotypes$to_json_list()}}
+    \item \href{#method-DetectedMicrohaplotypes-to_json}{\code{DetectedMicrohaplotypes$to_json()}}
+    \item \href{#method-DetectedMicrohaplotypes-clone}{\code{DetectedMicrohaplotypes$clone()}}
+  }
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-DetectedMicrohaplotypes-new"></a>}}
-\if{latex}{\out{\hypertarget{method-DetectedMicrohaplotypes-new}{}}}
-\subsection{Method \code{new()}}{
-Create a new instance.
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{DetectedMicrohaplotypes$new(
+\if{html}{\out{<a id="method-DetectedMicrohaplotypes-initialize"></a>}}
+\if{latex}{\out{\hypertarget{method-DetectedMicrohaplotypes-initialize}{}}}
+\subsection{\code{DetectedMicrohaplotypes$new()}}{
+  Create a new instance.
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{DetectedMicrohaplotypes$new(
   bioinformatics_run_id = NULL,
   library_samples = list(),
   extras = list()
-)}\if{html}{\out{</div>}}
+)}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Arguments}{
+    \if{html}{\out{<div class="arguments">}}
+    \describe{
+      \item{\code{bioinformatics_run_id}}{The index into bioinformatics_run_info list.}
+      \item{\code{library_samples}}{A list of the microhaplotypes detected for all samples with a list for each target.}
+      \item{\code{extras}}{Additional properties not explicitly defined in the schema.}
+    }
+    \if{html}{\out{</div>}}
+  }
 }
 
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{bioinformatics_run_id}}{The index into bioinformatics_run_info list.}
-
-\item{\code{library_samples}}{A list of the microhaplotypes detected for all samples with a list for each target.}
-
-\item{\code{extras}}{Additional properties not explicitly defined in the schema.}
-}
-\if{html}{\out{</div>}}
-}
-}
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-DetectedMicrohaplotypes-validate"></a>}}
 \if{latex}{\out{\hypertarget{method-DetectedMicrohaplotypes-validate}{}}}
-\subsection{Method \code{validate()}}{
-Validate the current instance against schema-derived constraints.
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{DetectedMicrohaplotypes$validate()}\if{html}{\out{</div>}}
+\subsection{\code{DetectedMicrohaplotypes$validate()}}{
+  Validate the current instance against schema-derived constraints.
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{DetectedMicrohaplotypes$validate()}
+    \if{html}{\out{</div>}}
+  }
 }
 
-}
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-DetectedMicrohaplotypes-to_list"></a>}}
 \if{latex}{\out{\hypertarget{method-DetectedMicrohaplotypes-to_list}{}}}
-\subsection{Method \code{to_list()}}{
-Convert the object to a plain R list using in-memory values.
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{DetectedMicrohaplotypes$to_list()}\if{html}{\out{</div>}}
+\subsection{\code{DetectedMicrohaplotypes$to_list()}}{
+  Convert the object to a plain R list using in-memory values.
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{DetectedMicrohaplotypes$to_list()}
+    \if{html}{\out{</div>}}
+  }
 }
 
-}
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-DetectedMicrohaplotypes-to_json_list"></a>}}
 \if{latex}{\out{\hypertarget{method-DetectedMicrohaplotypes-to_json_list}{}}}
-\subsection{Method \code{to_json_list()}}{
-Convert the object to a JSON-ready R list.
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{DetectedMicrohaplotypes$to_json_list()}\if{html}{\out{</div>}}
+\subsection{\code{DetectedMicrohaplotypes$to_json_list()}}{
+  Convert the object to a JSON-ready R list.
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{DetectedMicrohaplotypes$to_json_list()}
+    \if{html}{\out{</div>}}
+  }
 }
 
-}
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-DetectedMicrohaplotypes-to_json"></a>}}
 \if{latex}{\out{\hypertarget{method-DetectedMicrohaplotypes-to_json}{}}}
-\subsection{Method \code{to_json()}}{
-Convert the object to a JSON string.
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{DetectedMicrohaplotypes$to_json(pretty = FALSE, auto_unbox = TRUE, ...)}\if{html}{\out{</div>}}
+\subsection{\code{DetectedMicrohaplotypes$to_json()}}{
+  Convert the object to a JSON string.
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{DetectedMicrohaplotypes$to_json(pretty = FALSE, auto_unbox = TRUE, ...)}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Arguments}{
+    \if{html}{\out{<div class="arguments">}}
+    \describe{
+      \item{\code{pretty}}{Logical; pretty-print the JSON.}
+      \item{\code{auto_unbox}}{Logical; passed to \code{\link[jsonlite:toJSON]{jsonlite::toJSON()}}.}
+      \item{\code{...}}{Additional arguments passed to \code{\link[jsonlite:toJSON]{jsonlite::toJSON()}}.}
+    }
+    \if{html}{\out{</div>}}
+  }
 }
 
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{pretty}}{Logical; pretty-print the JSON.}
-
-\item{\code{auto_unbox}}{Logical; passed to \code{\link[jsonlite:fromJSON]{jsonlite::toJSON()}}.}
-
-\item{\code{...}}{Additional arguments passed to \code{\link[jsonlite:fromJSON]{jsonlite::toJSON()}}.}
-}
-\if{html}{\out{</div>}}
-}
-}
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-DetectedMicrohaplotypes-clone"></a>}}
 \if{latex}{\out{\hypertarget{method-DetectedMicrohaplotypes-clone}{}}}
-\subsection{Method \code{clone()}}{
-The objects of this class are cloneable with this method.
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{DetectedMicrohaplotypes$clone(deep = FALSE)}\if{html}{\out{</div>}}
+\subsection{\code{DetectedMicrohaplotypes$clone()}}{
+  The objects of this class are cloneable with this method.
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{DetectedMicrohaplotypes$clone(deep = FALSE)}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Arguments}{
+    \if{html}{\out{<div class="arguments">}}
+    \describe{
+      \item{\code{deep}}{Whether to make a deep clone.}
+    }
+    \if{html}{\out{</div>}}
+  }
 }
 
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{deep}}{Whether to make a deep clone.}
-}
-\if{html}{\out{</div>}}
-}
-}
 }

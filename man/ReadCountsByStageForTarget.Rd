@@ -7,11 +7,6 @@
 An \code{\link[R6:R6Class]{R6::R6Class()}} generator object.
 }
 \description{
-ReadCountsByStageForTarget
-
-ReadCountsByStageForTarget
-}
-\details{
 Information on the reads counts at several stages of a pipeline for a target.
 
 Auto-generated R6 class from JSON Schema.
@@ -32,118 +27,126 @@ See inline method documentation for \code{initialize()}, \code{validate()}, \cod
 }
 
 \section{Public fields}{
-\if{html}{\out{<div class="r6-fields">}}
-\describe{
-\item{\code{stages}}{The read counts by each stage.}
+  \if{html}{\out{<div class="r6-fields">}}
+  \describe{
+    \item{\code{stages}}{The read counts by each stage.}
 
-\item{\code{target_id}}{The index into the target_info list.}
+    \item{\code{target_id}}{The index into the target_info list.}
 
-\item{\code{extras}}{Additional properties not explicitly defined in the schema.}
-}
-\if{html}{\out{</div>}}
+    \item{\code{extras}}{Additional properties not explicitly defined in the schema.}
+  }
+  \if{html}{\out{</div>}}
 }
 \section{Methods}{
 \subsection{Public methods}{
-\itemize{
-\item \href{#method-ReadCountsByStageForTarget-new}{\code{ReadCountsByStageForTarget$new()}}
-\item \href{#method-ReadCountsByStageForTarget-validate}{\code{ReadCountsByStageForTarget$validate()}}
-\item \href{#method-ReadCountsByStageForTarget-to_list}{\code{ReadCountsByStageForTarget$to_list()}}
-\item \href{#method-ReadCountsByStageForTarget-to_json_list}{\code{ReadCountsByStageForTarget$to_json_list()}}
-\item \href{#method-ReadCountsByStageForTarget-to_json}{\code{ReadCountsByStageForTarget$to_json()}}
-\item \href{#method-ReadCountsByStageForTarget-clone}{\code{ReadCountsByStageForTarget$clone()}}
-}
+  \itemize{
+    \item \href{#method-ReadCountsByStageForTarget-initialize}{\code{ReadCountsByStageForTarget$new()}}
+    \item \href{#method-ReadCountsByStageForTarget-validate}{\code{ReadCountsByStageForTarget$validate()}}
+    \item \href{#method-ReadCountsByStageForTarget-to_list}{\code{ReadCountsByStageForTarget$to_list()}}
+    \item \href{#method-ReadCountsByStageForTarget-to_json_list}{\code{ReadCountsByStageForTarget$to_json_list()}}
+    \item \href{#method-ReadCountsByStageForTarget-to_json}{\code{ReadCountsByStageForTarget$to_json()}}
+    \item \href{#method-ReadCountsByStageForTarget-clone}{\code{ReadCountsByStageForTarget$clone()}}
+  }
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-ReadCountsByStageForTarget-new"></a>}}
-\if{latex}{\out{\hypertarget{method-ReadCountsByStageForTarget-new}{}}}
-\subsection{Method \code{new()}}{
-Create a new instance.
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{ReadCountsByStageForTarget$new(
+\if{html}{\out{<a id="method-ReadCountsByStageForTarget-initialize"></a>}}
+\if{latex}{\out{\hypertarget{method-ReadCountsByStageForTarget-initialize}{}}}
+\subsection{\code{ReadCountsByStageForTarget$new()}}{
+  Create a new instance.
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{ReadCountsByStageForTarget$new(
   stages = list(),
   target_id = NA_real_,
   extras = list()
-)}\if{html}{\out{</div>}}
+)}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Arguments}{
+    \if{html}{\out{<div class="arguments">}}
+    \describe{
+      \item{\code{stages}}{The read counts by each stage.}
+      \item{\code{target_id}}{The index into the target_info list.}
+      \item{\code{extras}}{Additional properties not explicitly defined in the schema.}
+    }
+    \if{html}{\out{</div>}}
+  }
 }
 
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{stages}}{The read counts by each stage.}
-
-\item{\code{target_id}}{The index into the target_info list.}
-
-\item{\code{extras}}{Additional properties not explicitly defined in the schema.}
-}
-\if{html}{\out{</div>}}
-}
-}
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-ReadCountsByStageForTarget-validate"></a>}}
 \if{latex}{\out{\hypertarget{method-ReadCountsByStageForTarget-validate}{}}}
-\subsection{Method \code{validate()}}{
-Validate the current instance against schema-derived constraints.
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{ReadCountsByStageForTarget$validate()}\if{html}{\out{</div>}}
+\subsection{\code{ReadCountsByStageForTarget$validate()}}{
+  Validate the current instance against schema-derived constraints.
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{ReadCountsByStageForTarget$validate()}
+    \if{html}{\out{</div>}}
+  }
 }
 
-}
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-ReadCountsByStageForTarget-to_list"></a>}}
 \if{latex}{\out{\hypertarget{method-ReadCountsByStageForTarget-to_list}{}}}
-\subsection{Method \code{to_list()}}{
-Convert the object to a plain R list using in-memory values.
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{ReadCountsByStageForTarget$to_list()}\if{html}{\out{</div>}}
+\subsection{\code{ReadCountsByStageForTarget$to_list()}}{
+  Convert the object to a plain R list using in-memory values.
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{ReadCountsByStageForTarget$to_list()}
+    \if{html}{\out{</div>}}
+  }
 }
 
-}
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-ReadCountsByStageForTarget-to_json_list"></a>}}
 \if{latex}{\out{\hypertarget{method-ReadCountsByStageForTarget-to_json_list}{}}}
-\subsection{Method \code{to_json_list()}}{
-Convert the object to a JSON-ready R list.
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{ReadCountsByStageForTarget$to_json_list()}\if{html}{\out{</div>}}
+\subsection{\code{ReadCountsByStageForTarget$to_json_list()}}{
+  Convert the object to a JSON-ready R list.
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{ReadCountsByStageForTarget$to_json_list()}
+    \if{html}{\out{</div>}}
+  }
 }
 
-}
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-ReadCountsByStageForTarget-to_json"></a>}}
 \if{latex}{\out{\hypertarget{method-ReadCountsByStageForTarget-to_json}{}}}
-\subsection{Method \code{to_json()}}{
-Convert the object to a JSON string.
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{ReadCountsByStageForTarget$to_json(pretty = FALSE, auto_unbox = TRUE, ...)}\if{html}{\out{</div>}}
+\subsection{\code{ReadCountsByStageForTarget$to_json()}}{
+  Convert the object to a JSON string.
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{ReadCountsByStageForTarget$to_json(pretty = FALSE, auto_unbox = TRUE, ...)}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Arguments}{
+    \if{html}{\out{<div class="arguments">}}
+    \describe{
+      \item{\code{pretty}}{Logical; pretty-print the JSON.}
+      \item{\code{auto_unbox}}{Logical; passed to \code{\link[jsonlite:toJSON]{jsonlite::toJSON()}}.}
+      \item{\code{...}}{Additional arguments passed to \code{\link[jsonlite:toJSON]{jsonlite::toJSON()}}.}
+    }
+    \if{html}{\out{</div>}}
+  }
 }
 
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{pretty}}{Logical; pretty-print the JSON.}
-
-\item{\code{auto_unbox}}{Logical; passed to \code{\link[jsonlite:fromJSON]{jsonlite::toJSON()}}.}
-
-\item{\code{...}}{Additional arguments passed to \code{\link[jsonlite:fromJSON]{jsonlite::toJSON()}}.}
-}
-\if{html}{\out{</div>}}
-}
-}
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-ReadCountsByStageForTarget-clone"></a>}}
 \if{latex}{\out{\hypertarget{method-ReadCountsByStageForTarget-clone}{}}}
-\subsection{Method \code{clone()}}{
-The objects of this class are cloneable with this method.
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{ReadCountsByStageForTarget$clone(deep = FALSE)}\if{html}{\out{</div>}}
+\subsection{\code{ReadCountsByStageForTarget$clone()}}{
+  The objects of this class are cloneable with this method.
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{ReadCountsByStageForTarget$clone(deep = FALSE)}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Arguments}{
+    \if{html}{\out{<div class="arguments">}}
+    \describe{
+      \item{\code{deep}}{Whether to make a deep clone.}
+    }
+    \if{html}{\out{</div>}}
+  }
 }
 
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{deep}}{Whether to make a deep clone.}
-}
-\if{html}{\out{</div>}}
-}
-}
 }

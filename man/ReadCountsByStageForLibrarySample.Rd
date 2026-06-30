@@ -7,11 +7,6 @@
 An \code{\link[R6:R6Class]{R6::R6Class()}} generator object.
 }
 \description{
-ReadCountsByStageForLibrarySample
-
-ReadCountsByStageForLibrarySample
-}
-\details{
 Information on the reads counts at several stages of a pipeline for a library_sample.
 
 Auto-generated R6 class from JSON Schema.
@@ -33,127 +28,134 @@ See inline method documentation for \code{initialize()}, \code{validate()}, \cod
 }
 
 \section{Public fields}{
-\if{html}{\out{<div class="r6-fields">}}
-\describe{
-\item{\code{library_sample_id}}{The index into the library_sample_info list.}
+  \if{html}{\out{<div class="r6-fields">}}
+  \describe{
+    \item{\code{library_sample_id}}{The index into the library_sample_info list.}
 
-\item{\code{read_counts_for_targets}}{A list of counts by stage for a target.}
+    \item{\code{read_counts_for_targets}}{A list of counts by stage for a target.}
 
-\item{\code{total_raw_count}}{The raw counts off the sequencing machine that a sample began with.}
+    \item{\code{total_raw_count}}{The raw counts off the sequencing machine that a sample began with.}
 
-\item{\code{extras}}{Additional properties not explicitly defined in the schema.}
-}
-\if{html}{\out{</div>}}
+    \item{\code{extras}}{Additional properties not explicitly defined in the schema.}
+  }
+  \if{html}{\out{</div>}}
 }
 \section{Methods}{
 \subsection{Public methods}{
-\itemize{
-\item \href{#method-ReadCountsByStageForLibrarySample-new}{\code{ReadCountsByStageForLibrarySample$new()}}
-\item \href{#method-ReadCountsByStageForLibrarySample-validate}{\code{ReadCountsByStageForLibrarySample$validate()}}
-\item \href{#method-ReadCountsByStageForLibrarySample-to_list}{\code{ReadCountsByStageForLibrarySample$to_list()}}
-\item \href{#method-ReadCountsByStageForLibrarySample-to_json_list}{\code{ReadCountsByStageForLibrarySample$to_json_list()}}
-\item \href{#method-ReadCountsByStageForLibrarySample-to_json}{\code{ReadCountsByStageForLibrarySample$to_json()}}
-\item \href{#method-ReadCountsByStageForLibrarySample-clone}{\code{ReadCountsByStageForLibrarySample$clone()}}
-}
+  \itemize{
+    \item \href{#method-ReadCountsByStageForLibrarySample-initialize}{\code{ReadCountsByStageForLibrarySample$new()}}
+    \item \href{#method-ReadCountsByStageForLibrarySample-validate}{\code{ReadCountsByStageForLibrarySample$validate()}}
+    \item \href{#method-ReadCountsByStageForLibrarySample-to_list}{\code{ReadCountsByStageForLibrarySample$to_list()}}
+    \item \href{#method-ReadCountsByStageForLibrarySample-to_json_list}{\code{ReadCountsByStageForLibrarySample$to_json_list()}}
+    \item \href{#method-ReadCountsByStageForLibrarySample-to_json}{\code{ReadCountsByStageForLibrarySample$to_json()}}
+    \item \href{#method-ReadCountsByStageForLibrarySample-clone}{\code{ReadCountsByStageForLibrarySample$clone()}}
+  }
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-ReadCountsByStageForLibrarySample-new"></a>}}
-\if{latex}{\out{\hypertarget{method-ReadCountsByStageForLibrarySample-new}{}}}
-\subsection{Method \code{new()}}{
-Create a new instance.
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{ReadCountsByStageForLibrarySample$new(
+\if{html}{\out{<a id="method-ReadCountsByStageForLibrarySample-initialize"></a>}}
+\if{latex}{\out{\hypertarget{method-ReadCountsByStageForLibrarySample-initialize}{}}}
+\subsection{\code{ReadCountsByStageForLibrarySample$new()}}{
+  Create a new instance.
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{ReadCountsByStageForLibrarySample$new(
   library_sample_id = NA_real_,
   read_counts_for_targets = NULL,
   total_raw_count = NA_real_,
   extras = list()
-)}\if{html}{\out{</div>}}
+)}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Arguments}{
+    \if{html}{\out{<div class="arguments">}}
+    \describe{
+      \item{\code{library_sample_id}}{The index into the library_sample_info list.}
+      \item{\code{read_counts_for_targets}}{A list of counts by stage for a target.}
+      \item{\code{total_raw_count}}{The raw counts off the sequencing machine that a sample began with.}
+      \item{\code{extras}}{Additional properties not explicitly defined in the schema.}
+    }
+    \if{html}{\out{</div>}}
+  }
 }
 
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{library_sample_id}}{The index into the library_sample_info list.}
-
-\item{\code{read_counts_for_targets}}{A list of counts by stage for a target.}
-
-\item{\code{total_raw_count}}{The raw counts off the sequencing machine that a sample began with.}
-
-\item{\code{extras}}{Additional properties not explicitly defined in the schema.}
-}
-\if{html}{\out{</div>}}
-}
-}
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-ReadCountsByStageForLibrarySample-validate"></a>}}
 \if{latex}{\out{\hypertarget{method-ReadCountsByStageForLibrarySample-validate}{}}}
-\subsection{Method \code{validate()}}{
-Validate the current instance against schema-derived constraints.
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{ReadCountsByStageForLibrarySample$validate()}\if{html}{\out{</div>}}
+\subsection{\code{ReadCountsByStageForLibrarySample$validate()}}{
+  Validate the current instance against schema-derived constraints.
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{ReadCountsByStageForLibrarySample$validate()}
+    \if{html}{\out{</div>}}
+  }
 }
 
-}
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-ReadCountsByStageForLibrarySample-to_list"></a>}}
 \if{latex}{\out{\hypertarget{method-ReadCountsByStageForLibrarySample-to_list}{}}}
-\subsection{Method \code{to_list()}}{
-Convert the object to a plain R list using in-memory values.
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{ReadCountsByStageForLibrarySample$to_list()}\if{html}{\out{</div>}}
+\subsection{\code{ReadCountsByStageForLibrarySample$to_list()}}{
+  Convert the object to a plain R list using in-memory values.
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{ReadCountsByStageForLibrarySample$to_list()}
+    \if{html}{\out{</div>}}
+  }
 }
 
-}
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-ReadCountsByStageForLibrarySample-to_json_list"></a>}}
 \if{latex}{\out{\hypertarget{method-ReadCountsByStageForLibrarySample-to_json_list}{}}}
-\subsection{Method \code{to_json_list()}}{
-Convert the object to a JSON-ready R list.
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{ReadCountsByStageForLibrarySample$to_json_list()}\if{html}{\out{</div>}}
+\subsection{\code{ReadCountsByStageForLibrarySample$to_json_list()}}{
+  Convert the object to a JSON-ready R list.
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{ReadCountsByStageForLibrarySample$to_json_list()}
+    \if{html}{\out{</div>}}
+  }
 }
 
-}
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-ReadCountsByStageForLibrarySample-to_json"></a>}}
 \if{latex}{\out{\hypertarget{method-ReadCountsByStageForLibrarySample-to_json}{}}}
-\subsection{Method \code{to_json()}}{
-Convert the object to a JSON string.
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{ReadCountsByStageForLibrarySample$to_json(
+\subsection{\code{ReadCountsByStageForLibrarySample$to_json()}}{
+  Convert the object to a JSON string.
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{ReadCountsByStageForLibrarySample$to_json(
   pretty = FALSE,
   auto_unbox = TRUE,
   ...
-)}\if{html}{\out{</div>}}
+)}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Arguments}{
+    \if{html}{\out{<div class="arguments">}}
+    \describe{
+      \item{\code{pretty}}{Logical; pretty-print the JSON.}
+      \item{\code{auto_unbox}}{Logical; passed to \code{\link[jsonlite:toJSON]{jsonlite::toJSON()}}.}
+      \item{\code{...}}{Additional arguments passed to \code{\link[jsonlite:toJSON]{jsonlite::toJSON()}}.}
+    }
+    \if{html}{\out{</div>}}
+  }
 }
 
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{pretty}}{Logical; pretty-print the JSON.}
-
-\item{\code{auto_unbox}}{Logical; passed to \code{\link[jsonlite:fromJSON]{jsonlite::toJSON()}}.}
-
-\item{\code{...}}{Additional arguments passed to \code{\link[jsonlite:fromJSON]{jsonlite::toJSON()}}.}
-}
-\if{html}{\out{</div>}}
-}
-}
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-ReadCountsByStageForLibrarySample-clone"></a>}}
 \if{latex}{\out{\hypertarget{method-ReadCountsByStageForLibrarySample-clone}{}}}
-\subsection{Method \code{clone()}}{
-The objects of this class are cloneable with this method.
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{ReadCountsByStageForLibrarySample$clone(deep = FALSE)}\if{html}{\out{</div>}}
+\subsection{\code{ReadCountsByStageForLibrarySample$clone()}}{
+  The objects of this class are cloneable with this method.
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{ReadCountsByStageForLibrarySample$clone(deep = FALSE)}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Arguments}{
+    \if{html}{\out{<div class="arguments">}}
+    \describe{
+      \item{\code{deep}}{Whether to make a deep clone.}
+    }
+    \if{html}{\out{</div>}}
+  }
 }
 
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{deep}}{Whether to make a deep clone.}
-}
-\if{html}{\out{</div>}}
-}
-}
 }

@@ -13,7 +13,7 @@ write_pmo(pmo, path, pretty = FALSE, auto_unbox = TRUE, validate = TRUE, ...)
 
 \item{pretty}{Logical; pretty-print the JSON.}
 
-\item{auto_unbox}{Logical; passed to \code{\link[jsonlite:fromJSON]{jsonlite::toJSON()}}.}
+\item{auto_unbox}{Logical; passed to \code{\link[jsonlite:toJSON]{jsonlite::toJSON()}}.}
 
 \item{validate}{Logical; if \code{TRUE}, validate before writing.}
 
@@ -28,4 +28,9 @@ Information on final microhaplotype results from a targeted amplicon analysis wi
 \details{
 Writes a PMO object to JSON, with optional compression inferred
 from the file extension.
+}
+\examples{
+pmo <- read_pmo(
+  system.file('extdata', 'example_pmo.json.gz', package = 'pmotoolsr'))
+write_pmo(pmo, tempfile(fileext = '.json'))
 }

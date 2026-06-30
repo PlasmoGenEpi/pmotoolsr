@@ -1330,6 +1330,7 @@ LibrarySampleInfo <- R6::R6Class(
       if (!is.null(self$specimen_id) && !is.na(self$specimen_id) && (!is.numeric(self$specimen_id) || length(self$specimen_id) != 1)) stop("LibrarySampleInfo.specimen_id must be a single numeric value")
       if (!is.null(self$specimen_id) && !is.na(self$specimen_id) && self$specimen_id < 0) stop("LibrarySampleInfo.specimen_id < minimum 0")
       if (!is.null(self$specimen_id) && !is.na(self$specimen_id) && !(is.numeric(self$specimen_id) && isTRUE(all.equal(self$specimen_id, as.integer(self$specimen_id))))) stop("LibrarySampleInfo.specimen_id must be integer-like")
+      if (!is.null(self$library_prep_plate_info)) self$library_prep_plate_info$validate()
       if (!is.null(self$qpcr_parasite_density_info)) for (.x in self$qpcr_parasite_density_info) .x$validate()
       invisible(TRUE)
     },
@@ -1340,7 +1341,7 @@ LibrarySampleInfo <- R6::R6Class(
       if (!is.null(self$alternate_identifiers)) out$alternate_identifiers <- self$alternate_identifiers
       if (!is.null(self$experiment_accession)) out$experiment_accession <- if (is.na(self$experiment_accession)) "NA" else self$experiment_accession
       if (!is.null(self$fastqs_loc)) out$fastqs_loc <- if (is.na(self$fastqs_loc)) "NA" else self$fastqs_loc
-      if (!is.null(self$library_prep_plate_info)) out$library_prep_plate_info <- self$library_prep_plate_info
+      if (!is.null(self$library_prep_plate_info)) out$library_prep_plate_info <- self$library_prep_plate_info$to_list()
       if (!is.null(self$library_sample_name)) out$library_sample_name <- if (is.na(self$library_sample_name)) "NA" else self$library_sample_name
       if (!is.null(self$panel_id)) out$panel_id <- self$panel_id
       if (!is.null(self$qpcr_parasite_density_info)) out$qpcr_parasite_density_info <- lapply(self$qpcr_parasite_density_info, function(x) x$to_list())
@@ -1357,7 +1358,7 @@ LibrarySampleInfo <- R6::R6Class(
       if (!is.null(self$alternate_identifiers)) out$alternate_identifiers <- I(self$alternate_identifiers)
       if (!is.null(self$experiment_accession)) out$experiment_accession <- if (is.na(self$experiment_accession)) "NA" else self$experiment_accession
       if (!is.null(self$fastqs_loc)) out$fastqs_loc <- if (is.na(self$fastqs_loc)) "NA" else self$fastqs_loc
-      if (!is.null(self$library_prep_plate_info)) out$library_prep_plate_info <- self$library_prep_plate_info
+      if (!is.null(self$library_prep_plate_info)) out$library_prep_plate_info <- self$library_prep_plate_info$to_json_list()
       if (!is.null(self$library_sample_name)) out$library_sample_name <- if (is.na(self$library_sample_name)) "NA" else self$library_sample_name
       if (!is.null(self$panel_id)) out$panel_id <- pmo_apply_id_offset_write(self$panel_id, "panel_id")
       if (!is.null(self$qpcr_parasite_density_info)) out$qpcr_parasite_density_info <- I(lapply(self$qpcr_parasite_density_info, function(x) x$to_json_list()))
@@ -1386,7 +1387,7 @@ LibrarySampleInfo$from_json <- function(x, validate = TRUE) {
   if (length(missing_required) > 0) stop("LibrarySampleInfo missing required field(s): ", paste(missing_required, collapse = ", "))
   known <- c("alternate_identifiers","experiment_accession","fastqs_loc","library_prep_plate_info","library_sample_name","panel_id","qpcr_parasite_density_info","run_accession","sequencing_info_id","specimen_id")
   extras <- obj[setdiff(names(obj), known)]
-  inst <- LibrarySampleInfo$new(alternate_identifiers = { v <- obj[["alternate_identifiers"]]; if (is.null(v)) NULL else if (length(v) == 0) character() else as.character(unlist(v, use.names = FALSE)) }, experiment_accession = { v <- obj[["experiment_accession"]]; if (is.null(v)) NULL else if (is.character(v) && length(v)==1 && v %in% PMO_NA_STRINGS) NA_character_ else v }, fastqs_loc = { v <- obj[["fastqs_loc"]]; if (is.null(v)) NULL else if (is.character(v) && length(v)==1 && v %in% PMO_NA_STRINGS) NA_character_ else v }, library_prep_plate_info = if (!is.null(obj[["library_prep_plate_info"]])) obj[["library_prep_plate_info"]] else NULL, library_sample_name = { v <- obj[["library_sample_name"]]; if (is.null(v)) NA_character_ else if (is.character(v) && length(v)==1 && v %in% PMO_NA_STRINGS) NA_character_ else v }, panel_id = pmo_apply_id_offset_read(if (!is.null(obj[["panel_id"]])) obj[["panel_id"]] else NA_real_, "panel_id"), qpcr_parasite_density_info = if (!is.null(obj[["qpcr_parasite_density_info"]])) lapply(obj[["qpcr_parasite_density_info"]], function(.x) ParasiteDensity$from_json(.x, validate = FALSE)) else NULL, run_accession = { v <- obj[["run_accession"]]; if (is.null(v)) NULL else if (is.character(v) && length(v)==1 && v %in% PMO_NA_STRINGS) NA_character_ else v }, sequencing_info_id = pmo_apply_id_offset_read(if (!is.null(obj[["sequencing_info_id"]])) obj[["sequencing_info_id"]] else NULL, "sequencing_info_id"), specimen_id = pmo_apply_id_offset_read(if (!is.null(obj[["specimen_id"]])) obj[["specimen_id"]] else NA_real_, "specimen_id"), extras = extras)
+  inst <- LibrarySampleInfo$new(alternate_identifiers = { v <- obj[["alternate_identifiers"]]; if (is.null(v)) NULL else if (length(v) == 0) character() else as.character(unlist(v, use.names = FALSE)) }, experiment_accession = { v <- obj[["experiment_accession"]]; if (is.null(v)) NULL else if (is.character(v) && length(v)==1 && v %in% PMO_NA_STRINGS) NA_character_ else v }, fastqs_loc = { v <- obj[["fastqs_loc"]]; if (is.null(v)) NULL else if (is.character(v) && length(v)==1 && v %in% PMO_NA_STRINGS) NA_character_ else v }, library_prep_plate_info = if (!is.null(obj[["library_prep_plate_info"]])) PlateInfo$from_json(obj[["library_prep_plate_info"]], validate = FALSE) else NULL, library_sample_name = { v <- obj[["library_sample_name"]]; if (is.null(v)) NA_character_ else if (is.character(v) && length(v)==1 && v %in% PMO_NA_STRINGS) NA_character_ else v }, panel_id = pmo_apply_id_offset_read(if (!is.null(obj[["panel_id"]])) obj[["panel_id"]] else NA_real_, "panel_id"), qpcr_parasite_density_info = if (!is.null(obj[["qpcr_parasite_density_info"]])) lapply(obj[["qpcr_parasite_density_info"]], function(.x) ParasiteDensity$from_json(.x, validate = FALSE)) else NULL, run_accession = { v <- obj[["run_accession"]]; if (is.null(v)) NULL else if (is.character(v) && length(v)==1 && v %in% PMO_NA_STRINGS) NA_character_ else v }, sequencing_info_id = pmo_apply_id_offset_read(if (!is.null(obj[["sequencing_info_id"]])) obj[["sequencing_info_id"]] else NULL, "sequencing_info_id"), specimen_id = pmo_apply_id_offset_read(if (!is.null(obj[["specimen_id"]])) obj[["specimen_id"]] else NA_real_, "specimen_id"), extras = extras)
   if (validate) inst$validate()
   inst
 }
@@ -1671,7 +1672,7 @@ ReactionInfo$from_json <- function(x, validate = TRUE) {
   if (length(missing_required) > 0) stop("ReactionInfo missing required field(s): ", paste(missing_required, collapse = ", "))
   known <- c("panel_targets","reaction_name")
   extras <- obj[setdiff(names(obj), known)]
-  inst <- ReactionInfo$new(panel_targets = { v <- obj[["panel_targets"]]; if (is.null(v)) NULL else if (length(v) == 0) numeric() else as.numeric(unlist(v, use.names = FALSE)) }, reaction_name = { v <- obj[["reaction_name"]]; if (is.null(v)) NA_character_ else if (is.character(v) && length(v)==1 && v %in% PMO_NA_STRINGS) NA_character_ else v }, extras = extras)
+  inst <- ReactionInfo$new(panel_targets = { v <- obj[["panel_targets"]]; if (is.null(v)) NULL else if (length(v) == 0) numeric() else pmo_apply_id_offset_read(as.numeric(unlist(v, use.names = FALSE)), "panel_targets") }, reaction_name = { v <- obj[["reaction_name"]]; if (is.null(v)) NA_character_ else if (is.character(v) && length(v)==1 && v %in% PMO_NA_STRINGS) NA_character_ else v }, extras = extras)
   if (validate) inst$validate()
   inst
 }
@@ -1901,6 +1902,7 @@ PmoHeader <- R6::R6Class(
       if (!is.null(self$creation_date) && !is.na(self$creation_date) && !grepl("\\d{4}-(?:0[1-9]|1[0-2])(?:-(?:0[1-9]|[12][0-9]|3[01]))?", self$creation_date, perl = TRUE)) stop("PmoHeader.creation_date does not match pattern: \\d{4}-(?:0[1-9]|1[0-2])(?:-(?:0[1-9]|[12][0-9]|3[01]))?")
       if (!is.null(self$pmo_version) && !is.na(self$pmo_version) && (!is.character(self$pmo_version) || length(self$pmo_version) != 1)) stop("PmoHeader.pmo_version must be a single string")
       if (!is.null(self$pmo_version) && !is.na(self$pmo_version) && !grepl("^[A-z-._0-9 ]+$", self$pmo_version, perl = TRUE)) stop("PmoHeader.pmo_version does not match pattern: ^[A-z-._0-9 ]+$")
+      if (!is.null(self$generation_method)) self$generation_method$validate()
       invisible(TRUE)
     },
 
@@ -1908,7 +1910,7 @@ PmoHeader <- R6::R6Class(
     to_list = function() {
       out <- list()
       if (!is.null(self$creation_date)) out$creation_date <- if (is.na(self$creation_date)) "NA" else self$creation_date
-      if (!is.null(self$generation_method)) out$generation_method <- self$generation_method
+      if (!is.null(self$generation_method)) out$generation_method <- self$generation_method$to_list()
       if (!is.null(self$pmo_version)) out$pmo_version <- if (is.na(self$pmo_version)) "NA" else self$pmo_version
       for (nm in names(self$extras)) out[[nm]] <- self$extras[[nm]]
       out
@@ -1918,7 +1920,7 @@ PmoHeader <- R6::R6Class(
     to_json_list = function() {
       out <- list()
       if (!is.null(self$creation_date)) out$creation_date <- if (is.na(self$creation_date)) "NA" else self$creation_date
-      if (!is.null(self$generation_method)) out$generation_method <- self$generation_method
+      if (!is.null(self$generation_method)) out$generation_method <- self$generation_method$to_json_list()
       if (!is.null(self$pmo_version)) out$pmo_version <- if (is.na(self$pmo_version)) "NA" else self$pmo_version
       for (nm in names(self$extras)) out[[nm]] <- self$extras[[nm]]
       out
@@ -1942,7 +1944,7 @@ PmoHeader$from_json <- function(x, validate = TRUE) {
   if (length(missing_required) > 0) stop("PmoHeader missing required field(s): ", paste(missing_required, collapse = ", "))
   known <- c("creation_date","generation_method","pmo_version")
   extras <- obj[setdiff(names(obj), known)]
-  inst <- PmoHeader$new(creation_date = { v <- obj[["creation_date"]]; if (is.null(v)) NULL else if (is.character(v) && length(v)==1 && v %in% PMO_NA_STRINGS) NA_character_ else v }, generation_method = if (!is.null(obj[["generation_method"]])) obj[["generation_method"]] else NULL, pmo_version = { v <- obj[["pmo_version"]]; if (is.null(v)) NA_character_ else if (is.character(v) && length(v)==1 && v %in% PMO_NA_STRINGS) NA_character_ else v }, extras = extras)
+  inst <- PmoHeader$new(creation_date = { v <- obj[["creation_date"]]; if (is.null(v)) NULL else if (is.character(v) && length(v)==1 && v %in% PMO_NA_STRINGS) NA_character_ else v }, generation_method = if (!is.null(obj[["generation_method"]])) PmoGenerationMethod$from_json(obj[["generation_method"]], validate = FALSE) else NULL, pmo_version = { v <- obj[["pmo_version"]]; if (is.null(v)) NA_character_ else if (is.character(v) && length(v)==1 && v %in% PMO_NA_STRINGS) NA_character_ else v }, extras = extras)
   if (validate) inst$validate()
   inst
 }
@@ -2490,6 +2492,7 @@ ProteinVariant <- R6::R6Class(
       if (!is.null(self$alternative_gene_name) && !is.na(self$alternative_gene_name) && !grepl("^[A-z-._0-9]+$", self$alternative_gene_name, perl = TRUE)) stop("ProteinVariant.alternative_gene_name does not match pattern: ^[A-z-._0-9]+$")
       if (!is.null(self$gene_name) && !is.na(self$gene_name) && (!is.character(self$gene_name) || length(self$gene_name) != 1)) stop("ProteinVariant.gene_name must be a single string")
       if (!is.null(self$gene_name) && !is.na(self$gene_name) && !grepl("^[A-z-._0-9:]+$", self$gene_name, perl = TRUE)) stop("ProteinVariant.gene_name does not match pattern: ^[A-z-._0-9:]+$")
+      if (!is.null(self$codon_genomic_location)) self$codon_genomic_location$validate()
       if (!is.null(self$protein_location)) self$protein_location$validate()
       invisible(TRUE)
     },
@@ -2498,7 +2501,7 @@ ProteinVariant <- R6::R6Class(
     to_list = function() {
       out <- list()
       if (!is.null(self$alternative_gene_name)) out$alternative_gene_name <- if (is.na(self$alternative_gene_name)) "NA" else self$alternative_gene_name
-      if (!is.null(self$codon_genomic_location)) out$codon_genomic_location <- self$codon_genomic_location
+      if (!is.null(self$codon_genomic_location)) out$codon_genomic_location <- self$codon_genomic_location$to_list()
       if (!is.null(self$gene_name)) out$gene_name <- if (is.na(self$gene_name)) "NA" else self$gene_name
       if (!is.null(self$protein_location)) out$protein_location <- self$protein_location$to_list()
       for (nm in names(self$extras)) out[[nm]] <- self$extras[[nm]]
@@ -2509,7 +2512,7 @@ ProteinVariant <- R6::R6Class(
     to_json_list = function() {
       out <- list()
       if (!is.null(self$alternative_gene_name)) out$alternative_gene_name <- if (is.na(self$alternative_gene_name)) "NA" else self$alternative_gene_name
-      if (!is.null(self$codon_genomic_location)) out$codon_genomic_location <- self$codon_genomic_location
+      if (!is.null(self$codon_genomic_location)) out$codon_genomic_location <- self$codon_genomic_location$to_json_list()
       if (!is.null(self$gene_name)) out$gene_name <- if (is.na(self$gene_name)) "NA" else self$gene_name
       if (!is.null(self$protein_location)) out$protein_location <- self$protein_location$to_json_list()
       for (nm in names(self$extras)) out[[nm]] <- self$extras[[nm]]
@@ -2534,7 +2537,7 @@ ProteinVariant$from_json <- function(x, validate = TRUE) {
   if (length(missing_required) > 0) stop("ProteinVariant missing required field(s): ", paste(missing_required, collapse = ", "))
   known <- c("alternative_gene_name","codon_genomic_location","gene_name","protein_location")
   extras <- obj[setdiff(names(obj), known)]
-  inst <- ProteinVariant$new(alternative_gene_name = { v <- obj[["alternative_gene_name"]]; if (is.null(v)) NULL else if (is.character(v) && length(v)==1 && v %in% PMO_NA_STRINGS) NA_character_ else v }, codon_genomic_location = if (!is.null(obj[["codon_genomic_location"]])) obj[["codon_genomic_location"]] else NULL, gene_name = { v <- obj[["gene_name"]]; if (is.null(v)) NULL else if (is.character(v) && length(v)==1 && v %in% PMO_NA_STRINGS) NA_character_ else v }, protein_location = if (!is.null(obj[["protein_location"]])) GenomicLocation$from_json(obj[["protein_location"]], validate = FALSE) else NULL, extras = extras)
+  inst <- ProteinVariant$new(alternative_gene_name = { v <- obj[["alternative_gene_name"]]; if (is.null(v)) NULL else if (is.character(v) && length(v)==1 && v %in% PMO_NA_STRINGS) NA_character_ else v }, codon_genomic_location = if (!is.null(obj[["codon_genomic_location"]])) GenomicLocation$from_json(obj[["codon_genomic_location"]], validate = FALSE) else NULL, gene_name = { v <- obj[["gene_name"]]; if (is.null(v)) NULL else if (is.character(v) && length(v)==1 && v %in% PMO_NA_STRINGS) NA_character_ else v }, protein_location = if (!is.null(obj[["protein_location"]])) GenomicLocation$from_json(obj[["protein_location"]], validate = FALSE) else NULL, extras = extras)
   if (validate) inst$validate()
   inst
 }
@@ -2718,6 +2721,7 @@ RepresentativeMicrohaplotype <- R6::R6Class(
       if (!is.null(self$associated_protein_variants)) for (.x in self$associated_protein_variants) .x$validate()
       if (!is.null(self$associated_seq_variants)) for (.x in self$associated_seq_variants) .x$validate()
       if (!is.null(self$masking)) for (.x in self$masking) .x$validate()
+      if (!is.null(self$pseudocigar)) self$pseudocigar$validate()
       invisible(TRUE)
     },
 
@@ -2729,7 +2733,7 @@ RepresentativeMicrohaplotype <- R6::R6Class(
       if (!is.null(self$associated_seq_variants)) out$associated_seq_variants <- lapply(self$associated_seq_variants, function(x) x$to_list())
       if (!is.null(self$masking)) out$masking <- lapply(self$masking, function(x) x$to_list())
       if (!is.null(self$microhaplotype_name)) out$microhaplotype_name <- if (is.na(self$microhaplotype_name)) "NA" else self$microhaplotype_name
-      if (!is.null(self$pseudocigar)) out$pseudocigar <- self$pseudocigar
+      if (!is.null(self$pseudocigar)) out$pseudocigar <- self$pseudocigar$to_list()
       if (!is.null(self$quality)) out$quality <- if (is.na(self$quality)) "NA" else self$quality
       if (!is.null(self$seq)) out$seq <- if (is.na(self$seq)) "NA" else self$seq
       for (nm in names(self$extras)) out[[nm]] <- self$extras[[nm]]
@@ -2744,7 +2748,7 @@ RepresentativeMicrohaplotype <- R6::R6Class(
       if (!is.null(self$associated_seq_variants)) out$associated_seq_variants <- I(lapply(self$associated_seq_variants, function(x) x$to_json_list()))
       if (!is.null(self$masking)) out$masking <- I(lapply(self$masking, function(x) x$to_json_list()))
       if (!is.null(self$microhaplotype_name)) out$microhaplotype_name <- if (is.na(self$microhaplotype_name)) "NA" else self$microhaplotype_name
-      if (!is.null(self$pseudocigar)) out$pseudocigar <- self$pseudocigar
+      if (!is.null(self$pseudocigar)) out$pseudocigar <- self$pseudocigar$to_json_list()
       if (!is.null(self$quality)) out$quality <- if (is.na(self$quality)) "NA" else self$quality
       if (!is.null(self$seq)) out$seq <- if (is.na(self$seq)) "NA" else self$seq
       for (nm in names(self$extras)) out[[nm]] <- self$extras[[nm]]
@@ -2769,7 +2773,7 @@ RepresentativeMicrohaplotype$from_json <- function(x, validate = TRUE) {
   if (length(missing_required) > 0) stop("RepresentativeMicrohaplotype missing required field(s): ", paste(missing_required, collapse = ", "))
   known <- c("alt_annotations","associated_protein_variants","associated_seq_variants","masking","microhaplotype_name","pseudocigar","quality","seq")
   extras <- obj[setdiff(names(obj), known)]
-  inst <- RepresentativeMicrohaplotype$new(alt_annotations = { v <- obj[["alt_annotations"]]; if (is.null(v)) NULL else if (length(v) == 0) character() else as.character(unlist(v, use.names = FALSE)) }, associated_protein_variants = if (!is.null(obj[["associated_protein_variants"]])) lapply(obj[["associated_protein_variants"]], function(.x) ProteinVariant$from_json(.x, validate = FALSE)) else NULL, associated_seq_variants = if (!is.null(obj[["associated_seq_variants"]])) lapply(obj[["associated_seq_variants"]], function(.x) GenomicLocation$from_json(.x, validate = FALSE)) else NULL, masking = if (!is.null(obj[["masking"]])) lapply(obj[["masking"]], function(.x) MaskingInfo$from_json(.x, validate = FALSE)) else NULL, microhaplotype_name = { v <- obj[["microhaplotype_name"]]; if (is.null(v)) NULL else if (is.character(v) && length(v)==1 && v %in% PMO_NA_STRINGS) NA_character_ else v }, pseudocigar = if (!is.null(obj[["pseudocigar"]])) obj[["pseudocigar"]] else NULL, quality = { v <- obj[["quality"]]; if (is.null(v)) NULL else if (is.character(v) && length(v)==1 && v %in% PMO_NA_STRINGS) NA_character_ else v }, seq = { v <- obj[["seq"]]; if (is.null(v)) NA_character_ else if (is.character(v) && length(v)==1 && v %in% PMO_NA_STRINGS) NA_character_ else v }, extras = extras)
+  inst <- RepresentativeMicrohaplotype$new(alt_annotations = { v <- obj[["alt_annotations"]]; if (is.null(v)) NULL else if (length(v) == 0) character() else as.character(unlist(v, use.names = FALSE)) }, associated_protein_variants = if (!is.null(obj[["associated_protein_variants"]])) lapply(obj[["associated_protein_variants"]], function(.x) ProteinVariant$from_json(.x, validate = FALSE)) else NULL, associated_seq_variants = if (!is.null(obj[["associated_seq_variants"]])) lapply(obj[["associated_seq_variants"]], function(.x) GenomicLocation$from_json(.x, validate = FALSE)) else NULL, masking = if (!is.null(obj[["masking"]])) lapply(obj[["masking"]], function(.x) MaskingInfo$from_json(.x, validate = FALSE)) else NULL, microhaplotype_name = { v <- obj[["microhaplotype_name"]]; if (is.null(v)) NULL else if (is.character(v) && length(v)==1 && v %in% PMO_NA_STRINGS) NA_character_ else v }, pseudocigar = if (!is.null(obj[["pseudocigar"]])) Pseudocigar$from_json(obj[["pseudocigar"]], validate = FALSE) else NULL, quality = { v <- obj[["quality"]]; if (is.null(v)) NULL else if (is.character(v) && length(v)==1 && v %in% PMO_NA_STRINGS) NA_character_ else v }, seq = { v <- obj[["seq"]]; if (is.null(v)) NA_character_ else if (is.character(v) && length(v)==1 && v %in% PMO_NA_STRINGS) NA_character_ else v }, extras = extras)
   if (validate) inst$validate()
   inst
 }
@@ -2823,6 +2827,7 @@ RepresentativeMicrohaplotypesForTarget <- R6::R6Class(
       if (!is.null(self$target_id) && !is.na(self$target_id) && (!is.numeric(self$target_id) || length(self$target_id) != 1)) stop("RepresentativeMicrohaplotypesForTarget.target_id must be a single numeric value")
       if (!is.null(self$target_id) && !is.na(self$target_id) && self$target_id < 0) stop("RepresentativeMicrohaplotypesForTarget.target_id < minimum 0")
       if (!is.null(self$target_id) && !is.na(self$target_id) && !(is.numeric(self$target_id) && isTRUE(all.equal(self$target_id, as.integer(self$target_id))))) stop("RepresentativeMicrohaplotypesForTarget.target_id must be integer-like")
+      if (!is.null(self$mhap_location)) self$mhap_location$validate()
       if (!is.null(self$microhaplotypes)) for (.x in self$microhaplotypes) .x$validate()
       invisible(TRUE)
     },
@@ -2830,7 +2835,7 @@ RepresentativeMicrohaplotypesForTarget <- R6::R6Class(
     #' @description Convert the object to a plain R list using in-memory values.
     to_list = function() {
       out <- list()
-      if (!is.null(self$mhap_location)) out$mhap_location <- self$mhap_location
+      if (!is.null(self$mhap_location)) out$mhap_location <- self$mhap_location$to_list()
       if (!is.null(self$microhaplotypes)) out$microhaplotypes <- lapply(self$microhaplotypes, function(x) x$to_list())
       if (!is.null(self$target_id)) out$target_id <- self$target_id
       for (nm in names(self$extras)) out[[nm]] <- self$extras[[nm]]
@@ -2840,7 +2845,7 @@ RepresentativeMicrohaplotypesForTarget <- R6::R6Class(
     #' @description Convert the object to a JSON-ready R list.
     to_json_list = function() {
       out <- list()
-      if (!is.null(self$mhap_location)) out$mhap_location <- self$mhap_location
+      if (!is.null(self$mhap_location)) out$mhap_location <- self$mhap_location$to_json_list()
       if (!is.null(self$microhaplotypes)) out$microhaplotypes <- I(lapply(self$microhaplotypes, function(x) x$to_json_list()))
       if (!is.null(self$target_id)) out$target_id <- pmo_apply_id_offset_write(self$target_id, "target_id")
       for (nm in names(self$extras)) out[[nm]] <- self$extras[[nm]]
@@ -2865,7 +2870,7 @@ RepresentativeMicrohaplotypesForTarget$from_json <- function(x, validate = TRUE)
   if (length(missing_required) > 0) stop("RepresentativeMicrohaplotypesForTarget missing required field(s): ", paste(missing_required, collapse = ", "))
   known <- c("mhap_location","microhaplotypes","target_id")
   extras <- obj[setdiff(names(obj), known)]
-  inst <- RepresentativeMicrohaplotypesForTarget$new(mhap_location = if (!is.null(obj[["mhap_location"]])) obj[["mhap_location"]] else NULL, microhaplotypes = if (!is.null(obj[["microhaplotypes"]])) lapply(obj[["microhaplotypes"]], function(.x) RepresentativeMicrohaplotype$from_json(.x, validate = FALSE)) else NULL, target_id = pmo_apply_id_offset_read(if (!is.null(obj[["target_id"]])) obj[["target_id"]] else NA_real_, "target_id"), extras = extras)
+  inst <- RepresentativeMicrohaplotypesForTarget$new(mhap_location = if (!is.null(obj[["mhap_location"]])) GenomicLocation$from_json(obj[["mhap_location"]], validate = FALSE) else NULL, microhaplotypes = if (!is.null(obj[["microhaplotypes"]])) lapply(obj[["microhaplotypes"]], function(.x) RepresentativeMicrohaplotype$from_json(.x, validate = FALSE)) else NULL, target_id = pmo_apply_id_offset_read(if (!is.null(obj[["target_id"]])) obj[["target_id"]] else NA_real_, "target_id"), extras = extras)
   if (validate) inst$validate()
   inst
 }
@@ -3241,7 +3246,7 @@ TravelInfo <- R6::R6Class(
       if (!is.null(self$lat_lon) && !is.na(self$lat_lon) && (!is.character(self$lat_lon) || length(self$lat_lon) != 1)) stop("TravelInfo.lat_lon must be a single string")
       if (!is.null(self$lat_lon) && !is.na(self$lat_lon) && !grepl("^[-+]?\\d{1,2}(?:\\.\\d+)?,[-+]?\\d{1,3}(?:\\.\\d+)?$", self$lat_lon, perl = TRUE)) stop("TravelInfo.lat_lon does not match pattern: ^[-+]?\\d{1,2}(?:\\.\\d+)?,[-+]?\\d{1,3}(?:\\.\\d+)?$")
       if (!is.null(self$travel_country) && !is.na(self$travel_country) && (!is.character(self$travel_country) || length(self$travel_country) != 1)) stop("TravelInfo.travel_country must be a single string")
-      if (!is.null(self$travel_country) && !is.na(self$travel_country) && !grepl("^[\\w ,._:'–-]+$", self$travel_country, perl = TRUE)) stop("TravelInfo.travel_country does not match pattern: ^[\\w ,._:'–-]+$")
+      if (!is.null(self$travel_country) && !is.na(self$travel_country) && !grepl("^[\\w ,._:'\u2013-]+$", self$travel_country, perl = TRUE)) stop("TravelInfo.travel_country does not match pattern: ^[\\w ,._:'\u2013-]+$")
       if (!is.null(self$travel_end_date) && !is.na(self$travel_end_date) && (!is.character(self$travel_end_date) || length(self$travel_end_date) != 1)) stop("TravelInfo.travel_end_date must be a single string")
       if (!is.null(self$travel_end_date) && !is.na(self$travel_end_date) && !grepl("\\d{4}-(?:0[1-9]|1[0-2])(?:-(?:0[1-9]|[12][0-9]|3[01]))?", self$travel_end_date, perl = TRUE)) stop("TravelInfo.travel_end_date does not match pattern: \\d{4}-(?:0[1-9]|1[0-2])(?:-(?:0[1-9]|[12][0-9]|3[01]))?")
       if (!is.null(self$travel_start_date) && !is.na(self$travel_start_date) && (!is.character(self$travel_start_date) || length(self$travel_start_date) != 1)) stop("TravelInfo.travel_start_date must be a single string")
@@ -3491,7 +3496,7 @@ SpecimenInfo <- R6::R6Class(
       if (!is.null(self$alternate_identifiers) && length(self$alternate_identifiers) > 0 && any(!grepl("^[A-z-._0-9 ]+$", self$alternate_identifiers, perl = TRUE))) stop("SpecimenInfo.alternate_identifiers contains values that do not match pattern: ^[A-z-._0-9 ]+$")
       if (!is.null(self$blood_meal) && !is.na(self$blood_meal) && (!is.logical(self$blood_meal) || length(self$blood_meal) != 1)) stop("SpecimenInfo.blood_meal must be a single logical value")
       if (!is.null(self$collection_country) && !is.na(self$collection_country) && (!is.character(self$collection_country) || length(self$collection_country) != 1)) stop("SpecimenInfo.collection_country must be a single string")
-      if (!is.null(self$collection_country) && !is.na(self$collection_country) && !grepl("^[\\w ,._:'–-]+$", self$collection_country, perl = TRUE)) stop("SpecimenInfo.collection_country does not match pattern: ^[\\w ,._:'–-]+$")
+      if (!is.null(self$collection_country) && !is.na(self$collection_country) && !grepl("^[\\w ,._:'\u2013-]+$", self$collection_country, perl = TRUE)) stop("SpecimenInfo.collection_country does not match pattern: ^[\\w ,._:'\u2013-]+$")
       if (!is.null(self$collection_date) && !is.na(self$collection_date) && (!is.character(self$collection_date) || length(self$collection_date) != 1)) stop("SpecimenInfo.collection_date must be a single string")
       if (!is.null(self$collection_date) && !is.na(self$collection_date) && !grepl("(?:\\d{4}(?:-(?:0[1-9]|1[0-2])(?:-(?:0[1-9]|[12][0-9]|3[01]))?)?|NA)", self$collection_date, perl = TRUE)) stop("SpecimenInfo.collection_date does not match pattern: (?:\\d{4}(?:-(?:0[1-9]|1[0-2])(?:-(?:0[1-9]|[12][0-9]|3[01]))?)?|NA)")
       if (!is.null(self$drug_usage) && !is.character(self$drug_usage)) stop("SpecimenInfo.drug_usage must be a character vector")
@@ -3543,6 +3548,7 @@ SpecimenInfo <- R6::R6Class(
       if (!is.null(self$treatment_status) && !is.character(self$treatment_status)) stop("SpecimenInfo.treatment_status must be a character vector")
       if (!is.null(self$treatment_status) && length(self$treatment_status) > 0 && any(!grepl("^[A-z-._0-9;|\\(\\),\\/\\ ]+$", self$treatment_status, perl = TRUE))) stop("SpecimenInfo.treatment_status contains values that do not match pattern: ^[A-z-._0-9;|\\(\\),\\/\\ ]+$")
       if (!is.null(self$parasite_density_info)) for (.x in self$parasite_density_info) .x$validate()
+      if (!is.null(self$storage_plate_info)) self$storage_plate_info$validate()
       if (!is.null(self$travel_out_six_month)) for (.x in self$travel_out_six_month) .x$validate()
       invisible(TRUE)
     },
@@ -3578,7 +3584,7 @@ SpecimenInfo <- R6::R6Class(
       if (!is.null(self$specimen_store_loc)) out$specimen_store_loc <- if (is.na(self$specimen_store_loc)) "NA" else self$specimen_store_loc
       if (!is.null(self$specimen_taxon_id)) out$specimen_taxon_id <- self$specimen_taxon_id
       if (!is.null(self$specimen_type)) out$specimen_type <- if (is.na(self$specimen_type)) "NA" else self$specimen_type
-      if (!is.null(self$storage_plate_info)) out$storage_plate_info <- self$storage_plate_info
+      if (!is.null(self$storage_plate_info)) out$storage_plate_info <- self$storage_plate_info$to_list()
       if (!is.null(self$travel_out_six_month)) out$travel_out_six_month <- lapply(self$travel_out_six_month, function(x) x$to_list())
       if (!is.null(self$treatment_status)) out$treatment_status <- self$treatment_status
       for (nm in names(self$extras)) out[[nm]] <- self$extras[[nm]]
@@ -3616,7 +3622,7 @@ SpecimenInfo <- R6::R6Class(
       if (!is.null(self$specimen_store_loc)) out$specimen_store_loc <- if (is.na(self$specimen_store_loc)) "NA" else self$specimen_store_loc
       if (!is.null(self$specimen_taxon_id)) out$specimen_taxon_id <- I(self$specimen_taxon_id)
       if (!is.null(self$specimen_type)) out$specimen_type <- if (is.na(self$specimen_type)) "NA" else self$specimen_type
-      if (!is.null(self$storage_plate_info)) out$storage_plate_info <- self$storage_plate_info
+      if (!is.null(self$storage_plate_info)) out$storage_plate_info <- self$storage_plate_info$to_json_list()
       if (!is.null(self$travel_out_six_month)) out$travel_out_six_month <- I(lapply(self$travel_out_six_month, function(x) x$to_json_list()))
       if (!is.null(self$treatment_status)) out$treatment_status <- I(self$treatment_status)
       for (nm in names(self$extras)) out[[nm]] <- self$extras[[nm]]
@@ -3641,7 +3647,7 @@ SpecimenInfo$from_json <- function(x, validate = TRUE) {
   if (length(missing_required) > 0) stop("SpecimenInfo missing required field(s): ", paste(missing_required, collapse = ", "))
   known <- c("alternate_identifiers","blood_meal","collection_country","collection_date","drug_usage","env_broad_scale","env_local_scale","env_medium","geo_admin1","geo_admin2","geo_admin3","gravid","gravidity","has_travel_out_six_month","host_age","host_sex","host_subject_name","host_taxon_id","lat_lon","parasite_density_info","project_id","specimen_accession","specimen_collect_device","specimen_comments","specimen_name","specimen_store_loc","specimen_taxon_id","specimen_type","storage_plate_info","travel_out_six_month","treatment_status")
   extras <- obj[setdiff(names(obj), known)]
-  inst <- SpecimenInfo$new(alternate_identifiers = { v <- obj[["alternate_identifiers"]]; if (is.null(v)) NULL else if (length(v) == 0) character() else as.character(unlist(v, use.names = FALSE)) }, blood_meal = if (!is.null(obj[["blood_meal"]])) obj[["blood_meal"]] else NULL, collection_country = { v <- obj[["collection_country"]]; if (is.null(v)) NULL else if (is.character(v) && length(v)==1 && v %in% PMO_NA_STRINGS) NA_character_ else v }, collection_date = { v <- obj[["collection_date"]]; if (is.null(v)) NULL else if (is.character(v) && length(v)==1 && v %in% PMO_NA_STRINGS) NA_character_ else v }, drug_usage = { v <- obj[["drug_usage"]]; if (is.null(v)) NULL else if (length(v) == 0) character() else as.character(unlist(v, use.names = FALSE)) }, env_broad_scale = { v <- obj[["env_broad_scale"]]; if (is.null(v)) NULL else if (is.character(v) && length(v)==1 && v %in% PMO_NA_STRINGS) NA_character_ else v }, env_local_scale = { v <- obj[["env_local_scale"]]; if (is.null(v)) NULL else if (is.character(v) && length(v)==1 && v %in% PMO_NA_STRINGS) NA_character_ else v }, env_medium = { v <- obj[["env_medium"]]; if (is.null(v)) NULL else if (is.character(v) && length(v)==1 && v %in% PMO_NA_STRINGS) NA_character_ else v }, geo_admin1 = { v <- obj[["geo_admin1"]]; if (is.null(v)) NULL else if (is.character(v) && length(v)==1 && v %in% PMO_NA_STRINGS) NA_character_ else v }, geo_admin2 = { v <- obj[["geo_admin2"]]; if (is.null(v)) NULL else if (is.character(v) && length(v)==1 && v %in% PMO_NA_STRINGS) NA_character_ else v }, geo_admin3 = { v <- obj[["geo_admin3"]]; if (is.null(v)) NULL else if (is.character(v) && length(v)==1 && v %in% PMO_NA_STRINGS) NA_character_ else v }, gravid = if (!is.null(obj[["gravid"]])) obj[["gravid"]] else NULL, gravidity = if (!is.null(obj[["gravidity"]])) obj[["gravidity"]] else NULL, has_travel_out_six_month = if (!is.null(obj[["has_travel_out_six_month"]])) obj[["has_travel_out_six_month"]] else NULL, host_age = if (!is.null(obj[["host_age"]])) obj[["host_age"]] else NULL, host_sex = { v <- obj[["host_sex"]]; if (is.null(v)) NULL else if (is.character(v) && length(v)==1 && v %in% PMO_NA_STRINGS) NA_character_ else v }, host_subject_name = { v <- obj[["host_subject_name"]]; if (is.null(v)) NULL else if (is.character(v) && length(v)==1 && v %in% PMO_NA_STRINGS) NA_character_ else v }, host_taxon_id = if (!is.null(obj[["host_taxon_id"]])) obj[["host_taxon_id"]] else NULL, lat_lon = { v <- obj[["lat_lon"]]; if (is.null(v)) NULL else if (is.character(v) && length(v)==1 && v %in% PMO_NA_STRINGS) NA_character_ else v }, parasite_density_info = if (!is.null(obj[["parasite_density_info"]])) lapply(obj[["parasite_density_info"]], function(.x) ParasiteDensity$from_json(.x, validate = FALSE)) else NULL, project_id = pmo_apply_id_offset_read(if (!is.null(obj[["project_id"]])) obj[["project_id"]] else NULL, "project_id"), specimen_accession = { v <- obj[["specimen_accession"]]; if (is.null(v)) NULL else if (is.character(v) && length(v)==1 && v %in% PMO_NA_STRINGS) NA_character_ else v }, specimen_collect_device = { v <- obj[["specimen_collect_device"]]; if (is.null(v)) NULL else if (is.character(v) && length(v)==1 && v %in% PMO_NA_STRINGS) NA_character_ else v }, specimen_comments = { v <- obj[["specimen_comments"]]; if (is.null(v)) NULL else if (length(v) == 0) character() else as.character(unlist(v, use.names = FALSE)) }, specimen_name = { v <- obj[["specimen_name"]]; if (is.null(v)) NA_character_ else if (is.character(v) && length(v)==1 && v %in% PMO_NA_STRINGS) NA_character_ else v }, specimen_store_loc = { v <- obj[["specimen_store_loc"]]; if (is.null(v)) NULL else if (is.character(v) && length(v)==1 && v %in% PMO_NA_STRINGS) NA_character_ else v }, specimen_taxon_id = { v <- obj[["specimen_taxon_id"]]; if (is.null(v)) NULL else if (length(v) == 0) numeric() else as.numeric(unlist(v, use.names = FALSE)) }, specimen_type = { v <- obj[["specimen_type"]]; if (is.null(v)) NULL else if (is.character(v) && length(v)==1 && v %in% PMO_NA_STRINGS) NA_character_ else v }, storage_plate_info = if (!is.null(obj[["storage_plate_info"]])) obj[["storage_plate_info"]] else NULL, travel_out_six_month = if (!is.null(obj[["travel_out_six_month"]])) lapply(obj[["travel_out_six_month"]], function(.x) TravelInfo$from_json(.x, validate = FALSE)) else NULL, treatment_status = { v <- obj[["treatment_status"]]; if (is.null(v)) NULL else if (length(v) == 0) character() else as.character(unlist(v, use.names = FALSE)) }, extras = extras)
+  inst <- SpecimenInfo$new(alternate_identifiers = { v <- obj[["alternate_identifiers"]]; if (is.null(v)) NULL else if (length(v) == 0) character() else as.character(unlist(v, use.names = FALSE)) }, blood_meal = if (!is.null(obj[["blood_meal"]])) obj[["blood_meal"]] else NULL, collection_country = { v <- obj[["collection_country"]]; if (is.null(v)) NULL else if (is.character(v) && length(v)==1 && v %in% PMO_NA_STRINGS) NA_character_ else v }, collection_date = { v <- obj[["collection_date"]]; if (is.null(v)) NULL else if (is.character(v) && length(v)==1 && v %in% PMO_NA_STRINGS) NA_character_ else v }, drug_usage = { v <- obj[["drug_usage"]]; if (is.null(v)) NULL else if (length(v) == 0) character() else as.character(unlist(v, use.names = FALSE)) }, env_broad_scale = { v <- obj[["env_broad_scale"]]; if (is.null(v)) NULL else if (is.character(v) && length(v)==1 && v %in% PMO_NA_STRINGS) NA_character_ else v }, env_local_scale = { v <- obj[["env_local_scale"]]; if (is.null(v)) NULL else if (is.character(v) && length(v)==1 && v %in% PMO_NA_STRINGS) NA_character_ else v }, env_medium = { v <- obj[["env_medium"]]; if (is.null(v)) NULL else if (is.character(v) && length(v)==1 && v %in% PMO_NA_STRINGS) NA_character_ else v }, geo_admin1 = { v <- obj[["geo_admin1"]]; if (is.null(v)) NULL else if (is.character(v) && length(v)==1 && v %in% PMO_NA_STRINGS) NA_character_ else v }, geo_admin2 = { v <- obj[["geo_admin2"]]; if (is.null(v)) NULL else if (is.character(v) && length(v)==1 && v %in% PMO_NA_STRINGS) NA_character_ else v }, geo_admin3 = { v <- obj[["geo_admin3"]]; if (is.null(v)) NULL else if (is.character(v) && length(v)==1 && v %in% PMO_NA_STRINGS) NA_character_ else v }, gravid = if (!is.null(obj[["gravid"]])) obj[["gravid"]] else NULL, gravidity = if (!is.null(obj[["gravidity"]])) obj[["gravidity"]] else NULL, has_travel_out_six_month = if (!is.null(obj[["has_travel_out_six_month"]])) obj[["has_travel_out_six_month"]] else NULL, host_age = if (!is.null(obj[["host_age"]])) obj[["host_age"]] else NULL, host_sex = { v <- obj[["host_sex"]]; if (is.null(v)) NULL else if (is.character(v) && length(v)==1 && v %in% PMO_NA_STRINGS) NA_character_ else v }, host_subject_name = { v <- obj[["host_subject_name"]]; if (is.null(v)) NULL else if (is.character(v) && length(v)==1 && v %in% PMO_NA_STRINGS) NA_character_ else v }, host_taxon_id = if (!is.null(obj[["host_taxon_id"]])) obj[["host_taxon_id"]] else NULL, lat_lon = { v <- obj[["lat_lon"]]; if (is.null(v)) NULL else if (is.character(v) && length(v)==1 && v %in% PMO_NA_STRINGS) NA_character_ else v }, parasite_density_info = if (!is.null(obj[["parasite_density_info"]])) lapply(obj[["parasite_density_info"]], function(.x) ParasiteDensity$from_json(.x, validate = FALSE)) else NULL, project_id = pmo_apply_id_offset_read(if (!is.null(obj[["project_id"]])) obj[["project_id"]] else NULL, "project_id"), specimen_accession = { v <- obj[["specimen_accession"]]; if (is.null(v)) NULL else if (is.character(v) && length(v)==1 && v %in% PMO_NA_STRINGS) NA_character_ else v }, specimen_collect_device = { v <- obj[["specimen_collect_device"]]; if (is.null(v)) NULL else if (is.character(v) && length(v)==1 && v %in% PMO_NA_STRINGS) NA_character_ else v }, specimen_comments = { v <- obj[["specimen_comments"]]; if (is.null(v)) NULL else if (length(v) == 0) character() else as.character(unlist(v, use.names = FALSE)) }, specimen_name = { v <- obj[["specimen_name"]]; if (is.null(v)) NA_character_ else if (is.character(v) && length(v)==1 && v %in% PMO_NA_STRINGS) NA_character_ else v }, specimen_store_loc = { v <- obj[["specimen_store_loc"]]; if (is.null(v)) NULL else if (is.character(v) && length(v)==1 && v %in% PMO_NA_STRINGS) NA_character_ else v }, specimen_taxon_id = { v <- obj[["specimen_taxon_id"]]; if (is.null(v)) NULL else if (length(v) == 0) numeric() else as.numeric(unlist(v, use.names = FALSE)) }, specimen_type = { v <- obj[["specimen_type"]]; if (is.null(v)) NULL else if (is.character(v) && length(v)==1 && v %in% PMO_NA_STRINGS) NA_character_ else v }, storage_plate_info = if (!is.null(obj[["storage_plate_info"]])) PlateInfo$from_json(obj[["storage_plate_info"]], validate = FALSE) else NULL, travel_out_six_month = if (!is.null(obj[["travel_out_six_month"]])) lapply(obj[["travel_out_six_month"]], function(.x) TravelInfo$from_json(.x, validate = FALSE)) else NULL, treatment_status = { v <- obj[["treatment_status"]]; if (is.null(v)) NULL else if (length(v) == 0) character() else as.character(unlist(v, use.names = FALSE)) }, extras = extras)
   if (validate) inst$validate()
   inst
 }
@@ -3688,13 +3694,14 @@ PrimerInfo <- R6::R6Class(
     validate = function() {
       if (!is.null(self$seq) && !is.na(self$seq) && (!is.character(self$seq) || length(self$seq) != 1)) stop("PrimerInfo.seq must be a single string")
       if (!is.null(self$seq) && !is.na(self$seq) && !grepl("^[A-z]+$", self$seq, perl = TRUE)) stop("PrimerInfo.seq does not match pattern: ^[A-z]+$")
+      if (!is.null(self$location)) self$location$validate()
       invisible(TRUE)
     },
 
     #' @description Convert the object to a plain R list using in-memory values.
     to_list = function() {
       out <- list()
-      if (!is.null(self$location)) out$location <- self$location
+      if (!is.null(self$location)) out$location <- self$location$to_list()
       if (!is.null(self$seq)) out$seq <- if (is.na(self$seq)) "NA" else self$seq
       for (nm in names(self$extras)) out[[nm]] <- self$extras[[nm]]
       out
@@ -3703,7 +3710,7 @@ PrimerInfo <- R6::R6Class(
     #' @description Convert the object to a JSON-ready R list.
     to_json_list = function() {
       out <- list()
-      if (!is.null(self$location)) out$location <- self$location
+      if (!is.null(self$location)) out$location <- self$location$to_json_list()
       if (!is.null(self$seq)) out$seq <- if (is.na(self$seq)) "NA" else self$seq
       for (nm in names(self$extras)) out[[nm]] <- self$extras[[nm]]
       out
@@ -3727,7 +3734,7 @@ PrimerInfo$from_json <- function(x, validate = TRUE) {
   if (length(missing_required) > 0) stop("PrimerInfo missing required field(s): ", paste(missing_required, collapse = ", "))
   known <- c("location","seq")
   extras <- obj[setdiff(names(obj), known)]
-  inst <- PrimerInfo$new(location = if (!is.null(obj[["location"]])) obj[["location"]] else NULL, seq = { v <- obj[["seq"]]; if (is.null(v)) NA_character_ else if (is.character(v) && length(v)==1 && v %in% PMO_NA_STRINGS) NA_character_ else v }, extras = extras)
+  inst <- PrimerInfo$new(location = if (!is.null(obj[["location"]])) GenomicLocation$from_json(obj[["location"]], validate = FALSE) else NULL, seq = { v <- obj[["seq"]]; if (is.null(v)) NA_character_ else if (is.character(v) && length(v)==1 && v %in% PMO_NA_STRINGS) NA_character_ else v }, extras = extras)
   if (validate) inst$validate()
   inst
 }
@@ -3804,6 +3811,7 @@ TargetInfo <- R6::R6Class(
       if (!is.null(self$target_name) && !is.na(self$target_name) && (!is.character(self$target_name) || length(self$target_name) != 1)) stop("TargetInfo.target_name must be a single string")
       if (!is.null(self$target_name) && !is.na(self$target_name) && !grepl("^[A-z-._0-9]+$", self$target_name, perl = TRUE)) stop("TargetInfo.target_name does not match pattern: ^[A-z-._0-9]+$")
       if (!is.null(self$forward_primer)) self$forward_primer$validate()
+      if (!is.null(self$insert_location)) self$insert_location$validate()
       if (!is.null(self$markers_of_interest)) for (.x in self$markers_of_interest) .x$validate()
       if (!is.null(self$reverse_primer)) self$reverse_primer$validate()
       invisible(TRUE)
@@ -3814,7 +3822,7 @@ TargetInfo <- R6::R6Class(
       out <- list()
       if (!is.null(self$forward_primer)) out$forward_primer <- self$forward_primer$to_list()
       if (!is.null(self$gene_name)) out$gene_name <- if (is.na(self$gene_name)) "NA" else self$gene_name
-      if (!is.null(self$insert_location)) out$insert_location <- self$insert_location
+      if (!is.null(self$insert_location)) out$insert_location <- self$insert_location$to_list()
       if (!is.null(self$markers_of_interest)) out$markers_of_interest <- lapply(self$markers_of_interest, function(x) x$to_list())
       if (!is.null(self$reverse_primer)) out$reverse_primer <- self$reverse_primer$to_list()
       if (!is.null(self$target_attributes)) out$target_attributes <- self$target_attributes
@@ -3828,7 +3836,7 @@ TargetInfo <- R6::R6Class(
       out <- list()
       if (!is.null(self$forward_primer)) out$forward_primer <- self$forward_primer$to_json_list()
       if (!is.null(self$gene_name)) out$gene_name <- if (is.na(self$gene_name)) "NA" else self$gene_name
-      if (!is.null(self$insert_location)) out$insert_location <- self$insert_location
+      if (!is.null(self$insert_location)) out$insert_location <- self$insert_location$to_json_list()
       if (!is.null(self$markers_of_interest)) out$markers_of_interest <- I(lapply(self$markers_of_interest, function(x) x$to_json_list()))
       if (!is.null(self$reverse_primer)) out$reverse_primer <- self$reverse_primer$to_json_list()
       if (!is.null(self$target_attributes)) out$target_attributes <- I(self$target_attributes)
@@ -3855,7 +3863,7 @@ TargetInfo$from_json <- function(x, validate = TRUE) {
   if (length(missing_required) > 0) stop("TargetInfo missing required field(s): ", paste(missing_required, collapse = ", "))
   known <- c("forward_primer","gene_name","insert_location","markers_of_interest","reverse_primer","target_attributes","target_name")
   extras <- obj[setdiff(names(obj), known)]
-  inst <- TargetInfo$new(forward_primer = if (!is.null(obj[["forward_primer"]])) PrimerInfo$from_json(obj[["forward_primer"]], validate = FALSE) else NULL, gene_name = { v <- obj[["gene_name"]]; if (is.null(v)) NULL else if (is.character(v) && length(v)==1 && v %in% PMO_NA_STRINGS) NA_character_ else v }, insert_location = if (!is.null(obj[["insert_location"]])) obj[["insert_location"]] else NULL, markers_of_interest = if (!is.null(obj[["markers_of_interest"]])) lapply(obj[["markers_of_interest"]], function(.x) MarkerOfInterest$from_json(.x, validate = FALSE)) else NULL, reverse_primer = if (!is.null(obj[["reverse_primer"]])) PrimerInfo$from_json(obj[["reverse_primer"]], validate = FALSE) else NULL, target_attributes = { v <- obj[["target_attributes"]]; if (is.null(v)) NULL else if (length(v) == 0) character() else as.character(unlist(v, use.names = FALSE)) }, target_name = { v <- obj[["target_name"]]; if (is.null(v)) NA_character_ else if (is.character(v) && length(v)==1 && v %in% PMO_NA_STRINGS) NA_character_ else v }, extras = extras)
+  inst <- TargetInfo$new(forward_primer = if (!is.null(obj[["forward_primer"]])) PrimerInfo$from_json(obj[["forward_primer"]], validate = FALSE) else NULL, gene_name = { v <- obj[["gene_name"]]; if (is.null(v)) NULL else if (is.character(v) && length(v)==1 && v %in% PMO_NA_STRINGS) NA_character_ else v }, insert_location = if (!is.null(obj[["insert_location"]])) GenomicLocation$from_json(obj[["insert_location"]], validate = FALSE) else NULL, markers_of_interest = if (!is.null(obj[["markers_of_interest"]])) lapply(obj[["markers_of_interest"]], function(.x) MarkerOfInterest$from_json(.x, validate = FALSE)) else NULL, reverse_primer = if (!is.null(obj[["reverse_primer"]])) PrimerInfo$from_json(obj[["reverse_primer"]], validate = FALSE) else NULL, target_attributes = { v <- obj[["target_attributes"]]; if (is.null(v)) NULL else if (length(v) == 0) character() else as.character(unlist(v, use.names = FALSE)) }, target_name = { v <- obj[["target_name"]]; if (is.null(v)) NA_character_ else if (is.character(v) && length(v)==1 && v %in% PMO_NA_STRINGS) NA_character_ else v }, extras = extras)
   if (validate) inst$validate()
   inst
 }
@@ -3902,6 +3910,10 @@ TargetInfo$from_json <- function(x, validate = TRUE) {
 #' See inline method documentation for `initialize()`, `validate()`, `to_list()`, `to_json_list()`, and `to_json()`.
 #'
 #' @format An [R6::R6Class()] generator object.
+#' @examples
+#' pmo <- read_pmo(
+#'   system.file('extdata', 'example_pmo.json.gz', package = 'pmotoolsr'))
+#' length(pmo$specimen_info)
 #' @export
 PortableMicrohaplotypeObject <- R6::R6Class(
   "PortableMicrohaplotypeObject",
@@ -4028,6 +4040,16 @@ PortableMicrohaplotypeObject <- R6::R6Class(
     #' @param ... Additional arguments passed to [jsonlite::toJSON()].
     to_json = function(pretty = FALSE, auto_unbox = TRUE, ...) {
       jsonlite::toJSON(self$to_json_list(), pretty = pretty, auto_unbox = auto_unbox, na = "string", ...)
+    },
+
+    #' @description Write this object to a JSON file (compression inferred from the file extension).
+    #' @param path Output file path.
+    #' @param pretty Logical; pretty-print the JSON.
+    #' @param auto_unbox Logical; passed to [jsonlite::toJSON()].
+    #' @param validate Logical; if `TRUE`, validate before writing.
+    #' @param ... Additional arguments passed through to [write_pmo()].
+    to_file = function(path, pretty = FALSE, auto_unbox = TRUE, validate = TRUE, ...) {
+      write_pmo(self, path = path, pretty = pretty, auto_unbox = auto_unbox, validate = validate, ...)
     }
   )
 )
@@ -4056,6 +4078,9 @@ PortableMicrohaplotypeObject$from_json <- function(x, validate = TRUE) {
 #' @param validate Logical; if `TRUE`, validate the parsed object.
 #'
 #' @return A `PortableMicrohaplotypeObject` instance.
+#' @examples
+#' pmo <- read_pmo(
+#'   system.file('extdata', 'example_pmo.json.gz', package = 'pmotoolsr'))
 #' @export
 read_pmo <- function(path, validate = TRUE) {
   obj <- jsonlite::fromJSON(path, simplifyVector = FALSE)
@@ -4071,6 +4096,9 @@ read_pmo <- function(path, validate = TRUE) {
 #' @param path Path to the PMO JSON file.
 #'
 #' @return A nested list parsed from JSON.
+#' @examples
+#' raw <- read_pmo_raw(
+#'   system.file('extdata', 'example_pmo.json.gz', package = 'pmotoolsr'))
 #' @export
 read_pmo_raw <- function(path) {
   pmo_raw_postprocess(jsonlite::fromJSON(path, simplifyVector = FALSE))
@@ -4086,6 +4114,10 @@ read_pmo_raw <- function(path) {
 #' @param pretty Logical; pretty-print the JSON.
 #' @param auto_unbox Logical; passed to [jsonlite::toJSON()].
 #' @return Invisibly returns `path`.
+#' @examples
+#' raw <- read_pmo_raw(
+#'   system.file('extdata', 'example_pmo.json.gz', package = 'pmotoolsr'))
+#' write_pmo_raw(raw, tempfile(fileext = '.json.gz'))
 #' @export
 write_pmo_raw <- function(x, path, pretty = FALSE, auto_unbox = TRUE) {
   json_ready <- pmo_raw_prepare_for_json(x)
@@ -4110,6 +4142,10 @@ write_pmo_raw <- function(x, path, pretty = FALSE, auto_unbox = TRUE) {
 #' @param ... Additional arguments passed through to `to_json()`.
 #'
 #' @return Invisibly returns `path`.
+#' @examples
+#' pmo <- read_pmo(
+#'   system.file('extdata', 'example_pmo.json.gz', package = 'pmotoolsr'))
+#' write_pmo(pmo, tempfile(fileext = '.json'))
 #' @export
 write_pmo <- function(pmo, path, pretty = FALSE, auto_unbox = TRUE, validate = TRUE, ...) {
   if (validate) pmo$validate()
@@ -4120,7 +4156,3 @@ write_pmo <- function(pmo, path, pretty = FALSE, auto_unbox = TRUE, validate = T
 }
 
 PortableMicrohaplotypeObject$from_file <- read_pmo
-
-PortableMicrohaplotypeObject$set('public', 'to_file', function(path, pretty = FALSE, auto_unbox = TRUE, validate = TRUE, ...) {
-  write_pmo(self, path = path, pretty = pretty, auto_unbox = auto_unbox, validate = validate, ...)
-})

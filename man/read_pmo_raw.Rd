@@ -17,3 +17,7 @@ Reads a PMO JSON file directly into nested R lists without wrapping
 it into R6 classes. This is useful for performance comparisons or
 workflows that do not need the object-oriented API.
 }
+\examples{
+raw <- read_pmo_raw(
+  system.file('extdata', 'example_pmo.json.gz', package = 'pmotoolsr'))
+}

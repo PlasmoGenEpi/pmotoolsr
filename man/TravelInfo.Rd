@@ -7,11 +7,6 @@
 An \code{\link[R6:R6Class]{R6::R6Class()}} generator object.
 }
 \description{
-TravelInfo
-
-TravelInfo
-}
-\details{
 Information on travel info.
 
 Auto-generated R6 class from JSON Schema.
@@ -38,46 +33,47 @@ See inline method documentation for \code{initialize()}, \code{validate()}, \cod
 }
 
 \section{Public fields}{
-\if{html}{\out{<div class="r6-fields">}}
-\describe{
-\item{\code{bed_net_usage}}{Approximate usage of bed net while traveling, 1 = 100\% nights with bed net, 0 = 0\% no bed net usage.}
+  \if{html}{\out{<div class="r6-fields">}}
+  \describe{
+    \item{\code{bed_net_usage}}{Approximate usage of bed net while traveling, 1 = 100\% nights with bed net, 0 = 0\% no bed net usage.}
 
-\item{\code{geo_admin1}}{Geographical admin level 1, the secondary large demarcation of a nation (nation = admin level 0).}
+    \item{\code{geo_admin1}}{Geographical admin level 1, the secondary large demarcation of a nation (nation = admin level 0).}
 
-\item{\code{geo_admin2}}{Geographical admin level 2, the third large demarcation of a nation (nation = admin level 0).}
+    \item{\code{geo_admin2}}{Geographical admin level 2, the third large demarcation of a nation (nation = admin level 0).}
 
-\item{\code{geo_admin3}}{Geographical admin level 3, the third large demarcation of a nation (nation = admin level 0).}
+    \item{\code{geo_admin3}}{Geographical admin level 3, the third large demarcation of a nation (nation = admin level 0).}
 
-\item{\code{lat_lon}}{The latitude and longitude of a specific site.}
+    \item{\code{lat_lon}}{The latitude and longitude of a specific site.}
 
-\item{\code{travel_country}}{The name of country, would be the same as admin level 0.}
+    \item{\code{travel_country}}{The name of country, would be the same as admin level 0.}
 
-\item{\code{travel_end_date}}{The date of the end of travel, can be approximate, should be YYYY-MM or YYYY-MM-DD (preferred).}
+    \item{\code{travel_end_date}}{The date of the end of travel, can be approximate, should be YYYY-MM or YYYY-MM-DD (preferred).}
 
-\item{\code{travel_start_date}}{The date of the start of travel, can be approximate, should be YYYY-MM or YYYY-MM-DD (preferred).}
+    \item{\code{travel_start_date}}{The date of the start of travel, can be approximate, should be YYYY-MM or YYYY-MM-DD (preferred).}
 
-\item{\code{extras}}{Additional properties not explicitly defined in the schema.}
-}
-\if{html}{\out{</div>}}
+    \item{\code{extras}}{Additional properties not explicitly defined in the schema.}
+  }
+  \if{html}{\out{</div>}}
 }
 \section{Methods}{
 \subsection{Public methods}{
-\itemize{
-\item \href{#method-TravelInfo-new}{\code{TravelInfo$new()}}
-\item \href{#method-TravelInfo-validate}{\code{TravelInfo$validate()}}
-\item \href{#method-TravelInfo-to_list}{\code{TravelInfo$to_list()}}
-\item \href{#method-TravelInfo-to_json_list}{\code{TravelInfo$to_json_list()}}
-\item \href{#method-TravelInfo-to_json}{\code{TravelInfo$to_json()}}
-\item \href{#method-TravelInfo-clone}{\code{TravelInfo$clone()}}
-}
+  \itemize{
+    \item \href{#method-TravelInfo-initialize}{\code{TravelInfo$new()}}
+    \item \href{#method-TravelInfo-validate}{\code{TravelInfo$validate()}}
+    \item \href{#method-TravelInfo-to_list}{\code{TravelInfo$to_list()}}
+    \item \href{#method-TravelInfo-to_json_list}{\code{TravelInfo$to_json_list()}}
+    \item \href{#method-TravelInfo-to_json}{\code{TravelInfo$to_json()}}
+    \item \href{#method-TravelInfo-clone}{\code{TravelInfo$clone()}}
+  }
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-TravelInfo-new"></a>}}
-\if{latex}{\out{\hypertarget{method-TravelInfo-new}{}}}
-\subsection{Method \code{new()}}{
-Create a new instance.
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{TravelInfo$new(
+\if{html}{\out{<a id="method-TravelInfo-initialize"></a>}}
+\if{latex}{\out{\hypertarget{method-TravelInfo-initialize}{}}}
+\subsection{\code{TravelInfo$new()}}{
+  Create a new instance.
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{TravelInfo$new(
   bed_net_usage = NULL,
   geo_admin1 = NULL,
   geo_admin2 = NULL,
@@ -87,99 +83,100 @@ Create a new instance.
   travel_end_date = NA_character_,
   travel_start_date = NA_character_,
   extras = list()
-)}\if{html}{\out{</div>}}
+)}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Arguments}{
+    \if{html}{\out{<div class="arguments">}}
+    \describe{
+      \item{\code{bed_net_usage}}{Approximate usage of bed net while traveling, 1 = 100\% nights with bed net, 0 = 0\% no bed net usage.}
+      \item{\code{geo_admin1}}{Geographical admin level 1, the secondary large demarcation of a nation (nation = admin level 0).}
+      \item{\code{geo_admin2}}{Geographical admin level 2, the third large demarcation of a nation (nation = admin level 0).}
+      \item{\code{geo_admin3}}{Geographical admin level 3, the third large demarcation of a nation (nation = admin level 0).}
+      \item{\code{lat_lon}}{The latitude and longitude of a specific site.}
+      \item{\code{travel_country}}{The name of country, would be the same as admin level 0.}
+      \item{\code{travel_end_date}}{The date of the end of travel, can be approximate, should be YYYY-MM or YYYY-MM-DD (preferred).}
+      \item{\code{travel_start_date}}{The date of the start of travel, can be approximate, should be YYYY-MM or YYYY-MM-DD (preferred).}
+      \item{\code{extras}}{Additional properties not explicitly defined in the schema.}
+    }
+    \if{html}{\out{</div>}}
+  }
 }
 
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{bed_net_usage}}{Approximate usage of bed net while traveling, 1 = 100\% nights with bed net, 0 = 0\% no bed net usage.}
-
-\item{\code{geo_admin1}}{Geographical admin level 1, the secondary large demarcation of a nation (nation = admin level 0).}
-
-\item{\code{geo_admin2}}{Geographical admin level 2, the third large demarcation of a nation (nation = admin level 0).}
-
-\item{\code{geo_admin3}}{Geographical admin level 3, the third large demarcation of a nation (nation = admin level 0).}
-
-\item{\code{lat_lon}}{The latitude and longitude of a specific site.}
-
-\item{\code{travel_country}}{The name of country, would be the same as admin level 0.}
-
-\item{\code{travel_end_date}}{The date of the end of travel, can be approximate, should be YYYY-MM or YYYY-MM-DD (preferred).}
-
-\item{\code{travel_start_date}}{The date of the start of travel, can be approximate, should be YYYY-MM or YYYY-MM-DD (preferred).}
-
-\item{\code{extras}}{Additional properties not explicitly defined in the schema.}
-}
-\if{html}{\out{</div>}}
-}
-}
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-TravelInfo-validate"></a>}}
 \if{latex}{\out{\hypertarget{method-TravelInfo-validate}{}}}
-\subsection{Method \code{validate()}}{
-Validate the current instance against schema-derived constraints.
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{TravelInfo$validate()}\if{html}{\out{</div>}}
+\subsection{\code{TravelInfo$validate()}}{
+  Validate the current instance against schema-derived constraints.
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{TravelInfo$validate()}
+    \if{html}{\out{</div>}}
+  }
 }
 
-}
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-TravelInfo-to_list"></a>}}
 \if{latex}{\out{\hypertarget{method-TravelInfo-to_list}{}}}
-\subsection{Method \code{to_list()}}{
-Convert the object to a plain R list using in-memory values.
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{TravelInfo$to_list()}\if{html}{\out{</div>}}
+\subsection{\code{TravelInfo$to_list()}}{
+  Convert the object to a plain R list using in-memory values.
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{TravelInfo$to_list()}
+    \if{html}{\out{</div>}}
+  }
 }
 
-}
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-TravelInfo-to_json_list"></a>}}
 \if{latex}{\out{\hypertarget{method-TravelInfo-to_json_list}{}}}
-\subsection{Method \code{to_json_list()}}{
-Convert the object to a JSON-ready R list.
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{TravelInfo$to_json_list()}\if{html}{\out{</div>}}
+\subsection{\code{TravelInfo$to_json_list()}}{
+  Convert the object to a JSON-ready R list.
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{TravelInfo$to_json_list()}
+    \if{html}{\out{</div>}}
+  }
 }
 
-}
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-TravelInfo-to_json"></a>}}
 \if{latex}{\out{\hypertarget{method-TravelInfo-to_json}{}}}
-\subsection{Method \code{to_json()}}{
-Convert the object to a JSON string.
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{TravelInfo$to_json(pretty = FALSE, auto_unbox = TRUE, ...)}\if{html}{\out{</div>}}
+\subsection{\code{TravelInfo$to_json()}}{
+  Convert the object to a JSON string.
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{TravelInfo$to_json(pretty = FALSE, auto_unbox = TRUE, ...)}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Arguments}{
+    \if{html}{\out{<div class="arguments">}}
+    \describe{
+      \item{\code{pretty}}{Logical; pretty-print the JSON.}
+      \item{\code{auto_unbox}}{Logical; passed to \code{\link[jsonlite:toJSON]{jsonlite::toJSON()}}.}
+      \item{\code{...}}{Additional arguments passed to \code{\link[jsonlite:toJSON]{jsonlite::toJSON()}}.}
+    }
+    \if{html}{\out{</div>}}
+  }
 }
 
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{pretty}}{Logical; pretty-print the JSON.}
-
-\item{\code{auto_unbox}}{Logical; passed to \code{\link[jsonlite:fromJSON]{jsonlite::toJSON()}}.}
-
-\item{\code{...}}{Additional arguments passed to \code{\link[jsonlite:fromJSON]{jsonlite::toJSON()}}.}
-}
-\if{html}{\out{</div>}}
-}
-}
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-TravelInfo-clone"></a>}}
 \if{latex}{\out{\hypertarget{method-TravelInfo-clone}{}}}
-\subsection{Method \code{clone()}}{
-The objects of this class are cloneable with this method.
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{TravelInfo$clone(deep = FALSE)}\if{html}{\out{</div>}}
+\subsection{\code{TravelInfo$clone()}}{
+  The objects of this class are cloneable with this method.
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{TravelInfo$clone(deep = FALSE)}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Arguments}{
+    \if{html}{\out{<div class="arguments">}}
+    \describe{
+      \item{\code{deep}}{Whether to make a deep clone.}
+    }
+    \if{html}{\out{</div>}}
+  }
 }
 
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{deep}}{Whether to make a deep clone.}
-}
-\if{html}{\out{</div>}}
-}
-}
 }

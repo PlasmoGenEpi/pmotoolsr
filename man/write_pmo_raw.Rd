@@ -13,7 +13,7 @@ write_pmo_raw(x, path, pretty = FALSE, auto_unbox = TRUE)
 
 \item{pretty}{Logical; pretty-print the JSON.}
 
-\item{auto_unbox}{Logical; passed to \code{\link[jsonlite:fromJSON]{jsonlite::toJSON()}}.}
+\item{auto_unbox}{Logical; passed to \code{\link[jsonlite:toJSON]{jsonlite::toJSON()}}.}
 }
 \value{
 Invisibly returns \code{path}.
@@ -21,4 +21,9 @@ Invisibly returns \code{path}.
 \description{
 Writes a PMO represented as nested R lists back to JSON, reapplying
 JSON-facing conventions such as zero-based \verb{_id} fields.
+}
+\examples{
+raw <- read_pmo_raw(
+  system.file('extdata', 'example_pmo.json.gz', package = 'pmotoolsr'))
+write_pmo_raw(raw, tempfile(fileext = '.json.gz'))
 }
