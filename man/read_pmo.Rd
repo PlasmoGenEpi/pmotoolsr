@@ -21,3 +21,7 @@ Information on final microhaplotype results from a targeted amplicon analysis wi
 Reads a PMO JSON file from disk, including compressed files ending in
 \code{.gz}, \code{.bz2}, or \code{.xz}, and parses it into a PMO R6 instance.
 }
+\examples{
+pmo <- read_pmo(
+  system.file('extdata', 'example_pmo.json.gz', package = 'pmotoolsr'))
+}

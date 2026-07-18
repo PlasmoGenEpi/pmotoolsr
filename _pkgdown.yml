@@ -1,0 +1,120 @@
+url: https://plasmogenepi.github.io/pmotoolsr
+
+template:
+  bootstrap: 5
+
+articles:
+- title: Articles
+  navbar: ~
+  contents:
+  - getting-started
+  - building-a-minimal-pmo
+  - building-a-full-pmo
+
+reference:
+- title: Package overview
+  contents:
+  - pmotoolsr-package
+
+- title: Reading & writing PMOs
+  desc: >
+    Read and write Portable Microhaplotype Object files (plain or gzip / bzip2 /
+    xz compressed), as R6 objects or as raw nested lists.
+  contents:
+  - read_pmo
+  - write_pmo
+  - read_pmo_raw
+  - write_pmo_raw
+  - pmo_list_to_r6
+
+- title: Validation & schema
+  desc: >
+    Validate a PMO against the JSON Schema and inspect schema versions and
+    field requirements.
+  contents:
+  - pmo_validate
+  - pmo_validate_jsonschema
+  - pmo_check_required_base_fields
+  - pmo_required_fields_for_class
+  - starts_with("pmo_load_schema")
+  - pmo_schema_version
+  - pmo_has_section
+
+- title: Processing & querying
+  desc: >
+    Look up names and indices, count entities, and subset / filter a PMO down to
+    selected specimens, library samples, targets, metadata groups, or read depth.
+  contents:
+  - starts_with("pmo_get")
+  - starts_with("pmo_index")
+  - pmo_library_ids_for_specimen_ids
+  - starts_with("pmo_count")
+  - starts_with("pmo_filter")
+  - pmo_extract_by_read_filter
+  - pmo_extract_samples_by_meta_groupings
+  - pmo_extract_allele_counts_freq
+
+- title: Exporting tables
+  desc: >
+    Flatten PMO sections into tibbles and export allele tables, BED files, and
+    Excel workbooks.
+  contents:
+  - starts_with("pmo_export")
+  - pmo_extract_alleles_per_sample_table
+  - pmo_list_library_samples_per_specimen
+  - pmo_extract_targets_insert_bed
+  - pmo_extract_panels_insert_bed
+  - pmo_write_bed
+
+- title: Building & combining PMOs
+  desc: >
+    Assemble PMOs from tabular inputs, merge components into a single object,
+    update metadata, and combine multiple PMOs.
+  contents:
+  - ends_with("table_to_pmo")
+  - pmo_minimum_library_specimen_from_mhap_table
+  - pmo_merge_panel_info_dicts
+  - pmo_merge_to_pmo
+  - pmo_combine_pmos
+  - pmo_update_specimen_with_traveler_info
+  - pmo_merge_dicts_by_key
+
+- title: PMO classes
+  desc: >
+    Auto-generated R6 classes mirroring the PMO schema. Most users interact with
+    these through read_pmo() / write_pmo() rather than constructing them directly.
+  contents:
+  - PortableMicrohaplotypeObject
+  - BioMethod
+  - BioinformaticsMethodInfo
+  - BioinformaticsRunInfo
+  - DetectedMicrohaplotypes
+  - DetectedMicrohaplotypesForSample
+  - DetectedMicrohaplotypesForTarget
+  - GenomeInfo
+  - GenomicLocation
+  - LibrarySampleInfo
+  - MarkerOfInterest
+  - MaskingInfo
+  - MicrohaplotypeForTarget
+  - PanelInfo
+  - ParasiteDensity
+  - PlateInfo
+  - PmoGenerationMethod
+  - PmoHeader
+  - PrimerInfo
+  - ProjectInfo
+  - ProteinVariant
+  - Pseudocigar
+  - ReactionInfo
+  - ReadCountsByStage
+  - ReadCountsByStageForLibrarySample
+  - ReadCountsByStageForTarget
+  - RepresentativeMicrohaplotype
+  - RepresentativeMicrohaplotypes
+  - RepresentativeMicrohaplotypesForTarget
+  - SequencingInfo
+  - SpecimenInfo
+  - StageReadCounts
+  - TargetInfo
+  - TravelInfo

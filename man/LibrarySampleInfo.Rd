@@ -7,11 +7,6 @@
 An \code{\link[R6:R6Class]{R6::R6Class()}} generator object.
 }
 \description{
-LibrarySampleInfo
-
-LibrarySampleInfo
-}
-\details{
 Information about a specific amplification and sequencing of a specimen.
 
 Auto-generated R6 class from JSON Schema.
@@ -40,50 +35,51 @@ See inline method documentation for \code{initialize()}, \code{validate()}, \cod
 }
 
 \section{Public fields}{
-\if{html}{\out{<div class="r6-fields">}}
-\describe{
-\item{\code{alternate_identifiers}}{A list of alternative names.}
+  \if{html}{\out{<div class="r6-fields">}}
+  \describe{
+    \item{\code{alternate_identifiers}}{A list of alternative names.}
 
-\item{\code{experiment_accession}}{ERA/SRA experiment accession number for the sample if it was submitted.}
+    \item{\code{experiment_accession}}{ERA/SRA experiment accession number for the sample if it was submitted.}
 
-\item{\code{fastqs_loc}}{The location (url or filename path) of the fastqs for a library run.}
+    \item{\code{fastqs_loc}}{The location (url or filename path) of the fastqs for a library run.}
 
-\item{\code{library_prep_plate_info}}{Plate location of where library was prepared for sequencing.}
+    \item{\code{library_prep_plate_info}}{Plate location of where library was prepared for sequencing.}
 
-\item{\code{library_sample_name}}{A unique identifier for this sequencing/amplification run.}
+    \item{\code{library_sample_name}}{A unique identifier for this sequencing/amplification run.}
 
-\item{\code{panel_id}}{The index into the panel_info list.}
+    \item{\code{panel_id}}{The index into the panel_info list.}
 
-\item{\code{qpcr_parasite_density_info}}{Qpcr parasite density measurement for this extracted sample.}
+    \item{\code{qpcr_parasite_density_info}}{Qpcr parasite density measurement for this extracted sample.}
 
-\item{\code{run_accession}}{ERA/SRA run accession number for the sample if it was submitted.}
+    \item{\code{run_accession}}{ERA/SRA run accession number for the sample if it was submitted.}
 
-\item{\code{sequencing_info_id}}{The index into the sequencing_info list.}
+    \item{\code{sequencing_info_id}}{The index into the sequencing_info list.}
 
-\item{\code{specimen_id}}{The index into the specimen_info list.}
+    \item{\code{specimen_id}}{The index into the specimen_info list.}
 
-\item{\code{extras}}{Additional properties not explicitly defined in the schema.}
-}
-\if{html}{\out{</div>}}
+    \item{\code{extras}}{Additional properties not explicitly defined in the schema.}
+  }
+  \if{html}{\out{</div>}}
 }
 \section{Methods}{
 \subsection{Public methods}{
-\itemize{
-\item \href{#method-LibrarySampleInfo-new}{\code{LibrarySampleInfo$new()}}
-\item \href{#method-LibrarySampleInfo-validate}{\code{LibrarySampleInfo$validate()}}
-\item \href{#method-LibrarySampleInfo-to_list}{\code{LibrarySampleInfo$to_list()}}
-\item \href{#method-LibrarySampleInfo-to_json_list}{\code{LibrarySampleInfo$to_json_list()}}
-\item \href{#method-LibrarySampleInfo-to_json}{\code{LibrarySampleInfo$to_json()}}
-\item \href{#method-LibrarySampleInfo-clone}{\code{LibrarySampleInfo$clone()}}
-}
+  \itemize{
+    \item \href{#method-LibrarySampleInfo-initialize}{\code{LibrarySampleInfo$new()}}
+    \item \href{#method-LibrarySampleInfo-validate}{\code{LibrarySampleInfo$validate()}}
+    \item \href{#method-LibrarySampleInfo-to_list}{\code{LibrarySampleInfo$to_list()}}
+    \item \href{#method-LibrarySampleInfo-to_json_list}{\code{LibrarySampleInfo$to_json_list()}}
+    \item \href{#method-LibrarySampleInfo-to_json}{\code{LibrarySampleInfo$to_json()}}
+    \item \href{#method-LibrarySampleInfo-clone}{\code{LibrarySampleInfo$clone()}}
+  }
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-LibrarySampleInfo-new"></a>}}
-\if{latex}{\out{\hypertarget{method-LibrarySampleInfo-new}{}}}
-\subsection{Method \code{new()}}{
-Create a new instance.
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{LibrarySampleInfo$new(
+\if{html}{\out{<a id="method-LibrarySampleInfo-initialize"></a>}}
+\if{latex}{\out{\hypertarget{method-LibrarySampleInfo-initialize}{}}}
+\subsection{\code{LibrarySampleInfo$new()}}{
+  Create a new instance.
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{LibrarySampleInfo$new(
   alternate_identifiers = NULL,
   experiment_accession = NULL,
   fastqs_loc = NULL,
@@ -95,103 +91,102 @@ Create a new instance.
   sequencing_info_id = NULL,
   specimen_id = NA_real_,
   extras = list()
-)}\if{html}{\out{</div>}}
+)}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Arguments}{
+    \if{html}{\out{<div class="arguments">}}
+    \describe{
+      \item{\code{alternate_identifiers}}{A list of alternative names.}
+      \item{\code{experiment_accession}}{ERA/SRA experiment accession number for the sample if it was submitted.}
+      \item{\code{fastqs_loc}}{The location (url or filename path) of the fastqs for a library run.}
+      \item{\code{library_prep_plate_info}}{Plate location of where library was prepared for sequencing.}
+      \item{\code{library_sample_name}}{A unique identifier for this sequencing/amplification run.}
+      \item{\code{panel_id}}{The index into the panel_info list.}
+      \item{\code{qpcr_parasite_density_info}}{Qpcr parasite density measurement for this extracted sample.}
+      \item{\code{run_accession}}{ERA/SRA run accession number for the sample if it was submitted.}
+      \item{\code{sequencing_info_id}}{The index into the sequencing_info list.}
+      \item{\code{specimen_id}}{The index into the specimen_info list.}
+      \item{\code{extras}}{Additional properties not explicitly defined in the schema.}
+    }
+    \if{html}{\out{</div>}}
+  }
 }
 
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{alternate_identifiers}}{A list of alternative names.}
-
-\item{\code{experiment_accession}}{ERA/SRA experiment accession number for the sample if it was submitted.}
-
-\item{\code{fastqs_loc}}{The location (url or filename path) of the fastqs for a library run.}
-
-\item{\code{library_prep_plate_info}}{Plate location of where library was prepared for sequencing.}
-
-\item{\code{library_sample_name}}{A unique identifier for this sequencing/amplification run.}
-
-\item{\code{panel_id}}{The index into the panel_info list.}
-
-\item{\code{qpcr_parasite_density_info}}{Qpcr parasite density measurement for this extracted sample.}
-
-\item{\code{run_accession}}{ERA/SRA run accession number for the sample if it was submitted.}
-
-\item{\code{sequencing_info_id}}{The index into the sequencing_info list.}
-
-\item{\code{specimen_id}}{The index into the specimen_info list.}
-
-\item{\code{extras}}{Additional properties not explicitly defined in the schema.}
-}
-\if{html}{\out{</div>}}
-}
-}
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-LibrarySampleInfo-validate"></a>}}
 \if{latex}{\out{\hypertarget{method-LibrarySampleInfo-validate}{}}}
-\subsection{Method \code{validate()}}{
-Validate the current instance against schema-derived constraints.
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{LibrarySampleInfo$validate()}\if{html}{\out{</div>}}
+\subsection{\code{LibrarySampleInfo$validate()}}{
+  Validate the current instance against schema-derived constraints.
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{LibrarySampleInfo$validate()}
+    \if{html}{\out{</div>}}
+  }
 }
 
-}
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-LibrarySampleInfo-to_list"></a>}}
 \if{latex}{\out{\hypertarget{method-LibrarySampleInfo-to_list}{}}}
-\subsection{Method \code{to_list()}}{
-Convert the object to a plain R list using in-memory values.
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{LibrarySampleInfo$to_list()}\if{html}{\out{</div>}}
+\subsection{\code{LibrarySampleInfo$to_list()}}{
+  Convert the object to a plain R list using in-memory values.
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{LibrarySampleInfo$to_list()}
+    \if{html}{\out{</div>}}
+  }
 }
 
-}
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-LibrarySampleInfo-to_json_list"></a>}}
 \if{latex}{\out{\hypertarget{method-LibrarySampleInfo-to_json_list}{}}}
-\subsection{Method \code{to_json_list()}}{
-Convert the object to a JSON-ready R list.
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{LibrarySampleInfo$to_json_list()}\if{html}{\out{</div>}}
+\subsection{\code{LibrarySampleInfo$to_json_list()}}{
+  Convert the object to a JSON-ready R list.
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{LibrarySampleInfo$to_json_list()}
+    \if{html}{\out{</div>}}
+  }
 }
 
-}
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-LibrarySampleInfo-to_json"></a>}}
 \if{latex}{\out{\hypertarget{method-LibrarySampleInfo-to_json}{}}}
-\subsection{Method \code{to_json()}}{
-Convert the object to a JSON string.
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{LibrarySampleInfo$to_json(pretty = FALSE, auto_unbox = TRUE, ...)}\if{html}{\out{</div>}}
+\subsection{\code{LibrarySampleInfo$to_json()}}{
+  Convert the object to a JSON string.
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{LibrarySampleInfo$to_json(pretty = FALSE, auto_unbox = TRUE, ...)}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Arguments}{
+    \if{html}{\out{<div class="arguments">}}
+    \describe{
+      \item{\code{pretty}}{Logical; pretty-print the JSON.}
+      \item{\code{auto_unbox}}{Logical; passed to \code{\link[jsonlite:toJSON]{jsonlite::toJSON()}}.}
+      \item{\code{...}}{Additional arguments passed to \code{\link[jsonlite:toJSON]{jsonlite::toJSON()}}.}
+    }
+    \if{html}{\out{</div>}}
+  }
 }
 
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{pretty}}{Logical; pretty-print the JSON.}
-
-\item{\code{auto_unbox}}{Logical; passed to \code{\link[jsonlite:fromJSON]{jsonlite::toJSON()}}.}
-
-\item{\code{...}}{Additional arguments passed to \code{\link[jsonlite:fromJSON]{jsonlite::toJSON()}}.}
-}
-\if{html}{\out{</div>}}
-}
-}
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-LibrarySampleInfo-clone"></a>}}
 \if{latex}{\out{\hypertarget{method-LibrarySampleInfo-clone}{}}}
-\subsection{Method \code{clone()}}{
-The objects of this class are cloneable with this method.
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{LibrarySampleInfo$clone(deep = FALSE)}\if{html}{\out{</div>}}
+\subsection{\code{LibrarySampleInfo$clone()}}{
+  The objects of this class are cloneable with this method.
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{LibrarySampleInfo$clone(deep = FALSE)}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Arguments}{
+    \if{html}{\out{<div class="arguments">}}
+    \describe{
+      \item{\code{deep}}{Whether to make a deep clone.}
+    }
+    \if{html}{\out{</div>}}
+  }
 }
 
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{deep}}{Whether to make a deep clone.}
-}
-\if{html}{\out{</div>}}
-}
-}
 }

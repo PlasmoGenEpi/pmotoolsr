@@ -7,11 +7,6 @@
 An \code{\link[R6:R6Class]{R6::R6Class()}} generator object.
 }
 \description{
-ProteinVariant
-
-ProteinVariant
-}
-\details{
 Information on a variant in protein sequence.
 
 Auto-generated R6 class from JSON Schema.
@@ -34,128 +29,134 @@ See inline method documentation for \code{initialize()}, \code{validate()}, \cod
 }
 
 \section{Public fields}{
-\if{html}{\out{<div class="r6-fields">}}
-\describe{
-\item{\code{alternative_gene_name}}{An alternative gene name.}
+  \if{html}{\out{<div class="r6-fields">}}
+  \describe{
+    \item{\code{alternative_gene_name}}{An alternative gene name.}
 
-\item{\code{codon_genomic_location}}{The position within the genomic sequence of the codon.}
+    \item{\code{codon_genomic_location}}{The position within the genomic sequence of the codon.}
 
-\item{\code{gene_name}}{An identifier of the gene, if any, is being covered with this targeted.}
+    \item{\code{gene_name}}{An identifier of the gene, if any, is being covered with this targeted.}
 
-\item{\code{protein_location}}{The position within the protein, the chromosome in this case would be the transcript name.}
+    \item{\code{protein_location}}{The position within the protein, the chromosome in this case would be the transcript name.}
 
-\item{\code{extras}}{Additional properties not explicitly defined in the schema.}
-}
-\if{html}{\out{</div>}}
+    \item{\code{extras}}{Additional properties not explicitly defined in the schema.}
+  }
+  \if{html}{\out{</div>}}
 }
 \section{Methods}{
 \subsection{Public methods}{
-\itemize{
-\item \href{#method-ProteinVariant-new}{\code{ProteinVariant$new()}}
-\item \href{#method-ProteinVariant-validate}{\code{ProteinVariant$validate()}}
-\item \href{#method-ProteinVariant-to_list}{\code{ProteinVariant$to_list()}}
-\item \href{#method-ProteinVariant-to_json_list}{\code{ProteinVariant$to_json_list()}}
-\item \href{#method-ProteinVariant-to_json}{\code{ProteinVariant$to_json()}}
-\item \href{#method-ProteinVariant-clone}{\code{ProteinVariant$clone()}}
-}
+  \itemize{
+    \item \href{#method-ProteinVariant-initialize}{\code{ProteinVariant$new()}}
+    \item \href{#method-ProteinVariant-validate}{\code{ProteinVariant$validate()}}
+    \item \href{#method-ProteinVariant-to_list}{\code{ProteinVariant$to_list()}}
+    \item \href{#method-ProteinVariant-to_json_list}{\code{ProteinVariant$to_json_list()}}
+    \item \href{#method-ProteinVariant-to_json}{\code{ProteinVariant$to_json()}}
+    \item \href{#method-ProteinVariant-clone}{\code{ProteinVariant$clone()}}
+  }
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-ProteinVariant-new"></a>}}
-\if{latex}{\out{\hypertarget{method-ProteinVariant-new}{}}}
-\subsection{Method \code{new()}}{
-Create a new instance.
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{ProteinVariant$new(
+\if{html}{\out{<a id="method-ProteinVariant-initialize"></a>}}
+\if{latex}{\out{\hypertarget{method-ProteinVariant-initialize}{}}}
+\subsection{\code{ProteinVariant$new()}}{
+  Create a new instance.
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{ProteinVariant$new(
   alternative_gene_name = NULL,
   codon_genomic_location = NULL,
   gene_name = NULL,
   protein_location = NULL,
   extras = list()
-)}\if{html}{\out{</div>}}
+)}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Arguments}{
+    \if{html}{\out{<div class="arguments">}}
+    \describe{
+      \item{\code{alternative_gene_name}}{An alternative gene name.}
+      \item{\code{codon_genomic_location}}{The position within the genomic sequence of the codon.}
+      \item{\code{gene_name}}{An identifier of the gene, if any, is being covered with this targeted.}
+      \item{\code{protein_location}}{The position within the protein, the chromosome in this case would be the transcript name.}
+      \item{\code{extras}}{Additional properties not explicitly defined in the schema.}
+    }
+    \if{html}{\out{</div>}}
+  }
 }
 
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{alternative_gene_name}}{An alternative gene name.}
-
-\item{\code{codon_genomic_location}}{The position within the genomic sequence of the codon.}
-
-\item{\code{gene_name}}{An identifier of the gene, if any, is being covered with this targeted.}
-
-\item{\code{protein_location}}{The position within the protein, the chromosome in this case would be the transcript name.}
-
-\item{\code{extras}}{Additional properties not explicitly defined in the schema.}
-}
-\if{html}{\out{</div>}}
-}
-}
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-ProteinVariant-validate"></a>}}
 \if{latex}{\out{\hypertarget{method-ProteinVariant-validate}{}}}
-\subsection{Method \code{validate()}}{
-Validate the current instance against schema-derived constraints.
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{ProteinVariant$validate()}\if{html}{\out{</div>}}
+\subsection{\code{ProteinVariant$validate()}}{
+  Validate the current instance against schema-derived constraints.
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{ProteinVariant$validate()}
+    \if{html}{\out{</div>}}
+  }
 }
 
-}
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-ProteinVariant-to_list"></a>}}
 \if{latex}{\out{\hypertarget{method-ProteinVariant-to_list}{}}}
-\subsection{Method \code{to_list()}}{
-Convert the object to a plain R list using in-memory values.
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{ProteinVariant$to_list()}\if{html}{\out{</div>}}
+\subsection{\code{ProteinVariant$to_list()}}{
+  Convert the object to a plain R list using in-memory values.
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{ProteinVariant$to_list()}
+    \if{html}{\out{</div>}}
+  }
 }
 
-}
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-ProteinVariant-to_json_list"></a>}}
 \if{latex}{\out{\hypertarget{method-ProteinVariant-to_json_list}{}}}
-\subsection{Method \code{to_json_list()}}{
-Convert the object to a JSON-ready R list.
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{ProteinVariant$to_json_list()}\if{html}{\out{</div>}}
+\subsection{\code{ProteinVariant$to_json_list()}}{
+  Convert the object to a JSON-ready R list.
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{ProteinVariant$to_json_list()}
+    \if{html}{\out{</div>}}
+  }
 }
 
-}
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-ProteinVariant-to_json"></a>}}
 \if{latex}{\out{\hypertarget{method-ProteinVariant-to_json}{}}}
-\subsection{Method \code{to_json()}}{
-Convert the object to a JSON string.
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{ProteinVariant$to_json(pretty = FALSE, auto_unbox = TRUE, ...)}\if{html}{\out{</div>}}
+\subsection{\code{ProteinVariant$to_json()}}{
+  Convert the object to a JSON string.
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{ProteinVariant$to_json(pretty = FALSE, auto_unbox = TRUE, ...)}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Arguments}{
+    \if{html}{\out{<div class="arguments">}}
+    \describe{
+      \item{\code{pretty}}{Logical; pretty-print the JSON.}
+      \item{\code{auto_unbox}}{Logical; passed to \code{\link[jsonlite:toJSON]{jsonlite::toJSON()}}.}
+      \item{\code{...}}{Additional arguments passed to \code{\link[jsonlite:toJSON]{jsonlite::toJSON()}}.}
+    }
+    \if{html}{\out{</div>}}
+  }
 }
 
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{pretty}}{Logical; pretty-print the JSON.}
-
-\item{\code{auto_unbox}}{Logical; passed to \code{\link[jsonlite:fromJSON]{jsonlite::toJSON()}}.}
-
-\item{\code{...}}{Additional arguments passed to \code{\link[jsonlite:fromJSON]{jsonlite::toJSON()}}.}
-}
-\if{html}{\out{</div>}}
-}
-}
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-ProteinVariant-clone"></a>}}
 \if{latex}{\out{\hypertarget{method-ProteinVariant-clone}{}}}
-\subsection{Method \code{clone()}}{
-The objects of this class are cloneable with this method.
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{ProteinVariant$clone(deep = FALSE)}\if{html}{\out{</div>}}
+\subsection{\code{ProteinVariant$clone()}}{
+  The objects of this class are cloneable with this method.
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{ProteinVariant$clone(deep = FALSE)}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Arguments}{
+    \if{html}{\out{<div class="arguments">}}
+    \describe{
+      \item{\code{deep}}{Whether to make a deep clone.}
+    }
+    \if{html}{\out{</div>}}
+  }
 }
 
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{deep}}{Whether to make a deep clone.}
-}
-\if{html}{\out{</div>}}
-}
-}
 }

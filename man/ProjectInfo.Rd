@@ -7,11 +7,6 @@
 An \code{\link[R6:R6Class]{R6::R6Class()}} generator object.
 }
 \description{
-ProjectInfo
-
-ProjectInfo
-}
-\details{
 Information on a project underwhich a collection of specimens belong to.
 
 Auto-generated R6 class from JSON Schema.
@@ -36,42 +31,43 @@ See inline method documentation for \code{initialize()}, \code{validate()}, \cod
 }
 
 \section{Public fields}{
-\if{html}{\out{<div class="r6-fields">}}
-\describe{
-\item{\code{BioProject_accession}}{An SRA bioproject accession e.g. PRJNA33823.}
+  \if{html}{\out{<div class="r6-fields">}}
+  \describe{
+    \item{\code{BioProject_accession}}{An SRA bioproject accession e.g. PRJNA33823.}
 
-\item{\code{project_collector_chief_scientist}}{Can be collection of names separated by a semicolon if multiple people involved or can just be the name of the primary person managing the specimen.}
+    \item{\code{project_collector_chief_scientist}}{Can be collection of names separated by a semicolon if multiple people involved or can just be the name of the primary person managing the specimen.}
 
-\item{\code{project_contributors}}{A list of collaborators who contributed to this project.}
+    \item{\code{project_contributors}}{A list of collaborators who contributed to this project.}
 
-\item{\code{project_description}}{A short description of the project.}
+    \item{\code{project_description}}{A short description of the project.}
 
-\item{\code{project_name}}{A name for the project, should be unique if multiple projects listed.}
+    \item{\code{project_name}}{A name for the project, should be unique if multiple projects listed.}
 
-\item{\code{project_type}}{The type of project conducted, e.g. TES vs surveillance vs transmission.}
+    \item{\code{project_type}}{The type of project conducted, e.g. TES vs surveillance vs transmission.}
 
-\item{\code{extras}}{Additional properties not explicitly defined in the schema.}
-}
-\if{html}{\out{</div>}}
+    \item{\code{extras}}{Additional properties not explicitly defined in the schema.}
+  }
+  \if{html}{\out{</div>}}
 }
 \section{Methods}{
 \subsection{Public methods}{
-\itemize{
-\item \href{#method-ProjectInfo-new}{\code{ProjectInfo$new()}}
-\item \href{#method-ProjectInfo-validate}{\code{ProjectInfo$validate()}}
-\item \href{#method-ProjectInfo-to_list}{\code{ProjectInfo$to_list()}}
-\item \href{#method-ProjectInfo-to_json_list}{\code{ProjectInfo$to_json_list()}}
-\item \href{#method-ProjectInfo-to_json}{\code{ProjectInfo$to_json()}}
-\item \href{#method-ProjectInfo-clone}{\code{ProjectInfo$clone()}}
-}
+  \itemize{
+    \item \href{#method-ProjectInfo-initialize}{\code{ProjectInfo$new()}}
+    \item \href{#method-ProjectInfo-validate}{\code{ProjectInfo$validate()}}
+    \item \href{#method-ProjectInfo-to_list}{\code{ProjectInfo$to_list()}}
+    \item \href{#method-ProjectInfo-to_json_list}{\code{ProjectInfo$to_json_list()}}
+    \item \href{#method-ProjectInfo-to_json}{\code{ProjectInfo$to_json()}}
+    \item \href{#method-ProjectInfo-clone}{\code{ProjectInfo$clone()}}
+  }
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-ProjectInfo-new"></a>}}
-\if{latex}{\out{\hypertarget{method-ProjectInfo-new}{}}}
-\subsection{Method \code{new()}}{
-Create a new instance.
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{ProjectInfo$new(
+\if{html}{\out{<a id="method-ProjectInfo-initialize"></a>}}
+\if{latex}{\out{\hypertarget{method-ProjectInfo-initialize}{}}}
+\subsection{\code{ProjectInfo$new()}}{
+  Create a new instance.
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{ProjectInfo$new(
   BioProject_accession = NULL,
   project_collector_chief_scientist = NULL,
   project_contributors = NULL,
@@ -79,95 +75,98 @@ Create a new instance.
   project_name = NA_character_,
   project_type = NULL,
   extras = list()
-)}\if{html}{\out{</div>}}
+)}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Arguments}{
+    \if{html}{\out{<div class="arguments">}}
+    \describe{
+      \item{\code{BioProject_accession}}{An SRA bioproject accession e.g. PRJNA33823.}
+      \item{\code{project_collector_chief_scientist}}{Can be collection of names separated by a semicolon if multiple people involved or can just be the name of the primary person managing the specimen.}
+      \item{\code{project_contributors}}{A list of collaborators who contributed to this project.}
+      \item{\code{project_description}}{A short description of the project.}
+      \item{\code{project_name}}{A name for the project, should be unique if multiple projects listed.}
+      \item{\code{project_type}}{The type of project conducted, e.g. TES vs surveillance vs transmission.}
+      \item{\code{extras}}{Additional properties not explicitly defined in the schema.}
+    }
+    \if{html}{\out{</div>}}
+  }
 }
 
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{BioProject_accession}}{An SRA bioproject accession e.g. PRJNA33823.}
-
-\item{\code{project_collector_chief_scientist}}{Can be collection of names separated by a semicolon if multiple people involved or can just be the name of the primary person managing the specimen.}
-
-\item{\code{project_contributors}}{A list of collaborators who contributed to this project.}
-
-\item{\code{project_description}}{A short description of the project.}
-
-\item{\code{project_name}}{A name for the project, should be unique if multiple projects listed.}
-
-\item{\code{project_type}}{The type of project conducted, e.g. TES vs surveillance vs transmission.}
-
-\item{\code{extras}}{Additional properties not explicitly defined in the schema.}
-}
-\if{html}{\out{</div>}}
-}
-}
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-ProjectInfo-validate"></a>}}
 \if{latex}{\out{\hypertarget{method-ProjectInfo-validate}{}}}
-\subsection{Method \code{validate()}}{
-Validate the current instance against schema-derived constraints.
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{ProjectInfo$validate()}\if{html}{\out{</div>}}
+\subsection{\code{ProjectInfo$validate()}}{
+  Validate the current instance against schema-derived constraints.
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{ProjectInfo$validate()}
+    \if{html}{\out{</div>}}
+  }
 }
 
-}
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-ProjectInfo-to_list"></a>}}
 \if{latex}{\out{\hypertarget{method-ProjectInfo-to_list}{}}}
-\subsection{Method \code{to_list()}}{
-Convert the object to a plain R list using in-memory values.
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{ProjectInfo$to_list()}\if{html}{\out{</div>}}
+\subsection{\code{ProjectInfo$to_list()}}{
+  Convert the object to a plain R list using in-memory values.
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{ProjectInfo$to_list()}
+    \if{html}{\out{</div>}}
+  }
 }
 
-}
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-ProjectInfo-to_json_list"></a>}}
 \if{latex}{\out{\hypertarget{method-ProjectInfo-to_json_list}{}}}
-\subsection{Method \code{to_json_list()}}{
-Convert the object to a JSON-ready R list.
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{ProjectInfo$to_json_list()}\if{html}{\out{</div>}}
+\subsection{\code{ProjectInfo$to_json_list()}}{
+  Convert the object to a JSON-ready R list.
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{ProjectInfo$to_json_list()}
+    \if{html}{\out{</div>}}
+  }
 }
 
-}
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-ProjectInfo-to_json"></a>}}
 \if{latex}{\out{\hypertarget{method-ProjectInfo-to_json}{}}}
-\subsection{Method \code{to_json()}}{
-Convert the object to a JSON string.
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{ProjectInfo$to_json(pretty = FALSE, auto_unbox = TRUE, ...)}\if{html}{\out{</div>}}
+\subsection{\code{ProjectInfo$to_json()}}{
+  Convert the object to a JSON string.
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{ProjectInfo$to_json(pretty = FALSE, auto_unbox = TRUE, ...)}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Arguments}{
+    \if{html}{\out{<div class="arguments">}}
+    \describe{
+      \item{\code{pretty}}{Logical; pretty-print the JSON.}
+      \item{\code{auto_unbox}}{Logical; passed to \code{\link[jsonlite:toJSON]{jsonlite::toJSON()}}.}
+      \item{\code{...}}{Additional arguments passed to \code{\link[jsonlite:toJSON]{jsonlite::toJSON()}}.}
+    }
+    \if{html}{\out{</div>}}
+  }
 }
 
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{pretty}}{Logical; pretty-print the JSON.}
-
-\item{\code{auto_unbox}}{Logical; passed to \code{\link[jsonlite:fromJSON]{jsonlite::toJSON()}}.}
-
-\item{\code{...}}{Additional arguments passed to \code{\link[jsonlite:fromJSON]{jsonlite::toJSON()}}.}
-}
-\if{html}{\out{</div>}}
-}
-}
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-ProjectInfo-clone"></a>}}
 \if{latex}{\out{\hypertarget{method-ProjectInfo-clone}{}}}
-\subsection{Method \code{clone()}}{
-The objects of this class are cloneable with this method.
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{ProjectInfo$clone(deep = FALSE)}\if{html}{\out{</div>}}
+\subsection{\code{ProjectInfo$clone()}}{
+  The objects of this class are cloneable with this method.
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{ProjectInfo$clone(deep = FALSE)}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Arguments}{
+    \if{html}{\out{<div class="arguments">}}
+    \describe{
+      \item{\code{deep}}{Whether to make a deep clone.}
+    }
+    \if{html}{\out{</div>}}
+  }
 }
 
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{deep}}{Whether to make a deep clone.}
-}
-\if{html}{\out{</div>}}
-}
-}
 }

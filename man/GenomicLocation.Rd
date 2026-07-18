@@ -7,11 +7,6 @@
 An \code{\link[R6:R6Class]{R6::R6Class()}} generator object.
 }
 \description{
-GenomicLocation
-
-GenomicLocation
-}
-\details{
 Information on the genomic location of specific sequence.
 
 Auto-generated R6 class from JSON Schema.
@@ -37,44 +32,45 @@ See inline method documentation for \code{initialize()}, \code{validate()}, \cod
 }
 
 \section{Public fields}{
-\if{html}{\out{<div class="r6-fields">}}
-\describe{
-\item{\code{alt_seq}}{A possible alternative sequence of this genomic location.}
+  \if{html}{\out{<div class="r6-fields">}}
+  \describe{
+    \item{\code{alt_seq}}{A possible alternative sequence of this genomic location.}
 
-\item{\code{chrom}}{The chromosome name.}
+    \item{\code{chrom}}{The chromosome name.}
 
-\item{\code{end}}{The end of the location, 0-based positioning.}
+    \item{\code{end}}{The end of the location, 0-based positioning.}
 
-\item{\code{genome_id}}{The index to the genome in the targeted_genomes list that this location refers to.}
+    \item{\code{genome_id}}{The index to the genome in the targeted_genomes list that this location refers to.}
 
-\item{\code{ref_seq}}{The reference sequence of this genomic location.}
+    \item{\code{ref_seq}}{The reference sequence of this genomic location.}
 
-\item{\code{start}}{The start of the location, 0-based positioning.}
+    \item{\code{start}}{The start of the location, 0-based positioning.}
 
-\item{\code{strand}}{Which strand the location is, either + for plus strand or - for negative strand.}
+    \item{\code{strand}}{Which strand the location is, either + for plus strand or - for negative strand.}
 
-\item{\code{extras}}{Additional properties not explicitly defined in the schema.}
-}
-\if{html}{\out{</div>}}
+    \item{\code{extras}}{Additional properties not explicitly defined in the schema.}
+  }
+  \if{html}{\out{</div>}}
 }
 \section{Methods}{
 \subsection{Public methods}{
-\itemize{
-\item \href{#method-GenomicLocation-new}{\code{GenomicLocation$new()}}
-\item \href{#method-GenomicLocation-validate}{\code{GenomicLocation$validate()}}
-\item \href{#method-GenomicLocation-to_list}{\code{GenomicLocation$to_list()}}
-\item \href{#method-GenomicLocation-to_json_list}{\code{GenomicLocation$to_json_list()}}
-\item \href{#method-GenomicLocation-to_json}{\code{GenomicLocation$to_json()}}
-\item \href{#method-GenomicLocation-clone}{\code{GenomicLocation$clone()}}
-}
+  \itemize{
+    \item \href{#method-GenomicLocation-initialize}{\code{GenomicLocation$new()}}
+    \item \href{#method-GenomicLocation-validate}{\code{GenomicLocation$validate()}}
+    \item \href{#method-GenomicLocation-to_list}{\code{GenomicLocation$to_list()}}
+    \item \href{#method-GenomicLocation-to_json_list}{\code{GenomicLocation$to_json_list()}}
+    \item \href{#method-GenomicLocation-to_json}{\code{GenomicLocation$to_json()}}
+    \item \href{#method-GenomicLocation-clone}{\code{GenomicLocation$clone()}}
+  }
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-GenomicLocation-new"></a>}}
-\if{latex}{\out{\hypertarget{method-GenomicLocation-new}{}}}
-\subsection{Method \code{new()}}{
-Create a new instance.
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{GenomicLocation$new(
+\if{html}{\out{<a id="method-GenomicLocation-initialize"></a>}}
+\if{latex}{\out{\hypertarget{method-GenomicLocation-initialize}{}}}
+\subsection{\code{GenomicLocation$new()}}{
+  Create a new instance.
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{GenomicLocation$new(
   alt_seq = NULL,
   chrom = NA_character_,
   end = NA_real_,
@@ -83,97 +79,99 @@ Create a new instance.
   start = NA_real_,
   strand = NULL,
   extras = list()
-)}\if{html}{\out{</div>}}
+)}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Arguments}{
+    \if{html}{\out{<div class="arguments">}}
+    \describe{
+      \item{\code{alt_seq}}{A possible alternative sequence of this genomic location.}
+      \item{\code{chrom}}{The chromosome name.}
+      \item{\code{end}}{The end of the location, 0-based positioning.}
+      \item{\code{genome_id}}{The index to the genome in the targeted_genomes list that this location refers to.}
+      \item{\code{ref_seq}}{The reference sequence of this genomic location.}
+      \item{\code{start}}{The start of the location, 0-based positioning.}
+      \item{\code{strand}}{Which strand the location is, either + for plus strand or - for negative strand.}
+      \item{\code{extras}}{Additional properties not explicitly defined in the schema.}
+    }
+    \if{html}{\out{</div>}}
+  }
 }
 
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{alt_seq}}{A possible alternative sequence of this genomic location.}
-
-\item{\code{chrom}}{The chromosome name.}
-
-\item{\code{end}}{The end of the location, 0-based positioning.}
-
-\item{\code{genome_id}}{The index to the genome in the targeted_genomes list that this location refers to.}
-
-\item{\code{ref_seq}}{The reference sequence of this genomic location.}
-
-\item{\code{start}}{The start of the location, 0-based positioning.}
-
-\item{\code{strand}}{Which strand the location is, either + for plus strand or - for negative strand.}
-
-\item{\code{extras}}{Additional properties not explicitly defined in the schema.}
-}
-\if{html}{\out{</div>}}
-}
-}
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-GenomicLocation-validate"></a>}}
 \if{latex}{\out{\hypertarget{method-GenomicLocation-validate}{}}}
-\subsection{Method \code{validate()}}{
-Validate the current instance against schema-derived constraints.
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{GenomicLocation$validate()}\if{html}{\out{</div>}}
+\subsection{\code{GenomicLocation$validate()}}{
+  Validate the current instance against schema-derived constraints.
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{GenomicLocation$validate()}
+    \if{html}{\out{</div>}}
+  }
 }
 
-}
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-GenomicLocation-to_list"></a>}}
 \if{latex}{\out{\hypertarget{method-GenomicLocation-to_list}{}}}
-\subsection{Method \code{to_list()}}{
-Convert the object to a plain R list using in-memory values.
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{GenomicLocation$to_list()}\if{html}{\out{</div>}}
+\subsection{\code{GenomicLocation$to_list()}}{
+  Convert the object to a plain R list using in-memory values.
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{GenomicLocation$to_list()}
+    \if{html}{\out{</div>}}
+  }
 }
 
-}
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-GenomicLocation-to_json_list"></a>}}
 \if{latex}{\out{\hypertarget{method-GenomicLocation-to_json_list}{}}}
-\subsection{Method \code{to_json_list()}}{
-Convert the object to a JSON-ready R list.
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{GenomicLocation$to_json_list()}\if{html}{\out{</div>}}
+\subsection{\code{GenomicLocation$to_json_list()}}{
+  Convert the object to a JSON-ready R list.
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{GenomicLocation$to_json_list()}
+    \if{html}{\out{</div>}}
+  }
 }
 
-}
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-GenomicLocation-to_json"></a>}}
 \if{latex}{\out{\hypertarget{method-GenomicLocation-to_json}{}}}
-\subsection{Method \code{to_json()}}{
-Convert the object to a JSON string.
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{GenomicLocation$to_json(pretty = FALSE, auto_unbox = TRUE, ...)}\if{html}{\out{</div>}}
+\subsection{\code{GenomicLocation$to_json()}}{
+  Convert the object to a JSON string.
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{GenomicLocation$to_json(pretty = FALSE, auto_unbox = TRUE, ...)}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Arguments}{
+    \if{html}{\out{<div class="arguments">}}
+    \describe{
+      \item{\code{pretty}}{Logical; pretty-print the JSON.}
+      \item{\code{auto_unbox}}{Logical; passed to \code{\link[jsonlite:toJSON]{jsonlite::toJSON()}}.}
+      \item{\code{...}}{Additional arguments passed to \code{\link[jsonlite:toJSON]{jsonlite::toJSON()}}.}
+    }
+    \if{html}{\out{</div>}}
+  }
 }
 
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{pretty}}{Logical; pretty-print the JSON.}
-
-\item{\code{auto_unbox}}{Logical; passed to \code{\link[jsonlite:fromJSON]{jsonlite::toJSON()}}.}
-
-\item{\code{...}}{Additional arguments passed to \code{\link[jsonlite:fromJSON]{jsonlite::toJSON()}}.}
-}
-\if{html}{\out{</div>}}
-}
-}
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-GenomicLocation-clone"></a>}}
 \if{latex}{\out{\hypertarget{method-GenomicLocation-clone}{}}}
-\subsection{Method \code{clone()}}{
-The objects of this class are cloneable with this method.
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{GenomicLocation$clone(deep = FALSE)}\if{html}{\out{</div>}}
+\subsection{\code{GenomicLocation$clone()}}{
+  The objects of this class are cloneable with this method.
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{GenomicLocation$clone(deep = FALSE)}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Arguments}{
+    \if{html}{\out{<div class="arguments">}}
+    \describe{
+      \item{\code{deep}}{Whether to make a deep clone.}
+    }
+    \if{html}{\out{</div>}}
+  }
 }
 
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{deep}}{Whether to make a deep clone.}
-}
-\if{html}{\out{</div>}}
-}
-}
 }

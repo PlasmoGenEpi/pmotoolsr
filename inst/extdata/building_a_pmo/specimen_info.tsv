@@ -1,0 +1,9 @@
+form participant_id	facility_district	facility_province	facility_name	form date_diagnosis	host_taxon_id	specimen_taxon_id	project_name	country
+ZM008P090	Chipata	Eastern	NAMSECHE RURAL HEALTH CENTRE	2023-03-27	9606	5833	RegGenE8	Zambia
+ZM019P180	Pemba	Southern	SIAMULEYA RURAL HEALTH CENTRE	2023-05-12	9606	5833	RegGenE8	Zambia
+ZM019P194	Pemba	Southern	SIAMULEYA RURAL HEALTH CENTRE	2023-05-12	9606	5833	RegGenE8	Zambia
+ZMC-120-39	Kafue	Lusaka	CHIAWA RURAL HEALTH CENTRE	2023-05-04	9606	5833	RegGenE8	Zambia
+ZMC-123-35	Sikongo	Western	SIKONGO RURAL HEALTH CENTRE	2023-04-18	9606	5833	RegGenE8	Zambia
+ZMC-125-37	Shangombo	Western	SHANGOMBO RURAL HEALTH CENTRE	2023-04-24	9606	5833	RegGenE8	Zambia
+ZMC-192-35	Sikongo	Western	SIKONGO RURAL HEALTH CENTRE	2023-04-21	9606	5833	RegGenE8	Zambia
+M0005106	Ehlanzeni	Mpumalanga	SIBANGE CLINIC	2023-06-27	9606	5833	RegGenE8	RSA
