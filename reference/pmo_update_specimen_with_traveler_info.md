@@ -1,0 +1,70 @@
+# Add travel history to a PMO's specimens
+
+Appends one `travel_out_six_month` (TravelInfo) record per row of
+`traveler_info` to the matching specimen. Column names default to the
+schema field names, so the produced records are schema-shaped;
+non-default column names are used verbatim as keys.
+
+## Usage
+
+``` r
+pmo_update_specimen_with_traveler_info(
+  pmo,
+  traveler_info,
+  specimen_name_col = "specimen_name",
+  travel_country_col = "travel_country",
+  travel_start_col = "travel_start_date",
+  travel_end_col = "travel_end_date",
+  bed_net_usage_col = NULL,
+  geo_admin1_col = NULL,
+  geo_admin2_col = NULL,
+  geo_admin3_col = NULL,
+  lat_lon_col = NULL,
+  replace_current_traveler_info = FALSE
+)
+```
+
+## Arguments
+
+- pmo:
+
+  A `PortableMicrohaplotypeObject` or parsed PMO list.
+
+- traveler_info:
+
+  A data.frame of travel records.
+
+- specimen_name_col:
+
+  Column matching specimens in the PMO.
+
+- travel_country_col, travel_start_col, travel_end_col:
+
+  Required travel columns; the start/end values must be `YYYY-MM` or
+  `YYYY-MM-DD`.
+
+- bed_net_usage_col, geo_admin1_col, geo_admin2_col, geo_admin3_col,
+  lat_lon_col:
+
+  Optional travel columns.
+
+- replace_current_traveler_info:
+
+  If `TRUE`, clear any existing travel records on matched specimens
+  before appending.
+
+## Value
+
+The updated PMO as a raw nested list.
+
+## Examples
+
+``` r
+p <- read_pmo(
+  system.file("extdata", "example_full_pmo.json.gz", package = "pmotoolsr"))
+travel <- data.frame(
+  specimen_name = pmo_get_specimen_names(p)[1],
+  travel_country = "Kenya", travel_start_date = "2018-01",
+  travel_end_date = "2018-02")
+updated <- pmo_update_specimen_with_traveler_info(p, travel)
+```
