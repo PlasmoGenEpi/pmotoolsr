@@ -267,7 +267,7 @@ pmo_library_sample_info_table_to_pmo <- function(
 #'
 #' @param contents A data.frame, one row per specimen.
 #' @param specimen_name_col Column name for specimen names.
-#' @param specimen_taxon_id_col,host_taxon_id_col,collection_date_col,collection_country_col,project_name_col,alternate_identifiers_col,blood_meal_col,drug_usage_col,env_broad_scale_col,env_local_scale_col,env_medium_col,geo_admin1_col,geo_admin2_col,geo_admin3_col,gravid_col,gravidity_col,has_travel_out_six_month_col,host_age_col,host_sex_col,host_subject_id,lat_lon_col,specimen_accession_col,specimen_collect_device_col,specimen_comments_col,specimen_store_loc_col,specimen_type_col,treatment_status_col
+#' @param specimen_taxon_id_col,host_taxon_id_col,collection_date_col,collection_country_col,project_name_col,alternate_identifiers_col,blood_meal_col,drug_usage_col,env_broad_scale_col,env_local_scale_col,env_medium_col,geo_admin1_col,geo_admin2_col,geo_admin3_col,gravid_col,gravidity_col,has_travel_out_six_month_col,host_age_col,host_sex_col,host_subject_name,lat_lon_col,specimen_accession_col,specimen_collect_device_col,specimen_comments_col,specimen_store_loc_col,specimen_type_col,treatment_status_col
 #'   Optional column names mapped to the corresponding PMO fields.
 #' @param parasite_density_col,parasite_density_method_col Optional density
 #'   column(s).
@@ -291,7 +291,7 @@ pmo_specimen_info_table_to_pmo <- function(
     env_medium_col = NULL, geo_admin1_col = NULL, geo_admin2_col = NULL,
     geo_admin3_col = NULL, gravid_col = NULL, gravidity_col = NULL,
     has_travel_out_six_month_col = NULL, host_age_col = NULL, host_sex_col = NULL,
-    host_subject_id = NULL, lat_lon_col = NULL, parasite_density_col = NULL,
+    host_subject_name = NULL, lat_lon_col = NULL, parasite_density_col = NULL,
     parasite_density_method_col = NULL, specimen_accession_col = NULL,
     storage_plate_col_col = NULL, storage_plate_name_col = NULL,
     storage_plate_row_col = NULL, storage_plate_position_col = NULL,
@@ -317,7 +317,7 @@ pmo_specimen_info_table_to_pmo <- function(
     env_medium = env_medium_col, geo_admin1 = geo_admin1_col,
     geo_admin2 = geo_admin2_col, geo_admin3 = geo_admin3_col,
     host_age = host_age_col, host_sex = host_sex_col,
-    host_subject_id = host_subject_id, lat_lon = lat_lon_col,
+    host_subject_name = host_subject_name, lat_lon = lat_lon_col,
     specimen_accession = specimen_accession_col, specimen_type = specimen_type_col,
     treatment_status = treatment_status_col,
     specimen_collect_device = specimen_collect_device_col,
@@ -333,7 +333,7 @@ pmo_specimen_info_table_to_pmo <- function(
     collection_date_col, collection_country_col, project_name_col,
     alternate_identifiers_col, drug_usage_col, env_broad_scale_col,
     env_local_scale_col, env_medium_col, geo_admin1_col, geo_admin2_col,
-    geo_admin3_col, host_age_col, host_sex_col, host_subject_id, lat_lon_col,
+    geo_admin3_col, host_age_col, host_sex_col, host_subject_name, lat_lon_col,
     specimen_accession_col, specimen_type_col, treatment_status_col,
     storage_plate_col_col, storage_plate_name_col, storage_plate_row_col,
     storage_plate_position_col, specimen_collect_device_col,
