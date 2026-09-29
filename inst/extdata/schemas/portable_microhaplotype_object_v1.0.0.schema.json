@@ -1393,7 +1393,7 @@
                         "null"
                     ]
                 },
-                "host_subject_id": {
+                "host_subject_name": {
                     "description": "an identifier for the individual a specimen was collected from",
                     "minimum": 0,
                     "pattern": "^[0-9]+$",
