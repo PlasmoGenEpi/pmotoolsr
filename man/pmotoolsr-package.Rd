@@ -13,10 +13,5 @@ details, and note the 0-based (on disk) to 1-based (in R) index convention.
 \author{
 \strong{Maintainer}: Nicholas Hathaway \email{nicholas.hathaway@ucsf.edu} (\href{https://orcid.org/0000-0001-9639-2894}{ORCID})
 
-Authors:
-\itemize{
-  \item Nicholas Hathaway \email{nicholas.hathaway@ucsf.edu} (\href{https://orcid.org/0000-0001-9639-2894}{ORCID})
-}
-
 }
 \keyword{internal}

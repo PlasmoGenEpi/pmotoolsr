@@ -13,7 +13,7 @@ write_pmo_raw(x, path, pretty = FALSE, auto_unbox = TRUE)
 
 \item{pretty}{Logical; pretty-print the JSON.}
 
-\item{auto_unbox}{Logical; passed to \code{\link[jsonlite:toJSON]{jsonlite::toJSON()}}.}
+\item{auto_unbox}{Logical; passed to \code{\link[jsonlite:fromJSON]{jsonlite::toJSON()}}.}
 }
 \value{
 Invisibly returns \code{path}.
