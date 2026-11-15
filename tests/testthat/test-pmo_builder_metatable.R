@@ -98,7 +98,9 @@ test_that("multiple parasite density columns produce multiple entries", {
 test_that("null required column errors", {
   df <- spec_fixture_df()
   df$specimen_name <- c("sp1", NA)
-  expect_error(pmo_specimen_info_table_to_pmo(df), "null values")
+  expect_error(pmo_specimen_info_table_to_pmo(df),
+               "Missing values in required column(s) of contents: specimen_name_col",
+               fixed = TRUE)
 })
 
 test_that("duplicate column selection errors", {

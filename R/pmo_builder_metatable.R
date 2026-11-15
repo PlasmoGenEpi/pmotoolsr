@@ -4,28 +4,15 @@
 # NAME-based intermediates (specimen_name / panel_name / sequencing_info_name
 # instead of ids); pmo_merge_to_pmo() replaces the names with indices.
 #
-# Library plate info is matched to rows by library_sample_name, and library qPCR
-# density is written under the schema field "qpcr_parasite_density_info".
-
-#' @keywords internal
-.meta_present <- function(v) {
-  length(v) == 1 && !is.null(v) && !is.na(v) && !(is.character(v) && v == "")
-}
+# Plate and density values are read from the same row of the table as the
+# record they are added to. Library qPCR density is written under the schema
+# field "qpcr_parasite_density_info".
 
 #' @keywords internal
 .meta_check_unique_columns <- function(columns) {
   cols <- unlist(columns[!vapply(columns, is.null, logical(1))])
   if (length(cols) != length(unique(cols))) {
     stop("Selected columns must be unique.")
-  }
-}
-
-#' @keywords internal
-.meta_check_columns_exist <- function(df, columns) {
-  missing <- setdiff(unlist(columns), names(df))
-  if (length(missing) > 0) {
-    stop("The following columns are not in the data.frame: ",
-         paste(missing, collapse = ", "))
   }
 }
 
@@ -54,7 +41,7 @@
     rec <- list()
     for (field in fields) {
       v <- wdf[[field]][i]
-      if (field %in% required_fields || .meta_present(v)) rec[[field]] <- v
+      if (field %in% required_fields || .has_value(v)) rec[[field]] <- v
     }
     recs[[i]] <- rec
   }
@@ -62,27 +49,31 @@
 }
 
 #' @keywords internal
+# Split plate positions such as "A01" into a row letter and a column number.
+# A blank cell gives NA for both, so that record gets no plate position;
+# spaces around a value are ignored (both as in pmotools-python).
 .meta_parse_plate_position <- function(pos) {
-  pos <- as.character(pos)
+  pos <- trimws(as.character(pos))
+  blank <- .is_blank(pos)
+  rows <- rep(NA_character_, length(pos))
+  cols <- rep(NA_integer_, length(pos))
   m <- regmatches(pos, regexec("^([A-Ha-h])0*([1-9]|1[0-2])$", pos))
-  rows <- character(length(pos))
-  cols <- integer(length(pos))
-  for (i in seq_along(pos)) {
-    g <- m[[i]]
-    if (length(g) != 3) {
-      stop("Values in the plate position column must start with a single ",
-           "letter A-H/a-h followed by a number 1-12.")
-    }
-    rows[i] <- toupper(g[2])
-    cols[i] <- as.integer(g[3])
+  ok <- !blank & lengths(m) == 3
+  if (any(!blank & !ok)) {
+    stop("Values in the plate position column must be a single letter A-H/a-h ",
+         "followed by a number 1-12. Got: ",
+         paste(unique(pos[!blank & !ok]), collapse = ", "), call. = FALSE)
   }
+  rows[ok] <- toupper(vapply(m[ok], function(g) g[2], character(1)))
+  cols[ok] <- as.integer(vapply(m[ok], function(g) g[3], character(1)))
   list(row = rows, col = cols)
 }
 
+# Add a plate-location object to each record. `meta[[k]]` was built from row k
+# of `contents`, so values are read from that row of the original table.
 #' @keywords internal
-.meta_add_plate_info <- function(meta, wdf, match_col, plate_name_col,
-                                 plate_row_col, plate_col_col,
-                                 plate_position_col, entry_name) {
+.meta_add_plate_info <- function(meta, contents, plate_name_col, plate_row_col,
+                                 plate_col_col, plate_position_col, entry_name) {
   if (is.null(plate_name_col) && is.null(plate_row_col) &&
       is.null(plate_col_col) && is.null(plate_position_col)) {
     return(meta)
@@ -90,29 +81,28 @@
   if (xor(is.null(plate_row_col), is.null(plate_col_col))) {
     stop("If either plate row or column is set, then both must be.")
   }
+  if (!is.null(plate_position_col) && !is.null(plate_col_col)) {
+    stop("Plate position can be specified using either row and col, or ",
+         "position, but not both.")
+  }
+  names_v <- if (!is.null(plate_name_col)) contents[[plate_name_col]]
+  rows_v <- if (!is.null(plate_row_col)) contents[[plate_row_col]]
+  cols_v <- if (!is.null(plate_col_col)) contents[[plate_col_col]]
   if (!is.null(plate_position_col)) {
-    if (!is.null(plate_col_col)) {
-      stop("Plate position can be specified using either row and col, or ",
-           "position, but not both.")
-    }
-    parsed <- .meta_parse_plate_position(wdf[[plate_position_col]])
-    wdf[["plate_row"]] <- parsed$row
-    wdf[["plate_col"]] <- parsed$col
-    plate_row_col <- "plate_row"
-    plate_col_col <- "plate_col"
+    parsed <- .meta_parse_plate_position(contents[[plate_position_col]])
+    rows_v <- parsed$row
+    cols_v <- parsed$col
   }
   for (k in seq_along(meta)) {
-    idx <- which(as.character(wdf[[match_col]]) ==
-                   as.character(meta[[k]][[match_col]]))[1]
     plate_info <- list()
-    if (!is.null(plate_name_col) && .meta_present(wdf[[plate_name_col]][idx])) {
-      plate_info$plate_name <- wdf[[plate_name_col]][idx]
+    if (!is.null(names_v) && .has_value(names_v[k])) {
+      plate_info$plate_name <- names_v[k]
     }
-    if (!is.null(plate_row_col) && .meta_present(wdf[[plate_row_col]][idx])) {
-      plate_info$plate_row <- toupper(as.character(wdf[[plate_row_col]][idx]))
+    if (!is.null(rows_v) && .has_value(rows_v[k])) {
+      plate_info$plate_row <- toupper(as.character(rows_v[k]))
     }
-    if (!is.null(plate_col_col) && .meta_present(wdf[[plate_col_col]][idx])) {
-      plate_info$plate_col <- as.integer(wdf[[plate_col_col]][idx])
+    if (!is.null(cols_v) && .has_value(cols_v[k])) {
+      plate_info$plate_col <- as.integer(cols_v[k])
     }
     if (length(plate_info) > 0) meta[[k]][[entry_name]] <- plate_info
   }
@@ -149,21 +139,20 @@
   stop("parasite_density_method_col is set but parasite_density_col is NULL.")
 }
 
+# Add parasite densities to each record; values come from row k of `contents`.
 #' @keywords internal
-.meta_add_parasite_density_info <- function(meta, wdf, match_col, density_col,
+.meta_add_parasite_density_info <- function(meta, contents, density_col,
                                             method_col, entry_name) {
   pairs <- .meta_density_pairs(density_col, method_col)
   if (length(pairs) == 0) return(meta)
   for (k in seq_along(meta)) {
-    idx <- which(as.character(wdf[[match_col]]) ==
-                   as.character(meta[[k]][[match_col]]))[1]
     infos <- list()
     for (p in pairs) {
-      dv <- wdf[[p$density]][idx]
-      if (.meta_present(dv)) {
+      dv <- contents[[p$density]][k]
+      if (.has_value(dv)) {
         info <- list(parasite_density = dv)
-        if (!is.null(p$method) && .meta_present(wdf[[p$method]][idx])) {
-          info$parasite_density_method <- wdf[[p$method]][idx]
+        if (!is.null(p$method) && .has_value(contents[[p$method]][k])) {
+          info$parasite_density_method <- contents[[p$method]][k]
         }
         infos[[length(infos) + 1L]] <- info
       }
@@ -173,11 +162,66 @@
   meta
 }
 
+# The columns a metadata builder reads, as a named character vector of table
+# column -> PMO field. `field_cols` is a named list of PMO field -> column (NULL
+# entries are skipped); each additional column keeps its own name. An
+# additional column that is already mapped to the field of its own name changes
+# nothing. Two columns may not give the same field: pmotools-python keeps both
+# (PlasmoGenEpi/pmotools-python#110), and the record would take whichever comes
+# first in the table.
 #' @keywords internal
-.meta_rename <- function(contents, mapping) {
-  wdf <- contents
-  hit <- match(names(mapping), names(wdf))
-  names(wdf)[hit] <- unname(unlist(mapping))
+.meta_build_mapping <- function(field_cols, additional, additional_arg) {
+  field_cols <- field_cols[!vapply(field_cols, is.null, logical(1))]
+  mapping <- stats::setNames(names(field_cols),
+                             unlist(field_cols, use.names = FALSE))
+  additional <- additional[!(additional %in% names(mapping) &
+                               mapping[additional] == additional)]
+  already <- intersect(additional, names(mapping))
+  if (length(already) > 0) {
+    stop(additional_arg, " lists column(s) that are already mapped to a PMO ",
+         "field: ", paste(already, collapse = ", "), call. = FALSE)
+  }
+  mapping <- c(mapping, stats::setNames(additional, additional))
+  repeated <- unique(mapping[duplicated(mapping)])
+  if (length(repeated) > 0) {
+    field <- repeated[1]
+    stop("Columns ", paste0("\"", names(mapping)[mapping == field], "\"",
+                            collapse = " and "),
+         " would both become the PMO field \"", field, "\"", call. = FALSE)
+  }
+  mapping
+}
+
+# Check a metadata table and give it its PMO field names. Every cell of the
+# `required` columns (a named list of argument -> column) must hold a value.
+# The columns of the `recommended` PMO fields may not hold NA; an empty cell in
+# any other mapped column just leaves that field out of the record.
+#' @keywords internal
+.meta_prepare_table <- function(contents, mapping, required, recommended) {
+  .check_required_values(contents, required, "contents")
+  .meta_check_null_values(contents, names(mapping)[mapping %in% recommended])
+  .meta_names_as_text(.meta_rename_columns(contents, mapping))
+}
+
+# Rename the mapped columns to their PMO field names. An unmapped column that
+# already has one of those names is dropped first; otherwise the table would
+# have two columns with that name.
+#' @keywords internal
+.meta_rename_columns <- function(contents, mapping) {
+  fields <- unname(mapping)
+  clash <- setdiff(intersect(names(contents), fields), names(mapping))
+  wdf <- contents[, !(names(contents) %in% clash), drop = FALSE]
+  names(wdf)[match(names(mapping), names(wdf))] <- fields
+  wdf
+}
+
+# Name fields are text in a PMO, whatever type the column was read as.
+#' @keywords internal
+.meta_names_as_text <- function(wdf) {
+  for (field in intersect(c("specimen_name", "library_sample_name", "panel_name",
+                            "sequencing_info_name", "project_name"), names(wdf))) {
+    wdf[[field]] <- .as_text(wdf[[field]])
+  }
   wdf
 }
 
@@ -216,39 +260,36 @@ pmo_library_sample_info_table_to_pmo <- function(
 
   if (!is.data.frame(contents)) stop("contents must be a data.frame")
 
-  mapping <- stats::setNames("library_sample_name", library_sample_name_col)
-  opt <- list(specimen_name = specimen_name_col, panel_name = panel_name_col,
-              sequencing_info_name = sequencing_info_name_col,
-              alternate_identifiers = alternate_identifiers_col,
-              experiment_accession = experiment_accession_col,
-              fastqs_loc = fastqs_loc_col, run_accession = run_accession_col)
-  for (field in names(opt)) {
-    if (!is.null(opt[[field]])) mapping[opt[[field]]] <- field
-  }
-  for (col in additional_library_sample_info_cols) mapping[col] <- col
-
   .meta_check_unique_columns(list(
     library_sample_name_col, sequencing_info_name_col, specimen_name_col,
     panel_name_col, alternate_identifiers_col, experiment_accession_col,
     fastqs_loc_col))
-  .meta_check_columns_exist(contents, names(mapping))
+  .check_columns_exist(
+    contents, .column_arguments(also = "additional_library_sample_info_cols"),
+    "contents")
+  mapping <- .meta_build_mapping(
+    list(library_sample_name = library_sample_name_col,
+         specimen_name = specimen_name_col, panel_name = panel_name_col,
+         sequencing_info_name = sequencing_info_name_col,
+         alternate_identifiers = alternate_identifiers_col,
+         experiment_accession = experiment_accession_col,
+         fastqs_loc = fastqs_loc_col, run_accession = run_accession_col),
+    additional_library_sample_info_cols, "additional_library_sample_info_cols")
+  wdf <- .meta_prepare_table(
+    contents, mapping,
+    required = list(library_sample_name_col = library_sample_name_col),
+    recommended = c("specimen_name", "panel_name", "sequencing_info_name"))
 
-  required <- "library_sample_name"
-  recommended <- intersect(c("specimen_name", "panel_name",
-                             "sequencing_info_name"), unname(mapping))
-  wdf <- .meta_rename(contents, mapping)
-  .meta_check_null_values(wdf, c(required, recommended))
-
-  meta <- .meta_build_records(wdf, unname(mapping), required)
+  meta <- .meta_build_records(wdf, unname(mapping), "library_sample_name")
   meta <- .meta_add_plate_info(
-    meta, wdf, match_col = "library_sample_name",
+    meta, contents,
     plate_name_col = library_prep_plate_name_col,
     plate_row_col = library_prep_plate_row_col,
     plate_col_col = library_prep_plate_col_col,
     plate_position_col = library_prep_plate_position_col,
     entry_name = "library_prep_plate_info")
   meta <- .meta_add_parasite_density_info(
-    meta, wdf, match_col = "library_sample_name",
+    meta, contents,
     density_col = parasite_density_col, method_col = parasite_density_method_col,
     entry_name = "qpcr_parasite_density_info")
 
@@ -305,8 +346,8 @@ pmo_specimen_info_table_to_pmo <- function(
 
   if (!is.data.frame(contents)) stop("contents must be a data.frame")
 
-  mapping <- stats::setNames("specimen_name", specimen_name_col)
-  opt <- list(
+  field_cols <- list(
+    specimen_name = specimen_name_col,
     specimen_taxon_id = specimen_taxon_id_col, host_taxon_id = host_taxon_id_col,
     collection_date = collection_date_col,
     collection_country = collection_country_col, project_name = project_name_col,
@@ -323,10 +364,6 @@ pmo_specimen_info_table_to_pmo <- function(
     specimen_collect_device = specimen_collect_device_col,
     specimen_comments = specimen_comments_col,
     specimen_store_loc = specimen_store_loc_col)
-  for (field in names(opt)) {
-    if (!is.null(opt[[field]])) mapping[opt[[field]]] <- field
-  }
-  for (col in additional_specimen_cols) mapping[col] <- col
 
   .meta_check_unique_columns(list(
     specimen_name_col, specimen_taxon_id_col, host_taxon_id_col,
@@ -339,21 +376,24 @@ pmo_specimen_info_table_to_pmo <- function(
     storage_plate_position_col, specimen_collect_device_col,
     specimen_comments_col, specimen_store_loc_col, blood_meal_col, gravid_col,
     gravidity_col, has_travel_out_six_month_col))
-  .meta_check_columns_exist(contents, names(mapping))
+  # the host subject argument has no `_col` suffix
+  .check_columns_exist(
+    contents,
+    .column_arguments(also = c("host_subject_id", "additional_specimen_cols")),
+    "contents")
+  mapping <- .meta_build_mapping(field_cols, additional_specimen_cols,
+                                 "additional_specimen_cols")
+  wdf <- .meta_prepare_table(
+    contents, mapping, required = list(specimen_name_col = specimen_name_col),
+    recommended = c("specimen_taxon_id", "host_taxon_id", "collection_date",
+                    "collection_country", "project_name"))
 
-  required <- "specimen_name"
-  recommended <- intersect(c("specimen_taxon_id", "host_taxon_id",
-                             "collection_date", "collection_country",
-                             "project_name"), unname(mapping))
-  wdf <- .meta_rename(contents, mapping)
-  .meta_check_null_values(wdf, c(required, recommended))
-
-  meta <- .meta_build_records(wdf, unname(mapping), required)
+  meta <- .meta_build_records(wdf, unname(mapping), "specimen_name")
   meta <- .meta_add_parasite_density_info(
-    meta, wdf, match_col = "specimen_name", density_col = parasite_density_col,
+    meta, contents, density_col = parasite_density_col,
     method_col = parasite_density_method_col, entry_name = "parasite_density_info")
   meta <- .meta_add_plate_info(
-    meta, wdf, match_col = "specimen_name",
+    meta, contents,
     plate_name_col = storage_plate_name_col, plate_row_col = storage_plate_row_col,
     plate_col_col = storage_plate_col_col,
     plate_position_col = storage_plate_position_col,

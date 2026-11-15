@@ -91,5 +91,5 @@ test_that("duplicate library names in totals error", {
 test_that("missing required column errors", {
   bad <- data.frame(library_sample_name = "l1", stringsAsFactors = FALSE)
   expect_error(pmo_read_count_by_stage_table_to_pmo(bad),
-               "Missing required columns")
+               "total_raw_count_col = \"total_raw_count\"", fixed = TRUE)
 })

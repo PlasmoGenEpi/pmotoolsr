@@ -93,7 +93,7 @@ pmo_update_specimen_with_traveler_info <- function(
     for (col in required) {
       if (col == specimen_name_col) next
       v <- traveler_info[[col]][i]
-      if (.meta_present(v)) rec[[col]] <- v
+      if (.has_value(v)) rec[[col]] <- v
     }
     idx <- spec_idx[[sn]]
     n <- length(p$specimen_info[[idx]]$travel_out_six_month)
