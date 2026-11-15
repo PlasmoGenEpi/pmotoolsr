@@ -34,9 +34,9 @@ detected microhaplotype points into `representative_microhaplotypes` via
 `mhaps_target_id`). **On disk these indices are 0-based** (the Python/JSON
 convention).
 
-When a PMO is read into R with `read_pmo()` or `read_pmo_raw()`, every index /
-`*_id` field (and `panel_targets`) is shifted to be **1-based**, so it behaves
-like a normal R index. On write, the shift is reversed automatically. Because
+When a PMO is read into R with `read_pmo()` or `read_pmo_raw()`, every index
+field is shifted to be **1-based**, so it behaves like a normal R index. On
+write, the shift is reversed automatically. Because
 both R list indexing *and* the stored ids are 1-based, you can index directly:
 
 ```r
@@ -45,7 +45,14 @@ lib <- pmo$library_sample_info[[1]]
 specimen <- pmo$specimen_info[[ lib$specimen_id ]]   # 1-based, works directly
 ```
 
-`taxon_id` fields are **not** treated as indices and are never shifted.
+The index fields are the ones the PMO schema defines as pointing into another
+section: `specimen_id`, `panel_id`, `sequencing_info_id`, `project_id`,
+`target_id`, `mhaps_target_id`, `mhap_id`, `library_sample_id`,
+`bioinformatics_run_id`, `bioinformatics_methods_id`, `genome_id` and
+`panel_targets`. Each is shifted only in the object the schema puts it in, for
+example `specimen_id` in a `library_sample_info` entry. No other field is
+shifted: not the taxon ids, and not a column of your own, even one named like an
+index field.
 
 Every `pmo_*` function in this package works in this 1-based space, and any PMO
 written back out (`write_pmo()`, `write_pmo_raw()`) is converted back to 0-based,
@@ -150,6 +157,13 @@ Most functions are ports of their pmotools-python counterparts and the source
 comments note the originating module (for example,
 `pmo_engine/pmo_processor.py`). The two implementations are kept in sync; the
 main difference is the 0-based ↔ 1-based index convention described above.
+
+pmotoolsr differs on purpose in a few places where pmotools-python has a known
+bug or relies on a Python type. A source comment marks each one, with the
+upstream issue number where there is one. The table builders are stricter: they
+stop on a column argument that names no column and on an empty cell in a
+required column. `pmo_read_count_by_stage_table_to_pmo()` takes `wide = TRUE`
+for a wide table with one stage column.
 
 ## Citation
 
