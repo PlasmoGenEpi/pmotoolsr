@@ -15,8 +15,8 @@ pmo_extract_allele_counts_freq(
 \arguments{
 \item{pmo}{A \code{PortableMicrohaplotypeObject} or parsed PMO list.}
 
-\item{bioinformatics_run_ids}{Optional integer vector of 1-based run ids to
-include.}
+\item{bioinformatics_run_ids}{Optional vector of 1-based run ids to include
+(or run labels, for sets that have no run id).}
 
 \item{library_sample_names}{Optional character vector of library sample names
 to include.}
@@ -31,7 +31,8 @@ A tibble. If \code{collapse_across_runs = FALSE}: columns
 \code{bioinformatics_run_id}, \code{target_name}, \code{mhap_id}, \code{count}, \code{freq},
 \code{total_haps_per_target}. If \code{TRUE}: \code{target_name}, \code{mhap_id}, \code{count},
 \code{freq}, \code{target_total}. Note: \code{mhap_id} and \code{bioinformatics_run_id} are
-1-based.
+1-based. \code{bioinformatics_run_id} is an integer column, or a character
+column of run labels if any set has no run id.
 }
 \description{
 Tallies, per bioinformatics run and target, how many samples carry each
@@ -39,8 +40,11 @@ representative microhaplotype, and the within-target frequency. This is the
 table consumed by downstream tools such as dcifer and moire.
 }
 \details{
-Requires each detected-microhaplotypes set to have a \code{bioinformatics_run_id};
-an informative error is raised if that optional field is absent.
+A detected-microhaplotypes set normally carries a \code{bioinformatics_run_id}. A
+PMO built without \code{bioinformatics_run_info} has none, and each set is then
+labelled with its \code{bioinformatics_run_name}, or failing that with
+\verb{detected_microhaplotypes_count_idx_<n>} (its 0-based position, as in
+\code{\link[=pmo_count_targets_per_library_sample]{pmo_count_targets_per_library_sample()}}).
 }
 \examples{
 p <- read_pmo(

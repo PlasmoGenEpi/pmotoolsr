@@ -10,21 +10,6 @@
 # later replaces the names with target/library ids.
 
 #' @keywords internal
-.check_additional_columns_exist <- function(df, cols) {
-  if (length(cols) > 0) {
-    missing <- setdiff(cols, names(df))
-    if (length(missing) > 0) {
-      stop("Missing additional columns: ", paste(missing, collapse = ", "))
-    }
-  }
-}
-
-#' @keywords internal
-.present <- function(x) {
-  length(x) == 1 && !is.null(x) && !is.na(x)
-}
-
-#' @keywords internal
 .create_representative_microhaplotype_dict <- function(
     microhaplotype_table, target_name_col = "target_name", seq_col = "seq",
     genome_id = 1, chrom_col = NULL, start_col = NULL, end_col = NULL,
@@ -38,10 +23,6 @@
     pseudocigar_generation_description_col = NULL, quality_col = NULL,
     additional_representative_mhap_cols = NULL) {
 
-  if (!is.null(additional_representative_mhap_cols)) {
-    .check_additional_columns_exist(microhaplotype_table,
-                                    additional_representative_mhap_cols)
-  }
 
   # the pseudocigar's reference location shares the chromosome / genome with the
   # microhaplotype location by default, but each may use its own column
@@ -97,7 +78,7 @@
     s <- row[[masking_seq_start_col]]
     sz <- row[[masking_seq_segment_size_col]]
     r <- row[[masking_replacement_size_col]]
-    if (!(.present(s) && .present(sz) && .present(r))) return(list())
+    if (!(.has_value(s) && .has_value(sz) && .has_value(r))) return(list())
     starts <- strsplit(as.character(s), masking_delim, fixed = TRUE)[[1]]
     sizes <- strsplit(as.character(sz), masking_delim, fixed = TRUE)[[1]]
     repls <- strsplit(as.character(r), masking_delim, fixed = TRUE)[[1]]
@@ -106,9 +87,14 @@
     for (i in seq_len(n)) {
       if (nzchar(starts[i]) && nzchar(sizes[i]) && nzchar(repls[i])) {
         out[[length(out) + 1L]] <- list(
-          seq_start = as.integer(starts[i]),
-          seq_segment_size = as.integer(sizes[i]),
-          replacement_size = as.integer(repls[i])
+          seq_start = .as_whole_number(
+            starts[i], .arg_label("masking_seq_start_col", masking_seq_start_col)),
+          seq_segment_size = .as_whole_number(
+            sizes[i], .arg_label("masking_seq_segment_size_col",
+                                 masking_seq_segment_size_col)),
+          replacement_size = .as_whole_number(
+            repls[i], .arg_label("masking_replacement_size_col",
+                                 masking_replacement_size_col))
         )
       }
     }
@@ -116,17 +102,17 @@
   }
 
   targets <- list()
-  for (target in sort(unique(unique_table[[target_name_col]]))) {
+  for (target in .sort_c(unique(unique_table[[target_name_col]]))) {
     group <- unique_table[unique_table[[target_name_col]] == target, ,
                           drop = FALSE]
     target_dict <- list(target_name = target, microhaplotypes = list())
-    if (!is.null(chrom_col) && .present(group[[chrom_col]][1])) {
+    if (!is.null(chrom_col) && .has_value(group[[chrom_col]][1])) {
       loc <- list(genome_id = genome_id, chrom = group[[chrom_col]][1],
                   start = group[[start_col]][1], end = group[[end_col]][1])
-      if (!is.null(ref_seq_col) && .present(group[[ref_seq_col]][1])) {
+      if (!is.null(ref_seq_col) && .has_value(group[[ref_seq_col]][1])) {
         loc$ref_seq <- group[[ref_seq_col]][1]
       }
-      if (!is.null(strand_col) && .present(group[[strand_col]][1])) {
+      if (!is.null(strand_col) && .has_value(group[[strand_col]][1])) {
         loc$strand <- group[[strand_col]][1]
       }
       target_dict$mhap_location <- loc
@@ -134,17 +120,17 @@
     for (i in seq_len(nrow(group))) {
       row <- group[i, , drop = FALSE]
       mhap <- list(seq = row[[seq_col]])
-      if (!is.null(alt_annotations_col) && .present(row[[alt_annotations_col]])) {
+      if (!is.null(alt_annotations_col) && .has_value(row[[alt_annotations_col]])) {
         mhap$alt_annotations <- row[[alt_annotations_col]]
       }
       if (!is.null(microhaplotype_name_col) &&
-          .present(row[[microhaplotype_name_col]])) {
+          .has_value(row[[microhaplotype_name_col]])) {
         mhap$microhaplotype_name <- row[[microhaplotype_name_col]]
       }
-      if (!is.null(pseudocigar_col) && .present(row[[pseudocigar_col]])) {
-        if (!(.present(row[[ps_chrom_col]]) &&
-              .present(row[[pseudocigar_start_col]]) &&
-              .present(row[[pseudocigar_end_col]]))) {
+      if (!is.null(pseudocigar_col) && .has_value(row[[pseudocigar_col]])) {
+        if (!(.has_value(row[[ps_chrom_col]]) &&
+              .has_value(row[[pseudocigar_start_col]]) &&
+              .has_value(row[[pseudocigar_end_col]]))) {
           stop("pseudocigar present for a microhaplotype but its ref_loc ",
                "chrom/start/end is missing (target ", target, ", seq ",
                row[[seq_col]], ")")
@@ -153,26 +139,26 @@
                         start = row[[pseudocigar_start_col]],
                         end = row[[pseudocigar_end_col]])
         if (!is.null(pseudocigar_ref_seq_col) &&
-            .present(row[[pseudocigar_ref_seq_col]])) {
+            .has_value(row[[pseudocigar_ref_seq_col]])) {
           ref_loc$ref_seq <- row[[pseudocigar_ref_seq_col]]
         }
         if (!is.null(pseudocigar_strand_col) &&
-            .present(row[[pseudocigar_strand_col]])) {
+            .has_value(row[[pseudocigar_strand_col]])) {
           ref_loc$strand <- row[[pseudocigar_strand_col]]
         }
         ps <- list(pseudocigar_seq = row[[pseudocigar_col]], ref_loc = ref_loc)
         if (!is.null(pseudocigar_generation_description_col) &&
-            .present(row[[pseudocigar_generation_description_col]])) {
+            .has_value(row[[pseudocigar_generation_description_col]])) {
           ps$pseudocigar_generation_description <-
             row[[pseudocigar_generation_description_col]]
         }
         mhap$pseudocigar <- ps
       }
-      if (!is.null(quality_col) && .present(row[[quality_col]])) {
+      if (!is.null(quality_col) && .has_value(row[[quality_col]])) {
         mhap$quality <- row[[quality_col]]
       }
       for (col in additional_representative_mhap_cols) {
-        if (.present(row[[col]])) mhap[[col]] <- row[[col]]
+        if (.has_value(row[[col]])) mhap[[col]] <- row[[col]]
       }
       masking <- extract_masking(row)
       if (length(masking) > 0) mhap$masking <- masking
@@ -231,7 +217,7 @@
   if (!is.null(bioinformatics_run_name)) {
     out$bioinformatics_run_name <- bioinformatics_run_name
   }
-  for (sample in sort(unique(df$library_sample_name))) {
+  for (sample in .sort_c(unique(df$library_sample_name))) {
     sdf <- df[df$library_sample_name == sample, , drop = FALSE]
     target_results <- list()
     for (tid in sort(unique(sdf$mhaps_target_id))) {
@@ -240,7 +226,7 @@
         m <- list()
         for (col in mhap_cols) {
           v <- tdf[[col]][i]
-          if (col %in% always_include || .present(v)) m[[col]] <- v
+          if (col %in% always_include || .has_value(v)) m[[col]] <- v
         }
         m
       })
@@ -274,8 +260,6 @@
     mhap_cols <- c(mhap_cols, "umis")
   }
   if (!is.null(additional_mhap_detected_cols)) {
-    .check_additional_columns_exist(microhaplotype_table,
-                                    additional_mhap_detected_cols)
     for (col in additional_mhap_detected_cols) {
       work[[col]] <- microhaplotype_table[[col]]
     }
@@ -343,6 +327,28 @@ pmo_mhap_table_to_pmo <- function(
     quality_col = NULL, additional_representative_mhap_cols = NULL,
     additional_mhap_detected_cols = NULL) {
 
+  if (!is.data.frame(microhaplotype_table)) {
+    stop("microhaplotype_table must be a data.frame")
+  }
+  .check_columns_exist(
+    microhaplotype_table,
+    .column_arguments(also = c("additional_representative_mhap_cols",
+                               "additional_mhap_detected_cols")),
+    "microhaplotype_table")
+  .check_required_values(microhaplotype_table, list(
+    library_sample_name_col = library_sample_name_col,
+    target_name_col = target_name_col, seq_col = seq_col,
+    reads_col = reads_col), "microhaplotype_table")
+  for (col in unique(c(library_sample_name_col, target_name_col, seq_col))) {
+    microhaplotype_table[[col]] <- .as_text(microhaplotype_table[[col]])
+  }
+  microhaplotype_table[[reads_col]] <- .as_counts(
+    microhaplotype_table[[reads_col]], .arg_label("reads_col", reads_col))
+  if (!is.null(umis_col)) {
+    microhaplotype_table[[umis_col]] <- .as_counts(
+      microhaplotype_table[[umis_col]], .arg_label("umis_col", umis_col))
+  }
+
   rep_dict <- .create_representative_microhaplotype_dict(
     microhaplotype_table = microhaplotype_table,
     target_name_col = target_name_col, seq_col = seq_col, genome_id = genome_id,
@@ -370,6 +376,13 @@ pmo_mhap_table_to_pmo <- function(
   is_col <- !is.null(bioinformatics_run_name) &&
     bioinformatics_run_name %in% names(microhaplotype_table)
   if (is_col) {
+    # a row with no run would otherwise be copied into every run
+    .check_required_values(
+      microhaplotype_table,
+      list(bioinformatics_run_name = bioinformatics_run_name),
+      "microhaplotype_table")
+    microhaplotype_table[[bioinformatics_run_name]] <-
+      .as_text(microhaplotype_table[[bioinformatics_run_name]])
     for (run in unique(microhaplotype_table[[bioinformatics_run_name]])) {
       sub <- microhaplotype_table[
         microhaplotype_table[[bioinformatics_run_name]] == run, , drop = FALSE]
@@ -382,9 +395,12 @@ pmo_mhap_table_to_pmo <- function(
           additional_mhap_detected_cols = additional_mhap_detected_cols)
     }
   } else {
+    run_name <- if (!is.null(bioinformatics_run_name)) {
+      .as_text(bioinformatics_run_name)
+    }
     detected_list[[1L]] <- .create_detected_microhaplotype_dict(
       microhaplotype_table, rep_dict,
-      bioinformatics_run_name = bioinformatics_run_name,
+      bioinformatics_run_name = run_name,
       library_sample_name_col = library_sample_name_col,
       target_name_col = target_name_col, seq_col = seq_col,
       reads_col = reads_col, umis_col = umis_col,
@@ -423,30 +439,40 @@ pmo_minimum_library_specimen_from_mhap_table <- function(
     specimen_name_col = "specimen_name",
     missing_library_sample_becomes_specimen_name = FALSE) {
 
-  all_samples <- list()
+  # A library sample may appear in several bioinformatics runs, so names must be
+  # unique within a run and each distinct name gives one library sample.
+  # pmotools-python requires names to be unique across all runs
+  # (PlasmoGenEpi/pmotools-python#106).
+  names_vec <- character(0)
+  dups <- character(0)
   for (entry in detected_microhaps) {
-    for (s in entry$library_samples) {
-      all_samples[[length(all_samples) + 1L]] <- s
+    run_names <- vapply(entry$library_samples, function(s) {
+      if (is.null(s$library_sample_name)) NA_character_ else
+        as.character(s$library_sample_name)
+    }, character(1))
+    if (anyNA(run_names)) {
+      stop("Some samples are missing 'library_sample_name'")
     }
+    dups <- c(dups, run_names[duplicated(run_names)])
+    names_vec <- c(names_vec, run_names)
   }
-  names_vec <- vapply(all_samples, function(s) {
-    if (is.null(s$library_sample_name)) NA_character_ else s$library_sample_name
-  }, character(1))
-  if (anyNA(names_vec)) {
-    stop("Some samples are missing 'library_sample_name'")
-  }
-  dups <- unique(names_vec[duplicated(names_vec)])
   if (length(dups) > 0) {
-    stop("Duplicate library sample names found: ",
-         paste(sort(dups), collapse = ", "))
+    stop("Duplicate library sample names found within a bioinformatics run: ",
+         paste(.sort_c(unique(dups)), collapse = ", "))
   }
+  names_vec <- unique(names_vec)
 
   key <- NULL
   if (!is.null(library_sample_specimen_key)) {
     if (is.data.frame(library_sample_specimen_key)) {
+      .check_columns_exist(
+        library_sample_specimen_key,
+        list(library_sample_name_col = library_sample_name_col,
+             specimen_name_col = specimen_name_col),
+        "library_sample_specimen_key")
       key <- stats::setNames(
-        as.character(library_sample_specimen_key[[specimen_name_col]]),
-        as.character(library_sample_specimen_key[[library_sample_name_col]]))
+        .as_text(library_sample_specimen_key[[specimen_name_col]]),
+        .as_text(library_sample_specimen_key[[library_sample_name_col]]))
     } else {
       key <- library_sample_specimen_key
     }

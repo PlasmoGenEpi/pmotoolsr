@@ -7,7 +7,8 @@
 write_pmo(pmo, path, pretty = FALSE, auto_unbox = TRUE, validate = TRUE, ...)
 }
 \arguments{
-\item{pmo}{A \code{PortableMicrohaplotypeObject} instance.}
+\item{pmo}{A \code{PortableMicrohaplotypeObject} instance. A PMO list is also
+accepted and is written with \code{\link[=write_pmo_raw]{write_pmo_raw()}}.}
 
 \item{path}{Output path.}
 

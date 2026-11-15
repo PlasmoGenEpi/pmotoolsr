@@ -15,7 +15,8 @@ microhaplotypes) for that target to be counted.}
 \value{
 A tibble with columns \code{bioinformatics_run_id}, \code{library_sample_name},
 \code{target_number}. Note: \code{bioinformatics_run_id} is 1-based; when a detected
-set has no run id, a \verb{detected_microhaplotypes_count_idx_<n>} label is used.
+set has no run id, its \code{bioinformatics_run_name} is used, or failing that
+a \verb{detected_microhaplotypes_count_idx_<n>} label.
 }
 \description{
 Count the number of targets detected per library sample

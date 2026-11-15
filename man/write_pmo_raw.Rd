@@ -4,23 +4,28 @@
 \alias{write_pmo_raw}
 \title{Write a raw PMO nested list to a file}
 \usage{
-write_pmo_raw(x, path, pretty = FALSE, auto_unbox = TRUE)
+write_pmo_raw(x, path, pretty = FALSE, auto_unbox = TRUE, ...)
 }
 \arguments{
-\item{x}{A nested list as returned by \code{read_pmo_raw()}.}
+\item{x}{A nested list as returned by \code{read_pmo_raw()}. A
+\code{PortableMicrohaplotypeObject} is also accepted and is written with
+\code{\link[=write_pmo]{write_pmo()}}, without validation.}
 
 \item{path}{Output path.}
 
 \item{pretty}{Logical; pretty-print the JSON.}
 
 \item{auto_unbox}{Logical; passed to \code{\link[jsonlite:toJSON]{jsonlite::toJSON()}}.}
+
+\item{...}{Additional arguments passed to \code{\link[jsonlite:toJSON]{jsonlite::toJSON()}}.}
 }
 \value{
 Invisibly returns \code{path}.
 }
 \description{
 Writes a PMO represented as nested R lists back to JSON, reapplying
-JSON-facing conventions such as zero-based \verb{_id} fields.
+JSON-facing conventions such as zero-based index fields. The PMO is not
+validated first; use \code{\link[=write_pmo]{write_pmo()}} or \code{\link[=pmo_validate]{pmo_validate()}} for that.
 }
 \examples{
 raw <- read_pmo_raw(

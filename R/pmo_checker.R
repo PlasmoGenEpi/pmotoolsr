@@ -125,8 +125,7 @@ pmo_check_required_base_fields <- function(pmo, schema = NULL) {
   }
   if (is.list(x)) {
     json_ready <- pmo_raw_prepare_for_json(x)
-    return(as.character(jsonlite::toJSON(json_ready, auto_unbox = TRUE,
-                                         na = "string")))
+    return(as.character(.pmo_json_encode(json_ready)))
   }
   stop("cannot convert input to PMO JSON text; supply an R6 PMO, a PMO list, ",
        "a file path, or a JSON string")
@@ -143,8 +142,7 @@ pmo_check_required_base_fields <- function(pmo, schema = NULL) {
       return(schema) # JSON text
     }
     if (is.list(schema)) {
-      return(as.character(jsonlite::toJSON(schema, auto_unbox = TRUE,
-                                           null = "null")))
+      return(as.character(.pmo_json_encode(schema, null = "null")))
     }
     stop("`schema` must be a file path, JSON string, or parsed schema list")
   }

@@ -14,7 +14,8 @@ pmo_read_count_by_stage_table_to_pmo(
   stage_col = "stage",
   read_count_col = "read_count",
   additional_library_sample_cols = NULL,
-  additional_target_cols = NULL
+  additional_target_cols = NULL,
+  wide = length(stage_col) > 1
 )
 }
 \arguments{
@@ -26,13 +27,20 @@ giving its total raw read count.}
 name, or \code{NULL}.}
 
 \item{reads_by_stage_table}{Optional data.frame of per-sample, per-target,
-per-stage read counts; long format (single \code{stage_col}) or wide format
-(pass \code{stage_col} as a vector of stage column names).}
+per-stage read counts. In long format \code{stage_col} names the column holding
+the stage and \code{read_count_col} the count. In wide format each stage has
+its own count column, and \code{stage_col} names those columns (see \code{wide}).}
 
 \item{library_sample_name_col, target_name_col, total_raw_count_col, stage_col, read_count_col}{Column names.}
 
 \item{additional_library_sample_cols, additional_target_cols}{Optional extra
 columns to carry through.}
+
+\item{wide}{\code{TRUE} if \code{reads_by_stage_table} is in wide format, with one
+count column per stage named in \code{stage_col}. The default is \code{TRUE} when
+\code{stage_col} names more than one column. Set it to \code{TRUE} for a wide table
+with a single stage column (pmotools-python tells the two apart by whether
+\code{stage_col} is a list or a string, which R cannot).}
 }
 \value{
 A list of read-count sets (one per run; always a list).

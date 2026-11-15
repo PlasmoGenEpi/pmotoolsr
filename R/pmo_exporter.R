@@ -564,7 +564,7 @@ pmo_extract_alleles_per_sample_table <- function(
             if (!is.null(run_names) && !is.null(run_id)) {
               run_names[run_id]
             } else {
-              paste0("detected_microhaplotypes_count_idx_", detected_count)
+              .run_label_without_id(dm, detected_count)
             }
           for (f in additional_library_sample_info_fields) {
             row[[f]] <- .scalar_or_join(lib_meta[[f]])

@@ -1,14 +1,47 @@
 # Auto-generated R6 classes from JSON Schema
+#
+# Hand edits made since this file was generated. Keep them when it is
+# regenerated (the generator is not in this repository, see
+# PlasmoGenEpi/pmotoolsr#21):
+# - PMO_ID_OWNERS and the `owner` argument of pmo_should_apply_id_offset(),
+#   pmo_raw_postprocess() and pmo_raw_prepare_for_json(): an index field is
+#   shifted only in the object the schema puts it in (#5).
+# - Each to_json() method and write_pmo_raw() call .pmo_json_encode(), so
+#   numbers are not rounded to 4 decimal places (#6).
+# - write_pmo() and write_pmo_raw() accept either representation (#13).
 
 PMO_NA_STRINGS <- c('N/A','NA','Not Applicable','')
 PMO_ID_OFFSET <- 1
 PMO_ARRAY_FIELD_NAMES <- c("additional_argument", "alt_annotations", "alternate_identifiers", "associated_protein_variants", "associated_seq_variants", "associations", "bioinformatics_methods_info", "bioinformatics_run_info", "chromosomes", "detected_microhaplotypes", "drug_usage", "library_sample_info", "library_samples", "markers_of_interest", "masking", "methods", "mhaps", "microhaplotypes", "panel_info", "panel_targets", "parasite_density_info", "project_contributors", "project_info", "qpcr_parasite_density_info", "reactions", "read_counts_by_library_sample_by_stage", "read_counts_by_stage", "read_counts_for_targets", "sequencing_info", "specimen_comments", "specimen_info", "specimen_taxon_id", "stages", "target_attributes", "target_info", "target_results", "targeted_genomes", "targets", "taxon_id", "travel_out_six_month", "treatment_status")
-PMO_ID_EXTRA_FIELDS <- c("panel_targets")
+# The fields the PMO schema defines as indices into another section, each with
+# the fields that hold the objects it appears in (from the 1.0.0 and 1.1.0
+# schemas). Only these are shifted between 0-based (on disk) and 1-based (in
+# memory), and only in those objects. Any other field is data and is left as it
+# is, including a column of your own named like an index field.
+PMO_ID_OWNERS <- list(
+  bioinformatics_methods_id = "bioinformatics_run_info",
+  bioinformatics_run_id = c("detected_microhaplotypes", "read_counts_by_stage"),
+  genome_id = c("associated_seq_variants", "codon_genomic_location", "insert_location", "location", "marker_location", "mhap_location", "protein_location", "ref_loc"),
+  library_sample_id = c("library_samples", "read_counts_by_library_sample_by_stage"),
+  mhap_id = "mhaps",
+  mhaps_target_id = "target_results",
+  panel_id = "library_sample_info",
+  panel_targets = "reactions",
+  project_id = "specimen_info",
+  sequencing_info_id = "library_sample_info",
+  specimen_id = "library_sample_info",
+  target_id = c("read_counts_for_targets", "targets")
+)
+PMO_ID_FIELDS <- names(PMO_ID_OWNERS)
 
 `%||%` <- function(a, b) if (is.null(a)) b else a
 
-pmo_should_apply_id_offset <- function(field_name) {
-  (grepl('_id$', field_name) && !grepl('taxon', field_name, ignore.case = TRUE)) || field_name %in% PMO_ID_EXTRA_FIELDS
+# `owner` is the field holding the object that `field_name` is in (for an
+# object in an array, the array's field). The generated R6 classes call this
+# without an owner, because each class already knows its own index fields.
+pmo_should_apply_id_offset <- function(field_name, owner = NULL) {
+  if (!(field_name %in% PMO_ID_FIELDS)) return(FALSE)
+  is.null(owner) || owner %in% PMO_ID_OWNERS[[field_name]]
 }
 
 #' Open a text connection, optionally compressed
@@ -31,22 +64,23 @@ open_text_connection <- function(path, mode = c('rt', 'wt')) {
 }
 
 #' @keywords internal
-pmo_apply_id_offset_read <- function(x, field_name, offset = PMO_ID_OFFSET) {
-  if (offset == 0 || is.null(x) || !pmo_should_apply_id_offset(field_name)) return(x)
+pmo_apply_id_offset_read <- function(x, field_name, offset = PMO_ID_OFFSET, owner = NULL) {
+  if (offset == 0 || is.null(x) || !pmo_should_apply_id_offset(field_name, owner)) return(x)
   if (length(x) == 0) return(x)
-  if (is.list(x)) return(x)
+  if (!is.numeric(x)) return(x)
   ifelse(is.na(x), x, x + offset)
 }
 
 #' @keywords internal
-pmo_apply_id_offset_write <- function(x, field_name, offset = PMO_ID_OFFSET) {
-  if (offset == 0 || is.null(x) || !pmo_should_apply_id_offset(field_name)) return(x)
+pmo_apply_id_offset_write <- function(x, field_name, offset = PMO_ID_OFFSET, owner = NULL) {
+  if (offset == 0 || is.null(x) || !pmo_should_apply_id_offset(field_name, owner)) return(x)
   if (length(x) == 0) return(x)
-  if (is.list(x)) return(x)
+  if (!is.numeric(x)) return(x)
   ifelse(is.na(x), x, x - offset)
 }
 
-pmo_raw_postprocess <- function(x) {
+# `owner` is the field that holds `x`; "" for the root of a PMO.
+pmo_raw_postprocess <- function(x, owner = "") {
   if (is.null(x)) return(NULL)
   if (is.atomic(x)) return(x)
   if (!is.list(x)) return(x)
@@ -56,7 +90,7 @@ pmo_raw_postprocess <- function(x) {
       v <- out[[nm]]
       if (is.list(v) && is.null(names(v))) {
         if (length(v) == 0) {
-          if (pmo_should_apply_id_offset(nm)) out[[nm]] <- numeric() else out[[nm]] <- list()
+          if (pmo_should_apply_id_offset(nm, owner)) out[[nm]] <- numeric() else out[[nm]] <- list()
         } else if (all(vapply(v, function(.x) is.null(.x) || is.character(.x) || (length(.x) == 1 && is.na(.x)), logical(1)))) {
           out[[nm]] <- as.character(unlist(v, use.names = FALSE))
         } else if (all(vapply(v, function(.x) is.null(.x) || is.logical(.x) || (length(.x) == 1 && is.na(.x)), logical(1)))) {
@@ -64,13 +98,13 @@ pmo_raw_postprocess <- function(x) {
         } else if (all(vapply(v, function(.x) is.null(.x) || is.numeric(.x) || (length(.x) == 1 && is.na(.x)), logical(1)))) {
           out[[nm]] <- as.numeric(unlist(v, use.names = FALSE))
         } else {
-          out[[nm]] <- lapply(v, pmo_raw_postprocess)
+          out[[nm]] <- lapply(v, pmo_raw_postprocess, owner = nm)
         }
       } else {
-        out[[nm]] <- pmo_raw_postprocess(v)
+        out[[nm]] <- pmo_raw_postprocess(v, owner = nm)
       }
-      if (pmo_should_apply_id_offset(nm)) {
-        out[[nm]] <- pmo_apply_id_offset_read(out[[nm]], nm)
+      if (pmo_should_apply_id_offset(nm, owner)) {
+        out[[nm]] <- pmo_apply_id_offset_read(out[[nm]], nm, owner = owner)
       }
     }
     return(out)
@@ -79,10 +113,12 @@ pmo_raw_postprocess <- function(x) {
   if (all(vapply(x, function(.x) is.null(.x) || is.character(.x) || (length(.x) == 1 && is.na(.x)), logical(1)))) return(as.character(unlist(x, use.names = FALSE)))
   if (all(vapply(x, function(.x) is.null(.x) || is.logical(.x) || (length(.x) == 1 && is.na(.x)), logical(1)))) return(as.logical(unlist(x, use.names = FALSE)))
   if (all(vapply(x, function(.x) is.null(.x) || is.numeric(.x) || (length(.x) == 1 && is.na(.x)), logical(1)))) return(as.numeric(unlist(x, use.names = FALSE)))
-  lapply(x, pmo_raw_postprocess)
+  lapply(x, pmo_raw_postprocess, owner = owner)
 }
 
-pmo_raw_prepare_for_json <- function(x, field_name = NULL) {
+# `field_name` is the field that holds `x` (NULL for an element of an array);
+# `owner` is the field that holds the object or array `x` is in.
+pmo_raw_prepare_for_json <- function(x, field_name = NULL, owner = "") {
   if (is.null(x)) return(NULL)
   if (is.atomic(x)) {
     if (!is.null(field_name) && field_name %in% PMO_ARRAY_FIELD_NAMES) return(I(x))
@@ -91,19 +127,22 @@ pmo_raw_prepare_for_json <- function(x, field_name = NULL) {
   if (!is.list(x)) return(x)
   if (!is.null(names(x))) {
     out <- x
+    here <- field_name %||% owner
     for (nm in names(out)) {
       v <- out[[nm]]
-      if (pmo_should_apply_id_offset(nm)) {
-        v <- pmo_apply_id_offset_write(v, nm)
+      if (pmo_should_apply_id_offset(nm, here)) {
+        v <- pmo_apply_id_offset_write(v, nm, owner = here)
       }
-      out[[nm]] <- pmo_raw_prepare_for_json(v, nm)
+      out[[nm]] <- pmo_raw_prepare_for_json(v, nm, owner = here)
     }
     return(out)
   }
+  # the elements of an array are in the field that holds the array
+  here <- field_name %||% owner
   if (!is.null(field_name) && field_name %in% PMO_ARRAY_FIELD_NAMES) {
-    return(I(lapply(x, function(.x) pmo_raw_prepare_for_json(.x, NULL))))
+    return(I(lapply(x, function(.x) pmo_raw_prepare_for_json(.x, NULL, owner = here))))
   }
-  lapply(x, function(.x) pmo_raw_prepare_for_json(.x, NULL))
+  lapply(x, function(.x) pmo_raw_prepare_for_json(.x, NULL, owner = here))
 }
 
 #' BioMethod
@@ -203,7 +242,7 @@ BioMethod <- R6::R6Class(
     #' @param auto_unbox Logical; passed to [jsonlite::toJSON()].
     #' @param ... Additional arguments passed to [jsonlite::toJSON()].
     to_json = function(pretty = FALSE, auto_unbox = TRUE, ...) {
-      jsonlite::toJSON(self$to_json_list(), pretty = pretty, auto_unbox = auto_unbox, na = "string", ...)
+      .pmo_json_encode(self$to_json_list(), pretty = pretty, auto_unbox = auto_unbox, ...)
     }
   )
 )
@@ -282,7 +321,7 @@ BioinformaticsMethodInfo <- R6::R6Class(
     #' @param auto_unbox Logical; passed to [jsonlite::toJSON()].
     #' @param ... Additional arguments passed to [jsonlite::toJSON()].
     to_json = function(pretty = FALSE, auto_unbox = TRUE, ...) {
-      jsonlite::toJSON(self$to_json_list(), pretty = pretty, auto_unbox = auto_unbox, na = "string", ...)
+      .pmo_json_encode(self$to_json_list(), pretty = pretty, auto_unbox = auto_unbox, ...)
     }
   )
 )
@@ -380,7 +419,7 @@ BioinformaticsRunInfo <- R6::R6Class(
     #' @param auto_unbox Logical; passed to [jsonlite::toJSON()].
     #' @param ... Additional arguments passed to [jsonlite::toJSON()].
     to_json = function(pretty = FALSE, auto_unbox = TRUE, ...) {
-      jsonlite::toJSON(self$to_json_list(), pretty = pretty, auto_unbox = auto_unbox, na = "string", ...)
+      .pmo_json_encode(self$to_json_list(), pretty = pretty, auto_unbox = auto_unbox, ...)
     }
   )
 )
@@ -480,7 +519,7 @@ MicrohaplotypeForTarget <- R6::R6Class(
     #' @param auto_unbox Logical; passed to [jsonlite::toJSON()].
     #' @param ... Additional arguments passed to [jsonlite::toJSON()].
     to_json = function(pretty = FALSE, auto_unbox = TRUE, ...) {
-      jsonlite::toJSON(self$to_json_list(), pretty = pretty, auto_unbox = auto_unbox, na = "string", ...)
+      .pmo_json_encode(self$to_json_list(), pretty = pretty, auto_unbox = auto_unbox, ...)
     }
   )
 )
@@ -569,7 +608,7 @@ DetectedMicrohaplotypesForTarget <- R6::R6Class(
     #' @param auto_unbox Logical; passed to [jsonlite::toJSON()].
     #' @param ... Additional arguments passed to [jsonlite::toJSON()].
     to_json = function(pretty = FALSE, auto_unbox = TRUE, ...) {
-      jsonlite::toJSON(self$to_json_list(), pretty = pretty, auto_unbox = auto_unbox, na = "string", ...)
+      .pmo_json_encode(self$to_json_list(), pretty = pretty, auto_unbox = auto_unbox, ...)
     }
   )
 )
@@ -658,7 +697,7 @@ DetectedMicrohaplotypesForSample <- R6::R6Class(
     #' @param auto_unbox Logical; passed to [jsonlite::toJSON()].
     #' @param ... Additional arguments passed to [jsonlite::toJSON()].
     to_json = function(pretty = FALSE, auto_unbox = TRUE, ...) {
-      jsonlite::toJSON(self$to_json_list(), pretty = pretty, auto_unbox = auto_unbox, na = "string", ...)
+      .pmo_json_encode(self$to_json_list(), pretty = pretty, auto_unbox = auto_unbox, ...)
     }
   )
 )
@@ -747,7 +786,7 @@ DetectedMicrohaplotypes <- R6::R6Class(
     #' @param auto_unbox Logical; passed to [jsonlite::toJSON()].
     #' @param ... Additional arguments passed to [jsonlite::toJSON()].
     to_json = function(pretty = FALSE, auto_unbox = TRUE, ...) {
-      jsonlite::toJSON(self$to_json_list(), pretty = pretty, auto_unbox = auto_unbox, na = "string", ...)
+      .pmo_json_encode(self$to_json_list(), pretty = pretty, auto_unbox = auto_unbox, ...)
     }
   )
 )
@@ -872,7 +911,7 @@ GenomeInfo <- R6::R6Class(
     #' @param auto_unbox Logical; passed to [jsonlite::toJSON()].
     #' @param ... Additional arguments passed to [jsonlite::toJSON()].
     to_json = function(pretty = FALSE, auto_unbox = TRUE, ...) {
-      jsonlite::toJSON(self$to_json_list(), pretty = pretty, auto_unbox = auto_unbox, na = "string", ...)
+      .pmo_json_encode(self$to_json_list(), pretty = pretty, auto_unbox = auto_unbox, ...)
     }
   )
 )
@@ -1008,7 +1047,7 @@ GenomicLocation <- R6::R6Class(
     #' @param auto_unbox Logical; passed to [jsonlite::toJSON()].
     #' @param ... Additional arguments passed to [jsonlite::toJSON()].
     to_json = function(pretty = FALSE, auto_unbox = TRUE, ...) {
-      jsonlite::toJSON(self$to_json_list(), pretty = pretty, auto_unbox = auto_unbox, na = "string", ...)
+      .pmo_json_encode(self$to_json_list(), pretty = pretty, auto_unbox = auto_unbox, ...)
     }
   )
 )
@@ -1114,7 +1153,7 @@ ParasiteDensity <- R6::R6Class(
     #' @param auto_unbox Logical; passed to [jsonlite::toJSON()].
     #' @param ... Additional arguments passed to [jsonlite::toJSON()].
     to_json = function(pretty = FALSE, auto_unbox = TRUE, ...) {
-      jsonlite::toJSON(self$to_json_list(), pretty = pretty, auto_unbox = auto_unbox, na = "string", ...)
+      .pmo_json_encode(self$to_json_list(), pretty = pretty, auto_unbox = auto_unbox, ...)
     }
   )
 )
@@ -1212,7 +1251,7 @@ PlateInfo <- R6::R6Class(
     #' @param auto_unbox Logical; passed to [jsonlite::toJSON()].
     #' @param ... Additional arguments passed to [jsonlite::toJSON()].
     to_json = function(pretty = FALSE, auto_unbox = TRUE, ...) {
-      jsonlite::toJSON(self$to_json_list(), pretty = pretty, auto_unbox = auto_unbox, na = "string", ...)
+      .pmo_json_encode(self$to_json_list(), pretty = pretty, auto_unbox = auto_unbox, ...)
     }
   )
 )
@@ -1374,7 +1413,7 @@ LibrarySampleInfo <- R6::R6Class(
     #' @param auto_unbox Logical; passed to [jsonlite::toJSON()].
     #' @param ... Additional arguments passed to [jsonlite::toJSON()].
     to_json = function(pretty = FALSE, auto_unbox = TRUE, ...) {
-      jsonlite::toJSON(self$to_json_list(), pretty = pretty, auto_unbox = auto_unbox, na = "string", ...)
+      .pmo_json_encode(self$to_json_list(), pretty = pretty, auto_unbox = auto_unbox, ...)
     }
   )
 )
@@ -1461,7 +1500,7 @@ MarkerOfInterest <- R6::R6Class(
     #' @param auto_unbox Logical; passed to [jsonlite::toJSON()].
     #' @param ... Additional arguments passed to [jsonlite::toJSON()].
     to_json = function(pretty = FALSE, auto_unbox = TRUE, ...) {
-      jsonlite::toJSON(self$to_json_list(), pretty = pretty, auto_unbox = auto_unbox, na = "string", ...)
+      .pmo_json_encode(self$to_json_list(), pretty = pretty, auto_unbox = auto_unbox, ...)
     }
   )
 )
@@ -1570,7 +1609,7 @@ MaskingInfo <- R6::R6Class(
     #' @param auto_unbox Logical; passed to [jsonlite::toJSON()].
     #' @param ... Additional arguments passed to [jsonlite::toJSON()].
     to_json = function(pretty = FALSE, auto_unbox = TRUE, ...) {
-      jsonlite::toJSON(self$to_json_list(), pretty = pretty, auto_unbox = auto_unbox, na = "string", ...)
+      .pmo_json_encode(self$to_json_list(), pretty = pretty, auto_unbox = auto_unbox, ...)
     }
   )
 )
@@ -1659,7 +1698,7 @@ ReactionInfo <- R6::R6Class(
     #' @param auto_unbox Logical; passed to [jsonlite::toJSON()].
     #' @param ... Additional arguments passed to [jsonlite::toJSON()].
     to_json = function(pretty = FALSE, auto_unbox = TRUE, ...) {
-      jsonlite::toJSON(self$to_json_list(), pretty = pretty, auto_unbox = auto_unbox, na = "string", ...)
+      .pmo_json_encode(self$to_json_list(), pretty = pretty, auto_unbox = auto_unbox, ...)
     }
   )
 )
@@ -1747,7 +1786,7 @@ PanelInfo <- R6::R6Class(
     #' @param auto_unbox Logical; passed to [jsonlite::toJSON()].
     #' @param ... Additional arguments passed to [jsonlite::toJSON()].
     to_json = function(pretty = FALSE, auto_unbox = TRUE, ...) {
-      jsonlite::toJSON(self$to_json_list(), pretty = pretty, auto_unbox = auto_unbox, na = "string", ...)
+      .pmo_json_encode(self$to_json_list(), pretty = pretty, auto_unbox = auto_unbox, ...)
     }
   )
 )
@@ -1835,7 +1874,7 @@ PmoGenerationMethod <- R6::R6Class(
     #' @param auto_unbox Logical; passed to [jsonlite::toJSON()].
     #' @param ... Additional arguments passed to [jsonlite::toJSON()].
     to_json = function(pretty = FALSE, auto_unbox = TRUE, ...) {
-      jsonlite::toJSON(self$to_json_list(), pretty = pretty, auto_unbox = auto_unbox, na = "string", ...)
+      .pmo_json_encode(self$to_json_list(), pretty = pretty, auto_unbox = auto_unbox, ...)
     }
   )
 )
@@ -1931,7 +1970,7 @@ PmoHeader <- R6::R6Class(
     #' @param auto_unbox Logical; passed to [jsonlite::toJSON()].
     #' @param ... Additional arguments passed to [jsonlite::toJSON()].
     to_json = function(pretty = FALSE, auto_unbox = TRUE, ...) {
-      jsonlite::toJSON(self$to_json_list(), pretty = pretty, auto_unbox = auto_unbox, na = "string", ...)
+      .pmo_json_encode(self$to_json_list(), pretty = pretty, auto_unbox = auto_unbox, ...)
     }
   )
 )
@@ -2054,7 +2093,7 @@ ProjectInfo <- R6::R6Class(
     #' @param auto_unbox Logical; passed to [jsonlite::toJSON()].
     #' @param ... Additional arguments passed to [jsonlite::toJSON()].
     to_json = function(pretty = FALSE, auto_unbox = TRUE, ...) {
-      jsonlite::toJSON(self$to_json_list(), pretty = pretty, auto_unbox = auto_unbox, na = "string", ...)
+      .pmo_json_encode(self$to_json_list(), pretty = pretty, auto_unbox = auto_unbox, ...)
     }
   )
 )
@@ -2143,7 +2182,7 @@ StageReadCounts <- R6::R6Class(
     #' @param auto_unbox Logical; passed to [jsonlite::toJSON()].
     #' @param ... Additional arguments passed to [jsonlite::toJSON()].
     to_json = function(pretty = FALSE, auto_unbox = TRUE, ...) {
-      jsonlite::toJSON(self$to_json_list(), pretty = pretty, auto_unbox = auto_unbox, na = "string", ...)
+      .pmo_json_encode(self$to_json_list(), pretty = pretty, auto_unbox = auto_unbox, ...)
     }
   )
 )
@@ -2232,7 +2271,7 @@ ReadCountsByStageForTarget <- R6::R6Class(
     #' @param auto_unbox Logical; passed to [jsonlite::toJSON()].
     #' @param ... Additional arguments passed to [jsonlite::toJSON()].
     to_json = function(pretty = FALSE, auto_unbox = TRUE, ...) {
-      jsonlite::toJSON(self$to_json_list(), pretty = pretty, auto_unbox = auto_unbox, na = "string", ...)
+      .pmo_json_encode(self$to_json_list(), pretty = pretty, auto_unbox = auto_unbox, ...)
     }
   )
 )
@@ -2331,7 +2370,7 @@ ReadCountsByStageForLibrarySample <- R6::R6Class(
     #' @param auto_unbox Logical; passed to [jsonlite::toJSON()].
     #' @param ... Additional arguments passed to [jsonlite::toJSON()].
     to_json = function(pretty = FALSE, auto_unbox = TRUE, ...) {
-      jsonlite::toJSON(self$to_json_list(), pretty = pretty, auto_unbox = auto_unbox, na = "string", ...)
+      .pmo_json_encode(self$to_json_list(), pretty = pretty, auto_unbox = auto_unbox, ...)
     }
   )
 )
@@ -2420,7 +2459,7 @@ ReadCountsByStage <- R6::R6Class(
     #' @param auto_unbox Logical; passed to [jsonlite::toJSON()].
     #' @param ... Additional arguments passed to [jsonlite::toJSON()].
     to_json = function(pretty = FALSE, auto_unbox = TRUE, ...) {
-      jsonlite::toJSON(self$to_json_list(), pretty = pretty, auto_unbox = auto_unbox, na = "string", ...)
+      .pmo_json_encode(self$to_json_list(), pretty = pretty, auto_unbox = auto_unbox, ...)
     }
   )
 )
@@ -2524,7 +2563,7 @@ ProteinVariant <- R6::R6Class(
     #' @param auto_unbox Logical; passed to [jsonlite::toJSON()].
     #' @param ... Additional arguments passed to [jsonlite::toJSON()].
     to_json = function(pretty = FALSE, auto_unbox = TRUE, ...) {
-      jsonlite::toJSON(self$to_json_list(), pretty = pretty, auto_unbox = auto_unbox, na = "string", ...)
+      .pmo_json_encode(self$to_json_list(), pretty = pretty, auto_unbox = auto_unbox, ...)
     }
   )
 )
@@ -2620,7 +2659,7 @@ Pseudocigar <- R6::R6Class(
     #' @param auto_unbox Logical; passed to [jsonlite::toJSON()].
     #' @param ... Additional arguments passed to [jsonlite::toJSON()].
     to_json = function(pretty = FALSE, auto_unbox = TRUE, ...) {
-      jsonlite::toJSON(self$to_json_list(), pretty = pretty, auto_unbox = auto_unbox, na = "string", ...)
+      .pmo_json_encode(self$to_json_list(), pretty = pretty, auto_unbox = auto_unbox, ...)
     }
   )
 )
@@ -2760,7 +2799,7 @@ RepresentativeMicrohaplotype <- R6::R6Class(
     #' @param auto_unbox Logical; passed to [jsonlite::toJSON()].
     #' @param ... Additional arguments passed to [jsonlite::toJSON()].
     to_json = function(pretty = FALSE, auto_unbox = TRUE, ...) {
-      jsonlite::toJSON(self$to_json_list(), pretty = pretty, auto_unbox = auto_unbox, na = "string", ...)
+      .pmo_json_encode(self$to_json_list(), pretty = pretty, auto_unbox = auto_unbox, ...)
     }
   )
 )
@@ -2857,7 +2896,7 @@ RepresentativeMicrohaplotypesForTarget <- R6::R6Class(
     #' @param auto_unbox Logical; passed to [jsonlite::toJSON()].
     #' @param ... Additional arguments passed to [jsonlite::toJSON()].
     to_json = function(pretty = FALSE, auto_unbox = TRUE, ...) {
-      jsonlite::toJSON(self$to_json_list(), pretty = pretty, auto_unbox = auto_unbox, na = "string", ...)
+      .pmo_json_encode(self$to_json_list(), pretty = pretty, auto_unbox = auto_unbox, ...)
     }
   )
 )
@@ -2936,7 +2975,7 @@ RepresentativeMicrohaplotypes <- R6::R6Class(
     #' @param auto_unbox Logical; passed to [jsonlite::toJSON()].
     #' @param ... Additional arguments passed to [jsonlite::toJSON()].
     to_json = function(pretty = FALSE, auto_unbox = TRUE, ...) {
-      jsonlite::toJSON(self$to_json_list(), pretty = pretty, auto_unbox = auto_unbox, na = "string", ...)
+      .pmo_json_encode(self$to_json_list(), pretty = pretty, auto_unbox = auto_unbox, ...)
     }
   )
 )
@@ -3150,7 +3189,7 @@ SequencingInfo <- R6::R6Class(
     #' @param auto_unbox Logical; passed to [jsonlite::toJSON()].
     #' @param ... Additional arguments passed to [jsonlite::toJSON()].
     to_json = function(pretty = FALSE, auto_unbox = TRUE, ...) {
-      jsonlite::toJSON(self$to_json_list(), pretty = pretty, auto_unbox = auto_unbox, na = "string", ...)
+      .pmo_json_encode(self$to_json_list(), pretty = pretty, auto_unbox = auto_unbox, ...)
     }
   )
 )
@@ -3289,7 +3328,7 @@ TravelInfo <- R6::R6Class(
     #' @param auto_unbox Logical; passed to [jsonlite::toJSON()].
     #' @param ... Additional arguments passed to [jsonlite::toJSON()].
     to_json = function(pretty = FALSE, auto_unbox = TRUE, ...) {
-      jsonlite::toJSON(self$to_json_list(), pretty = pretty, auto_unbox = auto_unbox, na = "string", ...)
+      .pmo_json_encode(self$to_json_list(), pretty = pretty, auto_unbox = auto_unbox, ...)
     }
   )
 )
@@ -3634,7 +3673,7 @@ SpecimenInfo <- R6::R6Class(
     #' @param auto_unbox Logical; passed to [jsonlite::toJSON()].
     #' @param ... Additional arguments passed to [jsonlite::toJSON()].
     to_json = function(pretty = FALSE, auto_unbox = TRUE, ...) {
-      jsonlite::toJSON(self$to_json_list(), pretty = pretty, auto_unbox = auto_unbox, na = "string", ...)
+      .pmo_json_encode(self$to_json_list(), pretty = pretty, auto_unbox = auto_unbox, ...)
     }
   )
 )
@@ -3721,7 +3760,7 @@ PrimerInfo <- R6::R6Class(
     #' @param auto_unbox Logical; passed to [jsonlite::toJSON()].
     #' @param ... Additional arguments passed to [jsonlite::toJSON()].
     to_json = function(pretty = FALSE, auto_unbox = TRUE, ...) {
-      jsonlite::toJSON(self$to_json_list(), pretty = pretty, auto_unbox = auto_unbox, na = "string", ...)
+      .pmo_json_encode(self$to_json_list(), pretty = pretty, auto_unbox = auto_unbox, ...)
     }
   )
 )
@@ -3850,7 +3889,7 @@ TargetInfo <- R6::R6Class(
     #' @param auto_unbox Logical; passed to [jsonlite::toJSON()].
     #' @param ... Additional arguments passed to [jsonlite::toJSON()].
     to_json = function(pretty = FALSE, auto_unbox = TRUE, ...) {
-      jsonlite::toJSON(self$to_json_list(), pretty = pretty, auto_unbox = auto_unbox, na = "string", ...)
+      .pmo_json_encode(self$to_json_list(), pretty = pretty, auto_unbox = auto_unbox, ...)
     }
   )
 )
@@ -4039,7 +4078,7 @@ PortableMicrohaplotypeObject <- R6::R6Class(
     #' @param auto_unbox Logical; passed to [jsonlite::toJSON()].
     #' @param ... Additional arguments passed to [jsonlite::toJSON()].
     to_json = function(pretty = FALSE, auto_unbox = TRUE, ...) {
-      jsonlite::toJSON(self$to_json_list(), pretty = pretty, auto_unbox = auto_unbox, na = "string", ...)
+      .pmo_json_encode(self$to_json_list(), pretty = pretty, auto_unbox = auto_unbox, ...)
     },
 
     #' @description Write this object to a JSON file (compression inferred from the file extension).
@@ -4107,23 +4146,31 @@ read_pmo_raw <- function(path) {
 #' Write a raw PMO nested list to a file
 #'
 #' Writes a PMO represented as nested R lists back to JSON, reapplying
-#' JSON-facing conventions such as zero-based `_id` fields.
+#' JSON-facing conventions such as zero-based index fields. The PMO is not
+#' validated first; use [write_pmo()] or [pmo_validate()] for that.
 #'
-#' @param x A nested list as returned by `read_pmo_raw()`.
+#' @param x A nested list as returned by `read_pmo_raw()`. A
+#'   `PortableMicrohaplotypeObject` is also accepted and is written with
+#'   [write_pmo()], without validation.
 #' @param path Output path.
 #' @param pretty Logical; pretty-print the JSON.
 #' @param auto_unbox Logical; passed to [jsonlite::toJSON()].
+#' @param ... Additional arguments passed to [jsonlite::toJSON()].
 #' @return Invisibly returns `path`.
 #' @examples
 #' raw <- read_pmo_raw(
 #'   system.file('extdata', 'example_pmo.json.gz', package = 'pmotoolsr'))
 #' write_pmo_raw(raw, tempfile(fileext = '.json.gz'))
 #' @export
-write_pmo_raw <- function(x, path, pretty = FALSE, auto_unbox = TRUE) {
+write_pmo_raw <- function(x, path, pretty = FALSE, auto_unbox = TRUE, ...) {
+  if (inherits(x, "PortableMicrohaplotypeObject")) {
+    return(write_pmo(x, path, pretty = pretty, auto_unbox = auto_unbox, validate = FALSE, ...))
+  }
+  if (!is.list(x)) stop("`x` must be a PMO list or a PortableMicrohaplotypeObject")
   json_ready <- pmo_raw_prepare_for_json(x)
   con <- open_text_connection(path, 'wt')
   on.exit(close(con), add = TRUE)
-  writeLines(jsonlite::toJSON(json_ready, pretty = pretty, auto_unbox = auto_unbox, na = 'string'), con = con)
+  writeLines(.pmo_json_encode(json_ready, pretty = pretty, auto_unbox = auto_unbox, ...), con = con)
   invisible(path)
 }
 
@@ -4134,7 +4181,8 @@ write_pmo_raw <- function(x, path, pretty = FALSE, auto_unbox = TRUE) {
 #' Writes a PMO object to JSON, with optional compression inferred
 #' from the file extension.
 #'
-#' @param pmo A `PortableMicrohaplotypeObject` instance.
+#' @param pmo A `PortableMicrohaplotypeObject` instance. A PMO list is also
+#'   accepted and is written with [write_pmo_raw()].
 #' @param path Output path.
 #' @param pretty Logical; pretty-print the JSON.
 #' @param auto_unbox Logical; passed to [jsonlite::toJSON()].
@@ -4148,6 +4196,12 @@ write_pmo_raw <- function(x, path, pretty = FALSE, auto_unbox = TRUE) {
 #' write_pmo(pmo, tempfile(fileext = '.json'))
 #' @export
 write_pmo <- function(pmo, path, pretty = FALSE, auto_unbox = TRUE, validate = TRUE, ...) {
+  if (!inherits(pmo, "PortableMicrohaplotypeObject")) {
+    if (!is.list(pmo)) stop("`pmo` must be a PortableMicrohaplotypeObject or a PMO list")
+    # A plain list is written as it is; the R6 classes are used only to check it.
+    if (validate) pmo_list_to_r6(pmo, validate = TRUE)
+    return(write_pmo_raw(pmo, path, pretty = pretty, auto_unbox = auto_unbox, ...))
+  }
   if (validate) pmo$validate()
   con <- open_text_connection(path, 'wt')
   on.exit(close(con), add = TRUE)

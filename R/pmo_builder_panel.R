@@ -101,26 +101,26 @@
     row <- target_table[i, , drop = FALSE]
     tname <- as.character(row[[cfg$target_name_col]])
     td <- list(target_name = tname)
-    if (!is.null(cfg$gene_name_col) && .present(row[[cfg$gene_name_col]])) {
+    if (!is.null(cfg$gene_name_col) && .has_value(row[[cfg$gene_name_col]])) {
       td$gene_name <- row[[cfg$gene_name_col]]
     }
     if (!is.null(cfg$target_attributes_col) &&
-        .present(row[[cfg$target_attributes_col]])) {
+        .has_value(row[[cfg$target_attributes_col]])) {
       td$target_attributes <- trimws(strsplit(
         as.character(row[[cfg$target_attributes_col]]),
         cfg$target_attributes_col_delimiter, fixed = TRUE)[[1]])
     }
     for (col in cfg$additional_target_info_cols) {
-      if (.present(row[[col]])) td[[col]] <- row[[col]]
+      if (.has_value(row[[col]])) td[[col]] <- row[[col]]
     }
     if (!is.null(cfg$insert_start_col) && !(tname %in% missing$insert)) {
       il <- list(genome_id = gid_for(row), chrom = row[[cfg$chrom_col]],
                  start = as.integer(row[[cfg$insert_start_col]]),
                  end = as.integer(row[[cfg$insert_end_col]]))
-      if (!is.null(cfg$strand_col) && .present(row[[cfg$strand_col]])) {
+      if (!is.null(cfg$strand_col) && .has_value(row[[cfg$strand_col]])) {
         il$strand <- row[[cfg$strand_col]]
       }
-      if (!is.null(cfg$ref_seq_col) && .present(row[[cfg$ref_seq_col]])) {
+      if (!is.null(cfg$ref_seq_col) && .has_value(row[[cfg$ref_seq_col]])) {
         il$ref_seq <- row[[cfg$ref_seq_col]]
       }
       td$insert_location <- il
@@ -131,7 +131,7 @@
       loc <- list(genome_id = gid_for(row), chrom = row[[cfg$chrom_col]],
                   start = as.integer(row[[cfg$forward_primers_start_col]]),
                   end = as.integer(row[[cfg$forward_primers_end_col]]))
-      if (!is.null(cfg$strand_col) && .present(row[[cfg$strand_col]])) {
+      if (!is.null(cfg$strand_col) && .has_value(row[[cfg$strand_col]])) {
         loc$strand <- row[[cfg$strand_col]]
       }
       fwd$location <- loc
@@ -140,7 +140,7 @@
       loc <- list(genome_id = gid_for(row), chrom = row[[cfg$chrom_col]],
                   start = as.integer(row[[cfg$reverse_primers_start_col]]),
                   end = as.integer(row[[cfg$reverse_primers_end_col]]))
-      if (!is.null(cfg$strand_col) && .present(row[[cfg$strand_col]])) {
+      if (!is.null(cfg$strand_col) && .has_value(row[[cfg$strand_col]])) {
         loc$strand <- row[[cfg$strand_col]]
       }
       rev$location <- loc
@@ -248,7 +248,14 @@ pmo_panel_info_table_to_pmo <- function(
   if (!is.data.frame(target_table)) {
     stop("target_table must be a data.frame")
   }
-  .check_additional_columns_exist(target_table, additional_target_info_cols)
+  .check_columns_exist(
+    target_table, .column_arguments(also = "additional_target_info_cols"),
+    "target_table")
+  .check_required_values(target_table, list(
+    target_name_col = target_name_col,
+    forward_primers_seq_col = forward_primers_seq_col,
+    reverse_primers_seq_col = reverse_primers_seq_col), "target_table")
+  target_table[[target_name_col]] <- .as_text(target_table[[target_name_col]])
 
   cfg <- list(
     panel_name = panel_name, target_name_col = target_name_col,
@@ -325,8 +332,7 @@ pmo_panel_info_table_to_pmo <- function(
 
 #' @keywords internal
 .genome_signature <- function(g) {
-  as.character(jsonlite::toJSON(.canonicalise(g), auto_unbox = TRUE,
-                                null = "null"))
+  as.character(.pmo_json_encode(.canonicalise(g), null = "null"))
 }
 
 #' @keywords internal
