@@ -125,3 +125,17 @@
   }
   as.character(x)
 }
+
+# The label of a detected-microhaplotypes (or read-counts) set that has no
+# bioinformatics_run_id: its run name, or else its 0-based position.
+.run_label_without_id <- function(set, position) {
+  set$bioinformatics_run_name %||%
+    paste0("detected_microhaplotypes_count_idx_", position)
+}
+
+# A copy of a PMO object with one list field emptied, to be refilled. The
+# filters use it so that every other field of the object is kept.
+.copy_with_empty_field <- function(x, field) {
+  x[[field]] <- list()
+  x
+}

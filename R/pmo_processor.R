@@ -326,7 +326,8 @@ utils::globalVariables(c(
 #'   microhaplotypes) for that target to be counted.
 #' @return A tibble with columns `bioinformatics_run_id`, `library_sample_name`,
 #'   `target_number`. Note: `bioinformatics_run_id` is 1-based; when a detected
-#'   set has no run id, a `detected_microhaplotypes_count_idx_<n>` label is used.
+#'   set has no run id, its `bioinformatics_run_name` is used, or failing that
+#'   a `detected_microhaplotypes_count_idx_<n>` label.
 #' @examples
 #' pmo <- read_pmo(
 #'   system.file("extdata", "example_pmo.json.gz", package = "pmotoolsr"))
@@ -338,11 +339,8 @@ pmo_count_targets_per_library_sample <- function(pmo, min_reads = 0) {
   records <- list()
   detected_count <- 0L
   for (result in p$detected_microhaplotypes) {
-    run_id <- if (!is.null(result$bioinformatics_run_id)) {
-      result$bioinformatics_run_id
-    } else {
-      paste0("detected_microhaplotypes_count_idx_", detected_count)
-    }
+    run_id <- result$bioinformatics_run_id %||%
+      .run_label_without_id(result, detected_count)
     detected_count <- detected_count + 1L
     for (sample in result$library_samples) {
       sample_name <- lib_info[[sample$library_sample_id]]$library_sample_name
@@ -382,11 +380,8 @@ pmo_count_library_samples_per_target <- function(pmo, min_reads = 0,
   records <- list()
   detected_count <- 0L
   for (result in p$detected_microhaplotypes) {
-    run_id <- if (!is.null(result$bioinformatics_run_id)) {
-      result$bioinformatics_run_id
-    } else {
-      paste0("detected_microhaplotypes_count_idx_", detected_count)
-    }
+    run_id <- result$bioinformatics_run_id %||%
+      .run_label_without_id(result, detected_count)
     detected_count <- detected_count + 1L
     counts <- integer(0)
     for (sample in result$library_samples) {
@@ -534,12 +529,15 @@ pmo_count_specimen_by_field_value <- function(pmo, meta_fields) {
 #' representative microhaplotype, and the within-target frequency. This is the
 #' table consumed by downstream tools such as dcifer and moire.
 #'
-#' Requires each detected-microhaplotypes set to have a `bioinformatics_run_id`;
-#' an informative error is raised if that optional field is absent.
+#' A detected-microhaplotypes set normally carries a `bioinformatics_run_id`. A
+#' PMO built without `bioinformatics_run_info` has none, and each set is then
+#' labelled with its `bioinformatics_run_name`, or failing that with
+#' `detected_microhaplotypes_count_idx_<n>` (its 0-based position, as in
+#' [pmo_count_targets_per_library_sample()]).
 #'
 #' @param pmo A `PortableMicrohaplotypeObject` or parsed PMO list.
-#' @param bioinformatics_run_ids Optional integer vector of 1-based run ids to
-#'   include.
+#' @param bioinformatics_run_ids Optional vector of 1-based run ids to include
+#'   (or run labels, for sets that have no run id).
 #' @param library_sample_names Optional character vector of library sample names
 #'   to include.
 #' @param target_names Optional character vector of target names to include.
@@ -549,7 +547,8 @@ pmo_count_specimen_by_field_value <- function(pmo, meta_fields) {
 #'   `bioinformatics_run_id`, `target_name`, `mhap_id`, `count`, `freq`,
 #'   `total_haps_per_target`. If `TRUE`: `target_name`, `mhap_id`, `count`,
 #'   `freq`, `target_total`. Note: `mhap_id` and `bioinformatics_run_id` are
-#'   1-based.
+#'   1-based. `bioinformatics_run_id` is an integer column, or a character
+#'   column of run labels if any set has no run id.
 #' @examples
 #' p <- read_pmo(
 #'   system.file("extdata", "example_full_pmo.json.gz", package = "pmotoolsr"))
@@ -566,12 +565,16 @@ pmo_extract_allele_counts_freq <- function(pmo,
   target_info <- p$target_info
   counts <- list()
   totals <- list()
+  every_set_has_run_id <- TRUE
+  set_position <- 0L
   for (data_for_run in p$detected_microhaplotypes) {
-    if (is.null(data_for_run$bioinformatics_run_id)) {
-      stop("a detected_microhaplotypes set has no bioinformatics_run_id; ",
-           "this optional field is required for allele extraction")
-    }
     bioid <- data_for_run$bioinformatics_run_id
+    if (is.null(bioid)) {
+      # no bioinformatics_run_info (pmotools-python raises KeyError here)
+      every_set_has_run_id <- FALSE
+      bioid <- .run_label_without_id(data_for_run, set_position)
+    }
+    set_position <- set_position + 1L
     if (!is.null(bioinformatics_run_ids) &&
         !(bioid %in% bioinformatics_run_ids)) {
       next
@@ -602,7 +605,7 @@ pmo_extract_allele_counts_freq <- function(pmo,
   rows <- list()
   for (ck in names(counts)) {
     parts <- strsplit(ck, .PMO_KEY_SEP, fixed = TRUE)[[1]]
-    bioid <- as.integer(parts[1])
+    bioid <- parts[1]
     target <- parts[2]
     mid <- as.integer(parts[3])
     total <- totals[[paste(parts[1], parts[2], sep = .PMO_KEY_SEP)]]
@@ -616,7 +619,18 @@ pmo_extract_allele_counts_freq <- function(pmo,
       total_haps_per_target = as.integer(total)
     )
   }
-  ret <- dplyr::bind_rows(rows)
+  ret <- if (length(rows) > 0) {
+    dplyr::bind_rows(rows)
+  } else {
+    # nothing matched the filters: no rows, the usual columns
+    tibble::tibble(bioinformatics_run_id = character(0),
+                   target_name = character(0), mhap_id = integer(0),
+                   count = integer(0), freq = numeric(0),
+                   total_haps_per_target = integer(0))
+  }
+  if (every_set_has_run_id) {
+    ret$bioinformatics_run_id <- as.integer(ret$bioinformatics_run_id)
+  }
   if (collapse_across_runs) {
     collapsed <- ret |>
       dplyr::group_by(target_name, mhap_id) |>
@@ -641,16 +655,10 @@ pmo_extract_allele_counts_freq <- function(pmo,
 #
 # These return a plain PMO list with 1-based ids, which can be written with
 # write_pmo_raw(). All cross-referencing indices are remapped to the filtered
-# positions. The input is never modified (work happens on a fresh to_list()
-# copy).
-
-#' @keywords internal
-.copy_optional_sections <- function(src, dst, sections) {
-  for (s in sections) {
-    if (!is.null(src[[s]])) dst[[s]] <- src[[s]]
-  }
-  dst
-}
+# positions. Each filter starts from a copy of the input and replaces only the
+# sections it changes, and each object it rebuilds keeps its other fields (run
+# id, run name, anything extra). pmotools-python rebuilds them from fixed lists
+# of fields and drops the rest. The input is never modified.
 
 #' Filter a PMO down to selected library samples
 #'
@@ -677,19 +685,10 @@ pmo_filter_by_library_sample_ids <- function(pmo, library_sample_ids) {
                 collapse = "\n"))
   }
 
-  out <- list(
-    pmo_header = p$pmo_header,
-    panel_info = p$panel_info,
-    target_info = p$target_info,
-    representative_microhaplotypes = p$representative_microhaplotypes,
-    specimen_info = list(),
-    library_sample_info = list(),
-    detected_microhaplotypes = list()
-  )
-  out <- .copy_optional_sections(p, out, c(
-    "sequencing_info", "project_info", "bioinformatics_methods_info",
-    "bioinformatics_run_info", "targeted_genomes"
-  ))
+  out <- p
+  out$specimen_info <- list()
+  out$library_sample_info <- list()
+  out$detected_microhaplotypes <- list()
   has_read_counts <- !is.null(p$read_counts_by_stage)
   if (has_read_counts) out$read_counts_by_stage <- list()
 
@@ -717,10 +716,7 @@ pmo_filter_by_library_sample_ids <- function(pmo, library_sample_ids) {
 
   # detected_microhaplotypes: keep selected samples, remap library_sample_id
   for (dm in p$detected_microhaplotypes) {
-    new_dm <- list(library_samples = list())
-    if (!is.null(dm$bioinformatics_run_id)) {
-      new_dm$bioinformatics_run_id <- dm$bioinformatics_run_id
-    }
+    new_dm <- .copy_with_empty_field(dm, "library_samples")
     for (sample in dm$library_samples) {
       if (sample$library_sample_id %in% library_sample_ids) {
         sample$library_sample_id <-
@@ -735,10 +731,7 @@ pmo_filter_by_library_sample_ids <- function(pmo, library_sample_ids) {
   # read_counts_by_stage: keep selected samples, remap library_sample_id
   if (has_read_counts) {
     for (rc in p$read_counts_by_stage) {
-      new_rc <- list(read_counts_by_library_sample_by_stage = list())
-      if (!is.null(rc$bioinformatics_run_id)) {
-        new_rc$bioinformatics_run_id <- rc$bioinformatics_run_id
-      }
+      new_rc <- .copy_with_empty_field(rc, "read_counts_by_library_sample_by_stage")
       for (sample in rc$read_counts_by_library_sample_by_stage) {
         if (sample$library_sample_id %in% library_sample_ids) {
           sample$library_sample_id <-
@@ -844,16 +837,8 @@ pmo_filter_by_target_ids <- function(pmo, target_ids) {
   }
   if (length(warnings) > 0) stop(paste(warnings, collapse = "\n"))
 
-  out <- list(
-    pmo_header = p$pmo_header,
-    specimen_info = p$specimen_info,
-    library_sample_info = p$library_sample_info,
-    target_info = list()
-  )
-  out <- .copy_optional_sections(p, out, c(
-    "sequencing_info", "project_info", "bioinformatics_methods_info",
-    "bioinformatics_run_info", "targeted_genomes"
-  ))
+  out <- p
+  out$target_info <- list()
 
   # target_info: old 1-based id -> new 1-based index
   target_info_index_key <- integer(0)
@@ -867,7 +852,7 @@ pmo_filter_by_target_ids <- function(pmo, target_ids) {
   # panel_info: keep only reactions retaining at least one target
   out$panel_info <- list()
   for (panel in p$panel_info) {
-    new_panel <- list(panel_name = panel$panel_name, reactions = list())
+    new_panel <- .copy_with_empty_field(panel, "reactions")
     for (reaction in panel$reactions) {
       kept <- integer(0)
       for (pt in unlist(reaction$panel_targets)) {
@@ -876,17 +861,16 @@ pmo_filter_by_target_ids <- function(pmo, target_ids) {
         }
       }
       if (length(kept) > 0) {
-        new_panel$reactions[[length(new_panel$reactions) + 1L]] <- list(
-          reaction_name = reaction$reaction_name,
-          panel_targets = kept
-        )
+        reaction$panel_targets <- kept
+        new_panel$reactions[[length(new_panel$reactions) + 1L]] <- reaction
       }
     }
     out$panel_info[[length(out$panel_info) + 1L]] <- new_panel
   }
 
   # representative_microhaplotypes: old mhaps_target_id -> new index
-  out$representative_microhaplotypes <- list(targets = list())
+  out$representative_microhaplotypes <-
+    .copy_with_empty_field(p$representative_microhaplotypes, "targets")
   mhaps_target_id_new_key <- integer(0)
   for (mi_index in seq_along(rep_targets)) {
     mi <- rep_targets[[mi_index]]
@@ -901,15 +885,9 @@ pmo_filter_by_target_ids <- function(pmo, target_ids) {
   # detected_microhaplotypes: remap mhaps_target_id, drop targets not kept
   out$detected_microhaplotypes <- list()
   for (dm in p$detected_microhaplotypes) {
-    new_dm <- list(library_samples = list())
-    if (!is.null(dm$bioinformatics_run_id)) {
-      new_dm$bioinformatics_run_id <- dm$bioinformatics_run_id
-    }
+    new_dm <- .copy_with_empty_field(dm, "library_samples")
     for (sample in dm$library_samples) {
-      new_sample <- list(
-        library_sample_id = sample$library_sample_id,
-        target_results = list()
-      )
+      new_sample <- .copy_with_empty_field(sample, "target_results")
       for (tr in sample$target_results) {
         key <- as.character(tr$mhaps_target_id)
         if (key %in% names(mhaps_target_id_new_key)) {
@@ -928,15 +906,9 @@ pmo_filter_by_target_ids <- function(pmo, target_ids) {
   if (!is.null(p$read_counts_by_stage)) {
     out$read_counts_by_stage <- list()
     for (rc in p$read_counts_by_stage) {
-      new_rc <- list(read_counts_by_library_sample_by_stage = list())
-      if (!is.null(rc$bioinformatics_run_id)) {
-        new_rc$bioinformatics_run_id <- rc$bioinformatics_run_id
-      }
+      new_rc <- .copy_with_empty_field(rc, "read_counts_by_library_sample_by_stage")
       for (sample in rc$read_counts_by_library_sample_by_stage) {
-        new_sample <- list(
-          library_sample_id = sample$library_sample_id,
-          total_raw_count = sample$total_raw_count
-        )
+        new_sample <- sample
         if (!is.null(sample$read_counts_for_targets)) {
           new_sample$read_counts_for_targets <- list()
           for (tr in sample$read_counts_for_targets) {
@@ -1131,38 +1103,22 @@ pmo_extract_samples_by_meta_groupings <- function(pmo, meta_fields_values) {
 #' @export
 pmo_extract_by_read_filter <- function(pmo, read_filter) {
   p <- .pmo_as_list(pmo)
-  out <- list(
-    pmo_header = p$pmo_header,
-    panel_info = p$panel_info,
-    target_info = p$target_info,
-    specimen_info = p$specimen_info,
-    library_sample_info = p$library_sample_info,
-    representative_microhaplotypes = p$representative_microhaplotypes,
-    detected_microhaplotypes = list()
-  )
-  out <- .copy_optional_sections(p, out, c(
-    "sequencing_info", "project_info", "bioinformatics_methods_info",
-    "bioinformatics_run_info", "targeted_genomes", "read_counts_by_stage"
-  ))
+  out <- p
+  out$detected_microhaplotypes <- list()
 
   for (dm in p$detected_microhaplotypes) {
-    new_dm <- list(library_samples = list())
-    if (!is.null(dm$bioinformatics_run_id)) {
-      new_dm$bioinformatics_run_id <- dm$bioinformatics_run_id
-    }
+    new_dm <- .copy_with_empty_field(dm, "library_samples")
     for (library in dm$library_samples) {
-      new_sample <- list(
-        library_sample_id = library$library_sample_id,
-        target_results = list()
-      )
+      new_sample <- .copy_with_empty_field(library, "target_results")
       for (target in library$target_results) {
         kept <- list()
         for (mh in target$mhaps) {
           if (mh$reads >= read_filter) kept[[length(kept) + 1L]] <- mh
         }
         if (length(kept) > 0) {
+          target$mhaps <- kept
           new_sample$target_results[[length(new_sample$target_results) + 1L]] <-
-            list(mhaps_target_id = target$mhaps_target_id, mhaps = kept)
+            target
         }
       }
       if (length(new_sample$target_results) > 0) {

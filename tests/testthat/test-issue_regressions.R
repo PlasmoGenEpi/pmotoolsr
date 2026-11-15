@@ -546,6 +546,73 @@ test_that("#13 extra JSON arguments reach the encoder for either representation"
   }
 })
 
+# --- #14: run names without bioinformatics_run_info --------------------------
+
+test_that("#14 filters keep bioinformatics_run_name and other extra fields", {
+  pmo <- reg_pmo()
+  pmo$panel_info[[1]]$panel_note <- "keep"
+  pmo$detected_microhaplotypes[[1]]$library_samples[[1]]$note <- "keep"
+  pmo$representative_microhaplotypes$note <- "keep"
+  pmo$top_level_note <- "keep"
+  run_name <- function(p) p$detected_microhaplotypes[[1]]$bioinformatics_run_name
+  expect_equal(run_name(pmo), "run1")
+
+  by_library <- pmo_filter_by_library_sample_ids(pmo, 1L)
+  by_reads <- pmo_extract_by_read_filter(pmo, 1)
+  by_target <- pmo_filter_by_target_ids(pmo, 1L)
+  for (out in list(by_library, by_reads, by_target)) {
+    expect_equal(run_name(out), "run1")
+    expect_equal(out$top_level_note, "keep")
+    expect_equal(out$representative_microhaplotypes$note, "keep")
+  }
+  expect_equal(by_target$panel_info[[1]]$panel_note, "keep")
+  expect_equal(by_target$detected_microhaplotypes[[1]]$library_samples[[1]]$note,
+               "keep")
+  by_target$top_level_note <- NULL
+  by_target$representative_microhaplotypes$note <- NULL
+  expect_true(pmo_validate(by_target))
+})
+
+test_that("#14 the allele table and counts report the run name", {
+  tab <- pmo_extract_alleles_per_sample_table(reg_pmo())
+  expect_equal(unique(tab$bioinformatics_run_name), "run1")
+  expect_equal(unique(pmo_count_targets_per_library_sample(reg_pmo())$
+                        bioinformatics_run_id), "run1")
+  expect_equal(unique(pmo_count_library_samples_per_target(reg_pmo())$
+                        bioinformatics_run_id), "run1")
+})
+
+test_that("#14 allele counts are labelled by run name when there is no run id", {
+  res <- pmo_extract_allele_counts_freq(reg_pmo())
+  expect_equal(res$bioinformatics_run_id, c("run1", "run1"))
+  expect_equal(res$count, c(1L, 1L))
+  expect_equal(res$freq, c(0.5, 0.5))
+  expect_equal(nrow(pmo_extract_allele_counts_freq(
+    reg_pmo(), bioinformatics_run_ids = "run1")), 2L)
+  expect_equal(nrow(pmo_extract_allele_counts_freq(
+    reg_pmo(), bioinformatics_run_ids = "other")), 0L)
+
+  # with neither id nor name, the set is labelled by its position
+  pmo <- pmo_merge_to_pmo(pmo_mhap_table_to_pmo(reg_mhap()),
+                          pmo_panel_info_table_to_pmo(reg_panel(), "panel1"))
+  expect_equal(unique(pmo_extract_allele_counts_freq(pmo)$bioinformatics_run_id),
+               "detected_microhaplotypes_count_idx_0")
+})
+
+test_that("#14 the run id column stays an integer when every set has a run id", {
+  p <- read_pmo(
+    system.file("extdata", "example_full_pmo.json.gz", package = "pmotoolsr"))
+  expect_type(pmo_extract_allele_counts_freq(p)$bioinformatics_run_id, "integer")
+  # filters that match nothing give an empty table, not an error
+  none <- pmo_extract_allele_counts_freq(p, library_sample_names = "no_such_sample")
+  expect_equal(nrow(none), 0L)
+  expect_named(none, c("bioinformatics_run_id", "target_name", "mhap_id", "count",
+                       "freq", "total_haps_per_target"))
+  none <- pmo_extract_allele_counts_freq(p, library_sample_names = "no_such_sample",
+                                         collapse_across_runs = TRUE)
+  expect_named(none, c("target_name", "mhap_id", "count", "freq", "target_total"))
+})
+
 # --- #17: wide read counts with one stage column -----------------------------
 
 test_that("#17 a wide read-count table with one stage column is accepted", {

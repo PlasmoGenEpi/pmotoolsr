@@ -111,10 +111,13 @@ test_that("counts work on the minimum PMO (no run id -> placeholder label)", {
   expect_equal(fields$present_in_specimens_count, 129L)
 })
 
-test_that("allele extraction errors on minimum PMO (no bioinformatics_run_id)", {
+test_that("allele extraction labels the run on a minimum PMO (no bioinformatics_run_id)", {
+  # the fixture's one detected set has neither a run id nor a run name
   pmo <- minimum_pmo()
-  expect_error(
-    pmo_extract_allele_counts_freq(pmo),
-    "no bioinformatics_run_id"
-  )
+  res <- pmo_extract_allele_counts_freq(pmo)
+  expect_gt(nrow(res), 0)
+  expect_equal(unique(res$bioinformatics_run_id),
+               "detected_microhaplotypes_count_idx_0")
+  # counts agree with the allele table built from the same PMO
+  expect_equal(sum(res$count), nrow(pmo_extract_alleles_per_sample_table(pmo)))
 })
