@@ -1199,7 +1199,7 @@ pmo_extract_by_read_filter <- function(pmo, read_filter) {
 pmo_list_to_r6 <- function(pmo_list, validate = TRUE) {
   if (inherits(pmo_list, "PortableMicrohaplotypeObject")) return(pmo_list)
   json_ready <- pmo_raw_prepare_for_json(pmo_list)
-  json <- jsonlite::toJSON(json_ready, auto_unbox = TRUE, na = "string")
+  json <- .pmo_json_encode(json_ready)
   parsed <- jsonlite::fromJSON(json, simplifyVector = FALSE)
   PortableMicrohaplotypeObject$from_json(parsed, validate = validate)
 }

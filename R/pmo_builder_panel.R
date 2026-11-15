@@ -325,8 +325,7 @@ pmo_panel_info_table_to_pmo <- function(
 
 #' @keywords internal
 .genome_signature <- function(g) {
-  as.character(jsonlite::toJSON(.canonicalise(g), auto_unbox = TRUE,
-                                null = "null"))
+  as.character(.pmo_json_encode(.canonicalise(g), null = "null"))
 }
 
 #' @keywords internal
